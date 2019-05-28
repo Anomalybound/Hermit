@@ -3,14 +3,11 @@ using System.ComponentModel;
 using System.Reflection;
 using Hermit.DataBinding;
 using UnityEngine;
-using Component = UnityEngine.Component;
 
 namespace Hermit
 {
     public class OneWayPropertyBinding : DataBindingBase
     {
-        public Component DataProvider;
-
         [SerializeField]
         private string _viewModelEntry;
 
@@ -18,12 +15,30 @@ namespace Hermit
         private string _viewEntry;
 
         [SerializeField]
-        private string _adapterType;
+        private string viewAdapterType;
 
         [SerializeField]
-        private AdapterOptions _adapterOptions;
+        private AdapterOptions _viewAdapterOptions;
 
         #region Properties
+
+        public string ViewAdapterType
+        {
+            get => viewAdapterType;
+            set
+            {
+#if UNITY_EDITOR
+                UnityEditor.EditorUtility.SetDirty(this);
+#endif
+                viewAdapterType = value;
+            }
+        }
+
+        public AdapterOptions AdapterOptions
+        {
+            get => _viewAdapterOptions;
+            set => _viewAdapterOptions = value;
+        }
 
         public string ViewModelEntry
         {
@@ -49,127 +64,114 @@ namespace Hermit
             }
         }
 
-        public string AdapterType
-        {
-            get => _adapterType;
-            set
-            {
-#if UNITY_EDITOR
-                UnityEditor.EditorUtility.SetDirty(this);
-#endif
-                _adapterType = value;
-            }
-        }
-
-        public AdapterOptions AdapterOptions
-        {
-            get => _adapterOptions;
-            set => _adapterOptions = value;
-        }
-
         #endregion
 
         #region Runtime Variables
 
-        private ViewModel _viewModel;
+        protected string ViewModelMemberName;
 
-        private string _viewModelMemberName;
+        protected Action<object> ViewSetter;
 
-        private IAdapter _adapterInstance;
+        protected Func<object> ViewGetter;
 
-        private Action<object> _viewSetter;
+        protected Action<object> ViewModelSetter;
 
-        private Func<object> _viewModelGetter;
+        protected Func<object> ViewModelGetter;
+
+        protected IAdapter ViewAdapterInstance;
+
+        protected bool PropertyChanging;
 
         #endregion
 
-        protected void Awake()
+        protected override void Awake()
         {
-            if (DataProvider is IViewModelProvider provider) { _viewModel = provider.GetViewModel(); }
+            base.Awake();
 
-            if (string.IsNullOrEmpty(_adapterType)) { return; }
+            BindView2ViewModel();
 
-            _adapterInstance = Her.Resolve<IAdapter>(_adapterType);
+            SetupViewAdapter();
         }
 
-        private void OnEnable()
+        protected virtual void OnEnable()
         {
-            if (_viewModel != null) { _viewModel.PropertyChanged += OnPropertyChanged; }
+            if (ViewModel != null) { ViewModel.PropertyChanged += OnPropertyChanged; }
 
-            Bind(ViewEntry, ViewModelEntry);
+            UpdateProperty();
         }
 
-        private void OnDisable()
+        protected virtual void OnDisable()
         {
-            if (_viewModel != null) { _viewModel.PropertyChanged -= OnPropertyChanged; }
+            if (ViewModel != null) { ViewModel.PropertyChanged -= OnPropertyChanged; }
         }
 
-        private void OnPropertyChanged(object sender, PropertyChangedEventArgs e)
+        protected virtual void OnPropertyChanged(object sender, PropertyChangedEventArgs e)
         {
-            if (_viewModelMemberName != e.PropertyName) { return; }
+            if (ViewModelMemberName != e.PropertyName) { return; }
 
-            var rawValue = _viewModelGetter.Invoke();
-            var convertedValue = _adapterInstance?.Covert(rawValue, _adapterOptions);
-            _viewSetter.Invoke(_adapterInstance != null ? convertedValue : rawValue);
+            if (!PropertyChanging) { UpdateProperty(); }
         }
 
-        private void Bind(string viewPropertyName, string viewModelPropertyName)
+        protected void UpdateProperty()
+        {
+            var rawValue = ViewModelGetter.Invoke();
+            var convertedValue = ViewAdapterInstance?.Covert(rawValue, _viewAdapterOptions);
+            ViewSetter.Invoke(ViewAdapterInstance != null ? convertedValue : rawValue);
+        }
+
+        protected void SetupViewAdapter()
+        {
+            if (string.IsNullOrEmpty(viewAdapterType)) { return; }
+
+            ViewAdapterInstance = Her.Resolve<IAdapter>(viewAdapterType);
+        }
+
+        protected void BindView2ViewModel()
         {
             #region View 
 
-            var (typeName, memberName) = ParseEndPointReference(viewPropertyName);
-
-            var component = GetComponent(typeName);
-            if (component == null) { throw new Exception($"Can't find component of type: {typeName}."); }
-
-            var viewMemberInfos = component.GetType().GetMember(memberName);
-            if (viewMemberInfos.Length <= 0)
-            {
-                throw new Exception($"Can't find member of name: {memberName} on {component}.");
-            }
-
-            var memberInfo = viewMemberInfos[0];
+            var (component, memberInfo) = ParseViewEntry(this, ViewEntry);
 
             switch (memberInfo.MemberType)
             {
                 case MemberTypes.Field:
                     var fieldInfo = memberInfo as FieldInfo;
-                    _viewSetter = value => fieldInfo?.SetValue(component, value);
+                    ViewSetter = value => fieldInfo?.SetValue(component, value);
+                    ViewGetter = () => fieldInfo?.GetValue(component);
                     break;
                 case MemberTypes.Property:
                     var propertyInfo = memberInfo as PropertyInfo;
-                    _viewSetter = value => propertyInfo?.SetValue(component, value);
+                    ViewSetter = value => propertyInfo?.SetValue(component, value);
+                    ViewGetter = () => propertyInfo?.GetValue(component);
                     break;
                 default:
-                    throw new Exception($"MemberType: {memberName} is not supported in one way property binding.");
+                    throw new Exception(
+                        $"MemberType: {memberInfo.MemberType} is not supported in one way property binding.");
             }
 
             #endregion
 
             #region View Model
 
-            (_, _viewModelMemberName) = ParseEndPointReference(viewModelPropertyName);
+            memberInfo = ParseViewModelEntry(ViewModel, ViewModelEntry);
 
-            var viewModelMemberInfos = _viewModel.GetType().GetMember(_viewModelMemberName);
-            if (viewModelMemberInfos.Length <= 0)
-            {
-                throw new Exception($"Can't find member of name: {_viewModelMemberName} on {_viewModel}.");
-            }
-
-            memberInfo = viewModelMemberInfos[0];
+            ViewModelMemberName = memberInfo.Name;
 
             switch (memberInfo.MemberType)
             {
                 case MemberTypes.Field:
                     var fieldInfo = memberInfo as FieldInfo;
-                    _viewModelGetter = () => fieldInfo?.GetValue(_viewModel);
+                    ViewModelGetter = () => fieldInfo?.GetValue(ViewModel);
+                    ViewModelSetter = value => fieldInfo?.SetValue(ViewModel, value);
                     break;
                 case MemberTypes.Property:
                     var propertyInfo = memberInfo as PropertyInfo;
-                    _viewModelGetter = () => propertyInfo?.GetValue(_viewModel);
+                    ViewModelGetter = () => propertyInfo?.GetValue(ViewModel);
+                    ViewModelSetter = value => propertyInfo?.SetValue(ViewModel, value);
                     break;
                 default:
-                    throw new Exception($"MemberType: {memberName} is not supported in one way property binding.");
+                    throw new Exception(
+                        $"MemberType: {memberInfo.MemberType} is not supported in one way property binding.");
             }
 
             #endregion
