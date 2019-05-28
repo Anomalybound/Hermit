@@ -24,7 +24,7 @@ namespace Hermit
             if (DataProvider is IViewModelProvider provider) { ViewModel = provider.GetViewModel(); }
         }
 
-        protected static (string typeName, string memberName) ParseEntryTypeMember(string entry)
+        protected static (string typeName, string memberName) ParseEntry2TypeMember(string entry)
         {
             var lastPeriodIndex = entry.LastIndexOf('.');
             if (lastPeriodIndex == -1) { throw new Exception($"No period was found: {entry}"); }
@@ -46,7 +46,7 @@ namespace Hermit
 
         protected static MemberInfo ParseViewModelEntry(ViewModel viewModel, string entry)
         {
-            var (_, memberName) = ParseEntryTypeMember(entry);
+            var (_, memberName) = ParseEntry2TypeMember(entry);
 
             var viewMemberInfos = viewModel.GetType().GetMember(memberName);
             if (viewMemberInfos.Length <= 0)
@@ -61,7 +61,7 @@ namespace Hermit
         protected static (Component component, MemberInfo memberInfo) ParseViewEntry(Component viewProvider,
             string entry)
         {
-            var (typeName, memberName) = ParseEntryTypeMember(entry);
+            var (typeName, memberName) = ParseEntry2TypeMember(entry);
 
             var component = viewProvider.GetComponent(typeName);
             if (component == null)

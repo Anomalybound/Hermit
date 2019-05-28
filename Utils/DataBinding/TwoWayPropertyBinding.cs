@@ -111,7 +111,6 @@ namespace Hermit
             {
                 case MemberTypes.Event:
                     var eventInfo = memberInfo as EventInfo;
-                    eventInfo?.AddEventHandler(component, ViewChangedAction);
                     CreateEventBinder(component, eventInfo);
                     break;
                 case MemberTypes.Field:
@@ -143,11 +142,11 @@ namespace Hermit
         protected virtual void UpdateViewProperty()
         {
             PropertyChanging = true;
-            
+
             var rawValue = ViewGetter.Invoke();
             var convertedValue = ViewModelAdapter?.Covert(rawValue, ViewModelAdapterOptions);
             ViewModelSetter.Invoke(ViewModelAdapter != null ? convertedValue : rawValue);
-            
+
             PropertyChanging = false;
         }
 
@@ -155,7 +154,15 @@ namespace Hermit
 
         public void CreateEventBinder(Component target, EventInfo eventInfo)
         {
-            ViewEventBinder = new EventBinder(eventInfo, target, ViewChangedAction);
+            var handlerType = eventInfo.EventHandlerType;
+            var valueArguments = handlerType.GetGenericArguments();
+
+            var eventBinderType = valueArguments.Length <= 0
+                ? typeof(EventBinder)
+                : typeof(EventBinder<>).MakeGenericType(valueArguments);
+
+            ViewEventBinder = Activator.CreateInstance(eventBinderType, eventInfo, target,
+                ViewChangedAction) as IEventBinder;
         }
 
         public void CreateUnityEventBinder(object eventInstance, Type eventType)
@@ -165,7 +172,9 @@ namespace Hermit
             if (unityEventType == null) { throw new Exception($"Event {eventInstance} is not an UnityEvent."); }
 
             var valueArguments = unityEventType.GetGenericArguments();
-            var unityEventBinderType = typeof(UnityEventBinder<>).MakeGenericType(valueArguments);
+            var unityEventBinderType = valueArguments.Length <= 0
+                ? typeof(UnityEventBinder)
+                : typeof(UnityEventBinder<>).MakeGenericType(valueArguments);
 
             ViewEventBinder = Activator.CreateInstance(unityEventBinderType, eventInstance,
                 ViewChangedAction) as IEventBinder;

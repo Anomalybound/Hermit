@@ -3,7 +3,7 @@ using UnityEngine.Events;
 
 namespace Hermit.DataBinding
 {
-    public abstract class UnityEventBinderBase : IEventBinder
+    public abstract class EventBinderBase : IEventBinder
     {
         public Action Action { get; protected set; }
 
@@ -12,7 +12,7 @@ namespace Hermit.DataBinding
         public abstract void Disconnect();
     }
 
-    public class UnityEventBinder : UnityEventBinderBase
+    public class UnityEventBinder : EventBinderBase
     {
         public UnityEvent UnityEvent { get; }
 
@@ -38,7 +38,7 @@ namespace Hermit.DataBinding
         }
     }
 
-    public class UnityEventBinder<T> : UnityEventBinderBase
+    public class UnityEventBinder<T> : EventBinderBase
     {
         public UnityEvent<T> UnityEvent { get; }
 
@@ -64,7 +64,7 @@ namespace Hermit.DataBinding
         }
     }
 
-    public class UnityEventBinder<T0, T1> : UnityEventBinderBase
+    public class UnityEventBinder<T0, T1> : EventBinderBase
     {
         public UnityEvent<T0, T1> UnityEvent { get; }
 
@@ -90,7 +90,7 @@ namespace Hermit.DataBinding
         }
     }
 
-    public class UnityEventBinder<T0, T1, T2> : UnityEventBinderBase
+    public class UnityEventBinder<T0, T1, T2> : EventBinderBase
     {
         public UnityEvent<T0, T1, T2> UnityEvent { get; }
 
@@ -116,7 +116,7 @@ namespace Hermit.DataBinding
         }
     }
 
-    public class UnityEventBinder<T0, T1, T2, T3> : UnityEventBinderBase
+    public class UnityEventBinder<T0, T1, T2, T3> : EventBinderBase
     {
         public UnityEvent<T0, T1, T2, T3> UnityEvent { get; }
 
