@@ -10,27 +10,25 @@ namespace Hermit.DataBinding
 
         protected object Target { get; }
 
-        protected readonly Action EventHandler;
+        public Action EventHandler { get; }
 
-        public EventBinder(EventInfo eventInfo, object target, Action action)
+        public EventBinder(EventInfo eventInfo, object target, Action eventHandler)
         {
             EventInfo = eventInfo;
             Target = target;
-            Action = action;
 
-            EventHandler = Action;
+            EventHandler = eventHandler;
+            if (EventHandler == null) { throw new InvalidCastException(); }
         }
 
         public override void Connect()
         {
-            Assert.IsNull(Target);
-            EventInfo.AddEventHandler(Target, EventHandler);
+            if (EventHandler != null) { EventInfo.AddEventHandler(Target, EventHandler); }
         }
 
         public override void Disconnect()
         {
-            Assert.IsNull(Target);
-            EventInfo.RemoveEventHandler(Target, EventHandler);
+            if (EventHandler != null) { EventInfo.RemoveEventHandler(Target, EventHandler); }
         }
     }
 
@@ -40,27 +38,46 @@ namespace Hermit.DataBinding
 
         protected object Target { get; }
 
-        protected readonly Action<T0> EventHandler;
+        public Action EventHandler { get; }
 
-        public EventBinder(EventInfo eventInfo, object target, Action action)
+        public Action<T0> GenericEventHandler { get; }
+
+        public Delegate ActionDelegate { get; }
+
+        public EventBinder(EventInfo eventInfo, object target, Action eventHandler)
         {
             EventInfo = eventInfo;
             Target = target;
-            Action = action;
 
-            EventHandler = arg1 => Action();
+            EventHandler = eventHandler;
+            ActionDelegate = Delegate.CreateDelegate(typeof(Action<T0>), this, nameof(InvokeAction));
+        }
+
+        public EventBinder(EventInfo eventInfo, object target, Action<T0> eventHandler)
+        {
+            EventInfo = eventInfo;
+            Target = target;
+
+            GenericEventHandler = eventHandler;
         }
 
         public override void Connect()
         {
-            Assert.IsNotNull(Target);
-            EventInfo.AddEventHandler(Target, EventHandler);
+            if (EventHandler != null) { EventInfo.AddEventHandler(Target, ActionDelegate); }
+
+            if (GenericEventHandler != null) { EventInfo.AddEventHandler(Target, GenericEventHandler); }
         }
 
         public override void Disconnect()
         {
-            Assert.IsNotNull(Target);
-            EventInfo.RemoveEventHandler(Target, EventHandler);
+            if (EventHandler != null) { EventInfo.RemoveEventHandler(Target, ActionDelegate); }
+
+            if (GenericEventHandler != null) { EventInfo.RemoveEventHandler(Target, GenericEventHandler); }
+        }
+
+        protected void InvokeAction(T0 arg0)
+        {
+            EventHandler.Invoke();
         }
     }
 
@@ -70,27 +87,46 @@ namespace Hermit.DataBinding
 
         protected object Target { get; }
 
-        protected readonly Action<T0, T1> EventHandler;
+        public Action EventHandler { get; }
 
-        public EventBinder(EventInfo eventInfo, object target, Action action)
+        public Action<T0, T1> GenericEventHandler { get; }
+
+        public Delegate ActionDelegate { get; }
+
+        public EventBinder(EventInfo eventInfo, object target, Action eventHandler)
         {
             EventInfo = eventInfo;
             Target = target;
-            Action = action;
 
-            EventHandler = (arg1, arg2) => Action();
+            EventHandler = eventHandler;
+            ActionDelegate = Delegate.CreateDelegate(typeof(Action<T0>), this, nameof(InvokeAction));
+        }
+
+        public EventBinder(EventInfo eventInfo, object target, Action<T0, T1> eventHandler)
+        {
+            EventInfo = eventInfo;
+            Target = target;
+
+            GenericEventHandler = eventHandler;
         }
 
         public override void Connect()
         {
-            Assert.IsNotNull(Target);
-            EventInfo.AddEventHandler(Target, EventHandler);
+            if (EventHandler != null) { EventInfo.AddEventHandler(Target, EventHandler); }
+
+            if (GenericEventHandler != null) { EventInfo.AddEventHandler(Target, GenericEventHandler); }
         }
 
         public override void Disconnect()
         {
-            Assert.IsNotNull(Target);
-            EventInfo.RemoveEventHandler(Target, EventHandler);
+            if (EventHandler != null) { EventInfo.RemoveEventHandler(Target, EventHandler); }
+
+            if (GenericEventHandler != null) { EventInfo.RemoveEventHandler(Target, GenericEventHandler); }
+        }
+
+        protected void InvokeAction(T0 arg0)
+        {
+            EventHandler.Invoke();
         }
     }
 
@@ -100,27 +136,46 @@ namespace Hermit.DataBinding
 
         protected object Target { get; }
 
-        protected readonly Action<T0, T1, T2> EventHandler;
+        public Action EventHandler { get; }
 
-        public EventBinder(EventInfo eventInfo, object target, Action action)
+        protected readonly Action<T0, T1, T2> GenericEventHandler;
+
+        public Delegate ActionDelegate { get; }
+
+        public EventBinder(EventInfo eventInfo, object target, Action eventHandler)
         {
             EventInfo = eventInfo;
             Target = target;
-            Action = action;
 
-            EventHandler = (arg1, arg2, arg3) => Action();
+            EventHandler = eventHandler;
+            ActionDelegate = Delegate.CreateDelegate(typeof(Action<T0>), this, nameof(InvokeAction));
+        }
+
+        public EventBinder(EventInfo eventInfo, object target, Action<T0, T1, T2> eventHandler)
+        {
+            EventInfo = eventInfo;
+            Target = target;
+
+            GenericEventHandler = eventHandler;
         }
 
         public override void Connect()
         {
-            Assert.IsNotNull(Target);
-            EventInfo.AddEventHandler(Target, EventHandler);
+            if (EventHandler != null) { EventInfo.AddEventHandler(Target, EventHandler); }
+
+            if (GenericEventHandler != null) { EventInfo.AddEventHandler(Target, GenericEventHandler); }
         }
 
         public override void Disconnect()
         {
-            Assert.IsNotNull(Target);
-            EventInfo.RemoveEventHandler(Target, EventHandler);
+            if (EventHandler != null) { EventInfo.RemoveEventHandler(Target, EventHandler); }
+
+            if (GenericEventHandler != null) { EventInfo.RemoveEventHandler(Target, GenericEventHandler); }
+        }
+
+        protected void InvokeAction(T0 arg0)
+        {
+            EventHandler.Invoke();
         }
     }
 
@@ -130,27 +185,46 @@ namespace Hermit.DataBinding
 
         protected object Target { get; }
 
-        protected readonly Action<T0, T1, T2, T3> EventHandler;
+        public Action EventHandler { get; }
 
-        public EventBinder(EventInfo eventInfo, object target, Action action)
+        protected readonly Action<T0, T1, T2, T3> GenericEventHandler;
+
+        public Delegate ActionDelegate { get; }
+
+        public EventBinder(EventInfo eventInfo, object target, Action eventHandler)
         {
             EventInfo = eventInfo;
             Target = target;
-            Action = action;
 
-            EventHandler = (arg1, arg2, arg3, arg4) => Action();
+            EventHandler = eventHandler;
+            ActionDelegate = Delegate.CreateDelegate(typeof(Action<T0>), this, nameof(InvokeAction));
+        }
+
+        public EventBinder(EventInfo eventInfo, object target, Action<T0, T1, T2, T3> eventHandler)
+        {
+            EventInfo = eventInfo;
+            Target = target;
+
+            GenericEventHandler = eventHandler;
         }
 
         public override void Connect()
         {
-            Assert.IsNotNull(Target);
-            EventInfo.AddEventHandler(Target, EventHandler);
+            if (EventHandler != null) { EventInfo.AddEventHandler(Target, EventHandler); }
+
+            if (GenericEventHandler != null) { EventInfo.AddEventHandler(Target, GenericEventHandler); }
         }
 
         public override void Disconnect()
         {
-            Assert.IsNotNull(Target);
-            EventInfo.RemoveEventHandler(Target, EventHandler);
+            if (EventHandler != null) { EventInfo.RemoveEventHandler(Target, EventHandler); }
+
+            if (GenericEventHandler != null) { EventInfo.RemoveEventHandler(Target, GenericEventHandler); }
+        }
+
+        protected void InvokeAction(T0 arg0)
+        {
+            EventHandler.Invoke();
         }
     }
 
@@ -160,27 +234,46 @@ namespace Hermit.DataBinding
 
         protected object Target { get; }
 
-        protected readonly Action<T0, T1, T2, T3, T4> EventHandler;
+        public Action EventHandler { get; }
 
-        public EventBinder(EventInfo eventInfo, object target, Action action)
+        protected readonly Action<T0, T1, T2, T3, T4> GenericEventHandler;
+
+        public Delegate ActionDelegate { get; }
+
+        public EventBinder(EventInfo eventInfo, object target, Action eventHandler)
         {
             EventInfo = eventInfo;
             Target = target;
-            Action = action;
 
-            EventHandler = (arg1, arg2, arg3, arg4, arg5) => Action();
+            EventHandler = eventHandler;
+            ActionDelegate = Delegate.CreateDelegate(typeof(Action<T0>), this, nameof(InvokeAction));
+        }
+
+        public EventBinder(EventInfo eventInfo, object target, Action<T0, T1, T2, T3, T4> eventHandler)
+        {
+            EventInfo = eventInfo;
+            Target = target;
+
+            GenericEventHandler = eventHandler;
         }
 
         public override void Connect()
         {
-            Assert.IsNotNull(Target);
-            EventInfo.AddEventHandler(Target, EventHandler);
+            if (EventHandler != null) { EventInfo.AddEventHandler(Target, EventHandler); }
+
+            if (GenericEventHandler != null) { EventInfo.AddEventHandler(Target, GenericEventHandler); }
         }
 
         public override void Disconnect()
         {
-            Assert.IsNotNull(Target);
-            EventInfo.RemoveEventHandler(Target, EventHandler);
+            if (EventHandler != null) { EventInfo.RemoveEventHandler(Target, EventHandler); }
+
+            if (GenericEventHandler != null) { EventInfo.RemoveEventHandler(Target, GenericEventHandler); }
+        }
+
+        protected void InvokeAction(T0 arg0)
+        {
+            EventHandler.Invoke();
         }
     }
 }

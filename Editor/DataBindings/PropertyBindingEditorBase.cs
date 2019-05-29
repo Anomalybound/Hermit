@@ -40,6 +40,8 @@ namespace Hermit.DataBindings
         protected Type ViewCurrentType => ViewDest != null ? ViewDest : ViewSource;
         protected Type ViewModelCurrentType => ViewModelDest != null ? ViewModelDest : ViewModelSource;
 
+        protected readonly string[] InternalMethodFilter = {"OnPropertyChanged", "OnPropertyChanging"};
+
         protected virtual void OnEnable()
         {
             SetupStyles();
@@ -47,6 +49,11 @@ namespace Hermit.DataBindings
             BindingBase = target as DataBindingBase;
 
             if (AdapterLookup.Count <= 0) { CollectAdapters(); }
+        }
+
+        public override void OnInspectorGUI()
+        {
+            EditorGUILayout.PropertyField(serializedObject.FindProperty("DataProvider"));
         }
 
         private void SetupStyles()
@@ -213,7 +220,7 @@ namespace Hermit.DataBindings
             var selection = lookup.IndexOf(viewEntry);
             using (var check = new EditorGUI.ChangeCheckScope())
             {
-                selection = EditorGUILayout.Popup("Property", selection, options.ToArray());
+                selection = EditorGUILayout.Popup("Properties", selection, options.ToArray());
 
                 if (ViewSource == null && selection >= 0) { ViewSource = data[selection]; }
 
@@ -228,7 +235,7 @@ namespace Hermit.DataBindings
 
         #region Events
 
-        protected virtual string DrawViewEventPopup(string viewEventEntry)
+        protected virtual (string eventEntry, MemberInfo memberInfo) DrawViewEventPopup(string viewEventEntry)
         {
             var components = BindingBase.gameObject.GetComponents<Component>().ToList();
             var data = new List<MemberInfo>();
@@ -283,9 +290,160 @@ namespace Hermit.DataBindings
 
                 if (BindingEvent == null && selection >= 0) { BindingEvent = data[selection]; }
 
-                if (!check.changed) { return viewEventEntry; }
+                if (!check.changed) { return (viewEventEntry, BindingEvent); }
 
                 BindingEvent = data[selection];
+                return (lookup[selection], BindingEvent);
+            }
+        }
+
+
+        protected string DrawViewModelActionPopup(string viewModelActionEntry, MemberInfo eventMemberInfo)
+        {
+//            var extra = "";
+            var arguments = new List<Type>();
+            var options = new List<string>();
+            var lookup = new List<string>();
+
+            var assemblies = AppDomain.CurrentDomain.GetAssemblies();
+            var viewModelTypes = new List<Type>();
+            var providerTypeLookup = new Dictionary<Type, IViewModelProvider>();
+            var methodInfoTypeLookup = new Dictionary<MethodInfo, IViewModelProvider>();
+            var actionLookup = new Dictionary<int, List<MethodInfo>>
+            {
+                {0, new List<MethodInfo>()},
+                {1, new List<MethodInfo>()},
+                {2, new List<MethodInfo>()},
+                {3, new List<MethodInfo>()},
+                {4, new List<MethodInfo>()},
+                {5, new List<MethodInfo>()}
+            };
+
+            var providerLookup = new Dictionary<int, List<Component>>
+            {
+                {0, new List<Component>()},
+                {1, new List<Component>()},
+                {2, new List<Component>()},
+                {3, new List<Component>()},
+                {4, new List<Component>()},
+                {5, new List<Component>()}
+            };
+
+            if (eventMemberInfo == null)
+            {
+                using (new EditorGUI.DisabledScope(true)) { EditorGUILayout.Popup("Actions", -1, options.ToArray()); }
+
+                return viewModelActionEntry;
+            }
+
+            switch (eventMemberInfo.MemberType)
+            {
+                case MemberTypes.All:
+                case MemberTypes.Constructor:
+                case MemberTypes.Custom:
+                case MemberTypes.Method:
+                case MemberTypes.NestedType:
+                case MemberTypes.TypeInfo:
+                    return null;
+                case MemberTypes.Event:
+                    var eventInfo = eventMemberInfo as EventInfo;
+                    var handlerType = eventInfo.EventHandlerType;
+                    var invokeMethod = handlerType.GetMethod("Invoke");
+                    arguments.AddRange(invokeMethod.GetParameters().Select(p => p.ParameterType));
+                    break;
+                case MemberTypes.Field:
+                    var fieldInfo = eventMemberInfo as FieldInfo;
+                    if (!typeof(UnityEventBase).IsAssignableFrom(fieldInfo?.FieldType)) { return null; }
+
+                    arguments.AddRange(EventBinderBase.GetUnityEventType(fieldInfo?.FieldType).GetGenericArguments());
+
+                    break;
+                case MemberTypes.Property:
+                    var propertyInfo = eventMemberInfo as PropertyInfo;
+                    if (!typeof(UnityEventBase).IsAssignableFrom(propertyInfo?.PropertyType)) { return null; }
+
+                    arguments.AddRange(EventBinderBase.GetUnityEventType(propertyInfo?.PropertyType)
+                        .GetGenericArguments());
+
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
+
+            var dataProviders = BindingBase.transform.GetComponentsInParent<IViewModelProvider>(true);
+
+            if (dataProviders.Length <= 0)
+            {
+                var oriCol = EditorStyles.label.normal.textColor;
+                EditorStyles.label.normal.textColor = Color.red;
+
+                EditorGUILayout.LabelField("View Model not found in context.");
+
+                EditorStyles.label.normal.textColor = oriCol;
+                return null;
+            }
+
+            foreach (var dataProvider in dataProviders)
+            {
+                foreach (var assembly in assemblies)
+                {
+                    var viewModelType = assembly.GetType(dataProvider.GetViewModelTypeName);
+                    if (viewModelType == null) { continue; }
+
+                    viewModelTypes.Add(viewModelType);
+                    providerTypeLookup.Add(viewModelType, dataProvider);
+                }
+            }
+
+            foreach (var viewModelType in viewModelTypes)
+            {
+                var methods = viewModelType
+                    .GetMethods(BindingFlags.Instance | BindingFlags.Static |
+                                BindingFlags.Public | BindingFlags.NonPublic)
+                    .Where(m => !m.IsSpecialName)
+                    .Where(m => !InternalMethodFilter.Contains(m.Name));
+
+                foreach (var methodInfo in methods)
+                {
+                    var parameters = methodInfo.GetParameters();
+
+                    if (parameters.Length > 5) { continue; }
+
+                    methodInfoTypeLookup[methodInfo] = providerTypeLookup[viewModelType];
+                    actionLookup[parameters.Length].Add(methodInfo);
+                    providerLookup[arguments.Count].Add(providerTypeLookup[viewModelType] as Component);
+                }
+            }
+
+            var actionMethods = actionLookup[arguments.Count];
+            foreach (var actionMethod in actionMethods)
+            {
+                var left = actionMethod.GetParameters().Select(p => p.ParameterType);
+                var right = arguments;
+                if (!left.SequenceEqual(right)) { continue; }
+
+                options.Add($"{methodInfoTypeLookup[actionMethod].GetViewModelTypeName}/{actionMethod.Name}");
+                lookup.Add($"{methodInfoTypeLookup[actionMethod].GetViewModelTypeName}.{actionMethod.Name}");
+            }
+
+            var selection = lookup.IndexOf(viewModelActionEntry);
+
+//            EditorGUILayout.LabelField($"{eventMemberInfo.Name}/{eventMemberInfo.MemberType}/{extra}");
+//            EditorGUILayout.LabelField($"ArgumentsCount:{arguments.Count}/Arguments:{string.Join("-", arguments)}");
+
+            using (var check = new EditorGUI.ChangeCheckScope())
+            {
+                selection = EditorGUILayout.Popup("Actions", selection, options.ToArray());
+
+                if (BindingBase.DataProvider == null)
+                {
+                    BindingBase.DataProvider = providerLookup[arguments.Count][selection];
+                }
+
+                if (!check.changed) { return viewModelActionEntry; }
+
+                BindingBase.DataProvider = providerLookup[arguments.Count][selection];
+                serializedObject.ApplyModifiedProperties();
                 return lookup[selection];
             }
         }
@@ -326,7 +484,7 @@ namespace Hermit.DataBindings
             using (var check = new EditorGUI.ChangeCheckScope())
             {
                 selection++;
-                selection = EditorGUILayout.Popup("Adapter", selection, options.ToArray());
+                selection = EditorGUILayout.Popup("Adapters", selection, options.ToArray());
                 selection--;
 
                 if (lookup.Count <= selection || selection < 0) { return (adapterTypeName, null); }
@@ -349,15 +507,15 @@ namespace Hermit.DataBindings
 
         #region Info
 
-        protected virtual void DrawBindingLabel(string label, Type type)
+        protected virtual void DrawBindingLabel(string label, Type type = null)
         {
             using (new EditorGUILayout.HorizontalScope(BindingLabelContainerStyle))
             {
                 EditorGUILayout.LabelField(label, GUILayout.Width(120));
 
-                GUILayout.FlexibleSpace();
 
-                EditorGUILayout.LabelField($"Type: {(type != null ? type.Name : "Undefined")}", AlignToRightStyle);
+                GUILayout.FlexibleSpace();
+                if (type != null) { EditorGUILayout.LabelField($"Type: {type.Name}", AlignToRightStyle); }
             }
         }
 

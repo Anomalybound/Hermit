@@ -3,23 +3,27 @@ using UnityEngine.Events;
 
 namespace Hermit.DataBinding
 {
-    public abstract class EventBinderBase : IEventBinder
-    {
-        public Action Action { get; protected set; }
-
-        public abstract void Connect();
-
-        public abstract void Disconnect();
-    }
-
     public class UnityEventBinder : EventBinderBase
     {
         public UnityEvent UnityEvent { get; }
+
+        public Action Action { get; }
 
         public UnityEventBinder(UnityEvent unityEvent, Action action)
         {
             UnityEvent = unityEvent;
             Action = action;
+        }
+
+        public UnityEventBinder(UnityEvent unityEvent, Delegate action)
+        {
+            UnityEvent = unityEvent;
+            Action = action as Action;
+
+            if (Action == null)
+            {
+                throw new InvalidCastException($"{action} is not a suitable parameter for {typeof(UnityEventBinder)}");
+            }
         }
 
         public override void Connect()
@@ -42,10 +46,28 @@ namespace Hermit.DataBinding
     {
         public UnityEvent<T> UnityEvent { get; }
 
+        public Action Action { get; }
+
+        public Action<T> GenericAction { get; }
+
+        public bool MatchArguments { get; }
+
         public UnityEventBinder(UnityEvent<T> unityEvent, Action action)
         {
             UnityEvent = unityEvent;
             Action = action;
+        }
+
+        public UnityEventBinder(UnityEvent<T> unityEvent, Delegate action)
+        {
+            UnityEvent = unityEvent;
+            GenericAction = action as Action<T>;
+            MatchArguments = true;
+
+            if (GenericAction == null)
+            {
+                throw new InvalidCastException($"{action} is not a suitable parameter for {typeof(UnityEventBinder)}");
+            }
         }
 
         public override void Connect()
@@ -60,7 +82,8 @@ namespace Hermit.DataBinding
 
         protected void OnUnityEventInvoked(T arg0)
         {
-            Action?.Invoke();
+            if (MatchArguments) { GenericAction?.Invoke(arg0); }
+            else { Action?.Invoke(); }
         }
     }
 
@@ -68,10 +91,28 @@ namespace Hermit.DataBinding
     {
         public UnityEvent<T0, T1> UnityEvent { get; }
 
+        public Action Action { get; }
+
+        public Action<T0, T1> GenericAction { get; }
+
+        public bool MatchArguments { get; }
+
         public UnityEventBinder(UnityEvent<T0, T1> unityEvent, Action action)
         {
             UnityEvent = unityEvent;
             Action = action;
+        }
+
+        public UnityEventBinder(UnityEvent<T0, T1> unityEvent, Delegate action)
+        {
+            UnityEvent = unityEvent;
+            GenericAction = action as Action<T0, T1>;
+            MatchArguments = true;
+
+            if (GenericAction == null)
+            {
+                throw new InvalidCastException($"{action} is not a suitable parameter for {typeof(UnityEventBinder)}");
+            }
         }
 
         public override void Connect()
@@ -86,7 +127,8 @@ namespace Hermit.DataBinding
 
         private void OnUnityEventInvoked(T0 arg0, T1 arg1)
         {
-            Action?.Invoke();
+            if (MatchArguments) { GenericAction?.Invoke(arg0, arg1); }
+            else { Action?.Invoke(); }
         }
     }
 
@@ -94,10 +136,28 @@ namespace Hermit.DataBinding
     {
         public UnityEvent<T0, T1, T2> UnityEvent { get; }
 
+        public Action Action { get; }
+
+        public Action<T0, T1, T2> GenericAction { get; }
+
+        public bool MatchArguments { get; }
+
         public UnityEventBinder(UnityEvent<T0, T1, T2> unityEvent, Action action)
         {
             UnityEvent = unityEvent;
             Action = action;
+        }
+
+        public UnityEventBinder(UnityEvent<T0, T1, T2> unityEvent, Delegate action)
+        {
+            UnityEvent = unityEvent;
+            GenericAction = action as Action<T0, T1, T2>;
+            MatchArguments = true;
+
+            if (GenericAction == null)
+            {
+                throw new InvalidCastException($"{action} is not a suitable parameter for {typeof(UnityEventBinder)}");
+            }
         }
 
         public override void Connect()
@@ -112,7 +172,8 @@ namespace Hermit.DataBinding
 
         private void OnUnityEventInvoked(T0 arg0, T1 arg1, T2 arg2)
         {
-            Action?.Invoke();
+            if (MatchArguments) { GenericAction?.Invoke(arg0, arg1, arg2); }
+            else { Action?.Invoke(); }
         }
     }
 
@@ -120,10 +181,28 @@ namespace Hermit.DataBinding
     {
         public UnityEvent<T0, T1, T2, T3> UnityEvent { get; }
 
+        public Action Action { get; }
+
+        public Action<T0, T1, T2, T3> GenericAction { get; }
+
+        public bool MatchArguments { get; }
+
         public UnityEventBinder(UnityEvent<T0, T1, T2, T3> unityEvent, Action action)
         {
             UnityEvent = unityEvent;
             Action = action;
+        }
+
+        public UnityEventBinder(UnityEvent<T0, T1, T2, T3> unityEvent, Delegate action)
+        {
+            UnityEvent = unityEvent;
+            GenericAction = action as Action<T0, T1, T2, T3>;
+            MatchArguments = true;
+
+            if (GenericAction == null)
+            {
+                throw new InvalidCastException($"{action} is not a suitable parameter for {typeof(UnityEventBinder)}");
+            }
         }
 
         public override void Connect()
@@ -138,7 +217,8 @@ namespace Hermit.DataBinding
 
         private void OnUnityEventInvoked(T0 arg0, T1 arg1, T2 arg2, T3 arg3)
         {
-            Action?.Invoke();
+            if (MatchArguments) { GenericAction?.Invoke(arg0, arg1, arg2, arg3); }
+            else { Action?.Invoke(); }
         }
     }
 }

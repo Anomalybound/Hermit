@@ -24,6 +24,8 @@ namespace Hermit.DataBindings
 
         public override void OnInspectorGUI()
         {
+            base.OnInspectorGUI();
+            
             serializedObject.Update();
 
             using (new EditorGUILayout.VerticalScope(EditorStyles.helpBox))

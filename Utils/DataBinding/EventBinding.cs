@@ -6,16 +6,13 @@ using UnityEngine.Events;
 
 namespace Hermit
 {
-    public class TwoWayPropertyBinding : OneWayPropertyBinding
+    public class EventBinding : DataBindingBase
     {
         [SerializeField]
         private string _viewEventEntry;
 
         [SerializeField]
-        private string viewModelAdapterType;
-
-        [SerializeField]
-        private AdapterOptions _viewModelAdapterOptions;
+        private string _viewModelActionEntry;
 
         #region Properties
 
@@ -31,27 +28,15 @@ namespace Hermit
             }
         }
 
-        public string ViewModelAdapterType
+        public string ViewModelActionEntry
         {
-            get => viewModelAdapterType;
+            get => _viewModelActionEntry;
             set
             {
 #if UNITY_EDITOR
                 UnityEditor.EditorUtility.SetDirty(this);
 #endif
-                viewModelAdapterType = value;
-            }
-        }
-
-        public AdapterOptions ViewModelAdapterOptions
-        {
-            get => _viewModelAdapterOptions;
-            set
-            {
-#if UNITY_EDITOR
-                UnityEditor.EditorUtility.SetDirty(this);
-#endif
-                _viewModelAdapterOptions = value;
+                _viewModelActionEntry = value;
             }
         }
 
@@ -59,11 +44,7 @@ namespace Hermit
 
         #region Runtime Variables
 
-        protected Action ViewChangedAction;
-
         protected IEventBinder ViewEventBinder;
-
-        protected IAdapter ViewModelAdapter;
 
         #endregion
 
@@ -71,37 +52,18 @@ namespace Hermit
         {
             base.Awake();
 
-            BindViewModel2ViewEvent();
-
-            SetupViewModelAdapter();
+            BindViewAction2ViewModelFunction();
         }
 
-        protected override void OnEnable()
+        protected virtual void BindViewAction2ViewModelFunction()
         {
-            base.OnEnable();
+            #region ViewModel Actions
 
-            ViewEventBinder?.Connect();
+            var actionMethod = ParseViewModelEntry(ViewModel, ViewModelActionEntry);
 
-            UpdateViewProperty();
-        }
+            var viewModelAction = DelegateHelper.CreateInstance(ViewModel, actionMethod as MethodInfo);
 
-        protected override void OnDisable()
-        {
-            base.OnDisable();
-
-            ViewEventBinder?.Disconnect();
-        }
-
-        protected void SetupViewModelAdapter()
-        {
-            if (string.IsNullOrEmpty(viewModelAdapterType)) { return; }
-
-            ViewModelAdapter = Her.Resolve<IAdapter>(viewModelAdapterType);
-        }
-
-        protected void BindViewModel2ViewEvent()
-        {
-            ViewChangedAction = UpdateViewProperty;
+            #endregion
 
             #region View Events
 
@@ -111,7 +73,7 @@ namespace Hermit
             {
                 case MemberTypes.Event:
                     var eventInfo = memberInfo as EventInfo;
-                    ViewEventBinder = EventBinderBase.CreateEventBinder(component, eventInfo, ViewChangedAction);
+                    ViewEventBinder = EventBinderBase.CreateEventBinder(component, eventInfo, viewModelAction);
                     break;
                 case MemberTypes.Field:
                     var fieldInfo = memberInfo as FieldInfo;
@@ -119,7 +81,7 @@ namespace Hermit
                     if (fieldEventInstance is UnityEventBase)
                     {
                         ViewEventBinder = EventBinderBase.CreateUnityEventBinder(fieldEventInstance,
-                            fieldInfo.FieldType, ViewChangedAction);
+                            fieldInfo.FieldType, viewModelAction);
                     }
 
                     break;
@@ -129,7 +91,7 @@ namespace Hermit
                     if (propertyEventInstance is UnityEventBase)
                     {
                         ViewEventBinder = EventBinderBase.CreateUnityEventBinder(propertyEventInstance,
-                            propertyInfo.PropertyType, ViewChangedAction);
+                            propertyInfo.PropertyType, viewModelAction);
                     }
 
                     break;
@@ -141,15 +103,14 @@ namespace Hermit
             #endregion
         }
 
-        protected virtual void UpdateViewProperty()
+        protected virtual void OnEnable()
         {
-            PropertyChanging = true;
+            ViewEventBinder?.Connect();
+        }
 
-            var rawValue = ViewGetter.Invoke();
-            var convertedValue = ViewModelAdapter?.Covert(rawValue, ViewModelAdapterOptions);
-            ViewModelSetter.Invoke(ViewModelAdapter != null ? convertedValue : rawValue);
-
-            PropertyChanging = false;
+        protected virtual void OnDisable()
+        {
+            ViewEventBinder?.Disconnect();
         }
     }
 }

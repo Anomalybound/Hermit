@@ -26,6 +26,8 @@ namespace Hermit.DataBindings
 
         public override void OnInspectorGUI()
         {
+            base.OnInspectorGUI();
+            
             serializedObject.Update();
 
             using (new EditorGUILayout.VerticalScope(EditorStyles.helpBox))
@@ -55,7 +57,7 @@ namespace Hermit.DataBindings
                 Target.ViewAdapterType = DrawViewAdapterPopup(Target.ViewAdapterType, ViewAdapterOptions);
 
                 // Draw View value-changed notification Event popup
-                Target.ViewEventEntry = DrawViewEventPopup(Target.ViewEventEntry);
+                (Target.ViewEventEntry, _) = DrawViewEventPopup(Target.ViewEventEntry);
             }
 
             EditorGUI.EndDisabledGroup();
