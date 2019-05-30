@@ -3,7 +3,7 @@ using UnityEditor;
 namespace Hermit.DataBindings
 {
     [CustomEditor(typeof(TwoWayPropertyBinding))]
-    public class TwoWayPropertyBindingEditor : PropertyBindingEditorBase
+    public class TwoWayDataBindingEditor : DataBindingEditorBase
     {
         #region Runtime Variables
 

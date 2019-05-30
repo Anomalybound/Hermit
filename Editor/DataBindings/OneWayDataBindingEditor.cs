@@ -3,7 +3,7 @@ using UnityEditor;
 namespace Hermit.DataBindings
 {
     [CustomEditor(typeof(OneWayPropertyBinding))]
-    public class OneWayPropertyBindingEditor : PropertyBindingEditorBase
+    public class OneWayDataBindingEditor : DataBindingEditorBase
     {
         #region Runtime Variables
 
@@ -26,8 +26,6 @@ namespace Hermit.DataBindings
         {
             base.OnInspectorGUI();
             
-            serializedObject.Update();
-
             using (new EditorGUILayout.VerticalScope(EditorStyles.helpBox))
             {
                 DrawBindingLabel("View Model", ViewModelSource);

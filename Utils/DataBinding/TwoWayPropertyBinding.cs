@@ -67,32 +67,39 @@ namespace Hermit
 
         #endregion
 
-        protected override void Awake()
+        public override void SetupBinding()
         {
-            base.Awake();
+            base.SetupBinding();
 
             BindViewModel2ViewEvent();
 
-            SetupViewModelAdapter();
+            GetViewModelAdapterInstance();
         }
 
-        protected override void OnEnable()
+        public override void UpdateBinding()
         {
-            base.OnEnable();
+            base.UpdateBinding();
+            
+            UpdateViewProperty();
+        }
+
+        public override void Connect()
+        {
+            base.Connect();
 
             ViewEventBinder?.Connect();
 
             UpdateViewProperty();
         }
 
-        protected override void OnDisable()
+        protected override void DisConnect()
         {
-            base.OnDisable();
+            base.DisConnect();
 
             ViewEventBinder?.Disconnect();
         }
 
-        protected void SetupViewModelAdapter()
+        protected void GetViewModelAdapterInstance()
         {
             if (string.IsNullOrEmpty(viewModelAdapterType)) { return; }
 

@@ -1,10 +1,12 @@
+using System;
+
 namespace Hermit.View
 {
     public abstract class UIView<TViewModel> : UIViewBase, IViewModelProvider where TViewModel : ViewModel
     {
         public TViewModel DataContext { get; protected set; }
 
-        public override void SetViewModel(object context)
+        public virtual void SetViewModel(object context)
         {
             if (context is TViewModel viewModel) { DataContext = viewModel; }
             else { Her.Warn($"{context} is not matching {typeof(TViewModel)}"); }
@@ -17,9 +19,29 @@ namespace Hermit.View
 
         public string GetViewModelTypeName => typeof(TViewModel).FullName;
 
+        public void ReBindAll()
+        {
+            if (DataBindings != null)
+            {
+                foreach (var db in DataBindings)
+                {
+                    db.Disconnect();
+                    db.SetupBinding();
+                    db.Connect();
+                }
+            }
+        }
+
         ViewModel IViewModelProvider.GetViewModel()
         {
             return GetViewModel();
+        }
+
+        protected DataBindingBase[] DataBindings;
+
+        protected virtual void Awake()
+        {
+            DataBindings = GetComponentsInChildren<DataBindingBase>();
         }
     }
 

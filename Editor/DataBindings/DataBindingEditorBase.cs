@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Linq;
 using System.Reflection;
 using Hermit.DataBinding;
@@ -9,12 +10,14 @@ using UnityEngine.Events;
 
 namespace Hermit.DataBindings
 {
-    public abstract class PropertyBindingEditorBase : Editor
+    public abstract class DataBindingEditorBase : Editor
     {
         protected static readonly Dictionary<Type, List<Type>> AdapterLookup = new Dictionary<Type, List<Type>>();
 
         protected static readonly Dictionary<Type, AdapterAttribute> AdapterAttributeLookup =
             new Dictionary<Type, AdapterAttribute>();
+
+        protected static List<Type> ViewCollectionChangedHandlerTypes = new List<Type>();
 
         protected readonly Func<Type, string> AdapterFromName = type => AdapterAttributeLookup[type].FromType.Name;
         protected readonly Func<Type, string> AdapterToName = type => AdapterAttributeLookup[type].ToType.Name;
@@ -49,10 +52,14 @@ namespace Hermit.DataBindings
             BindingBase = target as DataBindingBase;
 
             if (AdapterLookup.Count <= 0) { CollectAdapters(); }
+
+            if (ViewCollectionChangedHandlerTypes.Count <= 0) { CollectViewHandlers(); }
         }
 
         public override void OnInspectorGUI()
         {
+            serializedObject.Update();
+
             using (new EditorGUI.DisabledScope(true))
             {
                 EditorGUILayout.PropertyField(serializedObject.FindProperty("DataProvider"));
@@ -107,6 +114,12 @@ namespace Hermit.DataBindings
                 AdapterAttributeLookup.Add(adapter, adapterAttribute);
                 AdapterLookup.AddToList(adapterAttribute.FromType, adapter);
             }
+        }
+
+        protected void CollectViewHandlers()
+        {
+            ViewCollectionChangedHandlerTypes = AssemblyHelper
+                .GetInheritancesInParentAssembly(typeof(IViewCollectionChangedHandler)).ToList();
         }
 
         #region View Model
@@ -300,6 +313,9 @@ namespace Hermit.DataBindings
             }
         }
 
+        #endregion
+
+        #region ViewModel Action
 
         protected string DrawViewModelActionPopup(string viewModelActionEntry, MemberInfo eventMemberInfo)
         {
@@ -454,6 +470,104 @@ namespace Hermit.DataBindings
 
         #endregion
 
+        #region ViewModel Collection
+
+        protected string DrawViewModelCollectionPopup(string viewModelCollectionEntry)
+        {
+            var data = new List<Component>();
+            var options = new List<string>();
+            var lookup = new List<string>();
+
+            var assemblies = AppDomain.CurrentDomain.GetAssemblies();
+            var viewModelTypes = new List<Type>();
+            var providerTypeLookup = new Dictionary<Type, IViewModelProvider>();
+            var memberInfoLookup = new Dictionary<MemberInfo, IViewModelProvider>();
+
+            var dataProviders = BindingBase.transform.GetComponentsInParent<IViewModelProvider>(true);
+
+            if (dataProviders.Length <= 0)
+            {
+                var oriCol = EditorStyles.label.normal.textColor;
+                EditorStyles.label.normal.textColor = Color.red;
+
+                EditorGUILayout.LabelField("View Model not found in context.");
+
+                EditorStyles.label.normal.textColor = oriCol;
+                return null;
+            }
+
+            foreach (var dataProvider in dataProviders)
+            {
+                foreach (var assembly in assemblies)
+                {
+                    var viewModelType = assembly.GetType(dataProvider.GetViewModelTypeName);
+                    if (viewModelType == null) { continue; }
+
+                    if (!viewModelTypes.Contains(viewModelType)) { viewModelTypes.Add(viewModelType); }
+
+                    providerTypeLookup[viewModelType] = dataProvider;
+                }
+            }
+
+            foreach (var viewModelType in viewModelTypes)
+            {
+                var members = viewModelType.GetMembers(BindingFlags.Instance | BindingFlags.Public)
+                    .Where(m => m.MemberType == MemberTypes.Property || m.MemberType == MemberTypes.Field);
+
+                foreach (var memberInfo in members)
+                {
+                    var valueName = "";
+                    var viewModelProvider = providerTypeLookup[viewModelType];
+                    switch (memberInfo.MemberType)
+                    {
+                        case MemberTypes.Field:
+                            var fieldInfo = (FieldInfo) memberInfo;
+                            if (typeof(INotifyCollectionChanged).IsAssignableFrom(fieldInfo.FieldType))
+                            {
+                                valueName = fieldInfo.Name;
+                                memberInfoLookup.Add(fieldInfo, viewModelProvider);
+                            }
+
+                            break;
+                        case MemberTypes.Property:
+                            var propertyInfo = (PropertyInfo) memberInfo;
+                            if (typeof(INotifyCollectionChanged).IsAssignableFrom(propertyInfo.PropertyType))
+                            {
+                                valueName = propertyInfo.Name;
+                                memberInfoLookup.Add(propertyInfo, viewModelProvider);
+                            }
+
+                            break;
+                        default:
+                            throw new ArgumentOutOfRangeException();
+                    }
+
+                    data.Add(viewModelProvider as Component);
+                    options.Add($"{viewModelProvider.GetViewModelTypeName}/{valueName}");
+                    lookup.Add($"{viewModelProvider.GetViewModelTypeName}.{valueName}");
+                }
+            }
+
+            var selection = lookup.IndexOf(viewModelCollectionEntry);
+
+            using (var check = new EditorGUI.ChangeCheckScope())
+            {
+                selection = EditorGUILayout.Popup("Collections", selection, options.ToArray());
+
+                if (selection < 0) { return viewModelCollectionEntry; }
+
+                if (BindingBase.DataProvider == null) { BindingBase.DataProvider = data[selection]; }
+
+                if (!check.changed) { return viewModelCollectionEntry; }
+
+                BindingBase.DataProvider = data[selection];
+                serializedObject.ApplyModifiedProperties();
+                return lookup[selection];
+            }
+        }
+
+        #endregion
+
         #region Adatpers
 
         protected virtual string DrawViewAdapterPopup(string adapterTypeName, SerializedProperty adapterOptionSp)
@@ -504,6 +618,27 @@ namespace Hermit.DataBindings
                 if (check.changed) { serializedObject.ApplyModifiedProperties(); }
 
                 return (lookup[selection], destinationType);
+            }
+        }
+
+        #endregion
+
+        #region Collection Handlers
+
+        public string DrawCollectionHandlerPopup(string handlerTypeName)
+        {
+            var options = ViewCollectionChangedHandlerTypes.Select(a => $"{a.FullName}").ToList();
+
+            if (string.IsNullOrEmpty(handlerTypeName) && options.Count > 0) { handlerTypeName = options[0]; }
+
+            var selection = options.IndexOf(handlerTypeName);
+            using (var check = new EditorGUI.ChangeCheckScope())
+            {
+                selection = EditorGUILayout.Popup("Handlers", selection, options.ToArray());
+
+                if (check.changed) { serializedObject.ApplyModifiedProperties(); }
+
+                return options[selection];
             }
         }
 
