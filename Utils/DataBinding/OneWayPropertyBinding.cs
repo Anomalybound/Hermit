@@ -84,25 +84,30 @@ namespace Hermit
 
         #endregion
 
-        protected override void Awake()
+        public override void SetupBinding()
         {
-            base.Awake();
-
+            base.SetupBinding();
+            
             BindView2ViewModel();
 
-            SetupViewAdapter();
+            GetViewAdapterInstance();
         }
 
-        protected virtual void OnEnable()
+        public override void Connect()
         {
             if (ViewModel != null) { ViewModel.PropertyChanged += OnPropertyChanged; }
 
-            UpdateProperty();
+            UpdateBinding();
         }
 
-        protected virtual void OnDisable()
+        public override void Disconnect()
         {
             if (ViewModel != null) { ViewModel.PropertyChanged -= OnPropertyChanged; }
+        }
+
+        public override void UpdateBinding()
+        {
+            UpdateProperty();
         }
 
         protected virtual void OnPropertyChanged(object sender, PropertyChangedEventArgs e)
@@ -119,7 +124,7 @@ namespace Hermit
             ViewSetter.Invoke(ViewAdapterInstance != null ? convertedValue : rawValue);
         }
 
-        protected void SetupViewAdapter()
+        protected void GetViewAdapterInstance()
         {
             if (string.IsNullOrEmpty(viewAdapterType)) { return; }
 

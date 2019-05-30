@@ -48,13 +48,6 @@ namespace Hermit
 
         #endregion
 
-        protected override void Awake()
-        {
-            base.Awake();
-
-            BindViewAction2ViewModelFunction();
-        }
-
         protected virtual void BindViewAction2ViewModelFunction()
         {
             #region ViewModel Actions
@@ -103,14 +96,23 @@ namespace Hermit
             #endregion
         }
 
-        protected virtual void OnEnable()
+        public override void SetupBinding()
+        {
+            base.SetupBinding();
+            
+            BindViewAction2ViewModelFunction();
+        }
+
+        public override void Connect()
         {
             ViewEventBinder?.Connect();
         }
 
-        protected virtual void OnDisable()
+        public override void Disconnect()
         {
             ViewEventBinder?.Disconnect();
         }
+
+        public override void UpdateBinding() { }
     }
 }

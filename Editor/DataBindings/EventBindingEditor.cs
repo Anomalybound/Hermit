@@ -9,7 +9,7 @@ using UnityEngine.Events;
 namespace Hermit.DataBindings
 {
     [CustomEditor(typeof(EventBinding))]
-    public class EventBindingEditor : PropertyBindingEditorBase
+    public class EventBindingEditor : DataBindingEditorBase
     {
         protected EventBinding Target;
 

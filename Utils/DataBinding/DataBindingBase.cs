@@ -7,6 +7,7 @@ using Component = UnityEngine.Component;
 
 namespace Hermit
 {
+    [ScriptOrder(10000)]
     public abstract class DataBindingBase : MonoBehaviour
     {
         public Component DataProvider;
@@ -21,6 +22,21 @@ namespace Hermit
 
         protected virtual void Awake()
         {
+            SetupBinding();
+        }
+
+        protected virtual void OnEnable()
+        {
+            Connect();
+        }
+
+        protected virtual void DisConnect()
+        {
+            Disconnect();
+        }
+
+        public virtual void SetupBinding()
+        {
             if (DataProvider != null && DataProvider is IViewModelProvider provider)
             {
                 ViewModel = provider.GetViewModel();
@@ -31,6 +47,12 @@ namespace Hermit
                 ViewModel = dataProvider.GetViewModel();
             }
         }
+
+        public abstract void Connect();
+
+        public abstract void Disconnect();
+
+        public abstract void UpdateBinding();
 
         protected static (string typeName, string memberName) ParseEntry2TypeMember(string entry)
         {
