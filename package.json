@@ -1,0 +1,16 @@
+{
+  "name": "com.thermalbyte.hermit",
+  "displayName": "Hermit Framework",
+	"description": "This is a DI/MVVM framework for Unity3D engine.",
+	"version": "0.0.1",
+	"unity": "2018.3",
+	"license": "MIT",
+	"repository": {
+		"type": "git",
+    "url": "https://github.com/ThermalByte/Hermit.git"
+	},
+  "src": "Assets/Plugins/Hermit",
+	"author": "Siyuan Wu",
+	"dependencies": {
+	}
+}

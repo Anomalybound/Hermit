@@ -16,32 +16,32 @@
         /// <summary>
         /// Subscribe callback to be raised on specific event.
         /// </summary>
-        /// <param name="eventName"></param>
+        /// <param name="channel"></param>
         /// <param name="eventAction">Callback.</param>
-        void Subscribe<T>(string eventName, EventAction<T> eventAction);
+        void Subscribe<T>(string channel, EventAction<T> eventAction);
 
         /// <summary>
         /// Subscribe callback to be raised on specific event.
         /// </summary>
-        /// <param name="eventName"></param>
+        /// <param name="channel"></param>
         /// <param name="eventAction"></param>
-        void Subscribe(string eventName, EventAction eventAction);
+        void Subscribe(string channel, EventAction eventAction);
 
         /// <summary>
         /// Unsubscribe callback.
         /// </summary>
-        /// <param name="eventName"></param>
+        /// <param name="channel"></param>
         /// <param name="eventAction">Event action.</param>
         /// <param name="keepEvent">GC optimization - clear only callback list and keep event for future use.</param>
-        void Unsubscribe<T>(string eventName, EventAction<T> eventAction, bool keepEvent = false);
+        void Unsubscribe<T>(string channel, EventAction<T> eventAction, bool keepEvent = false);
 
         /// <summary>
         /// Unsubscribe callback.
         /// </summary>
-        /// <param name="eventName"></param>
+        /// <param name="channel"></param>
         /// <param name="eventAction">Event action.</param>
         /// <param name="keepEvent">GC optimization - clear only callback list and keep event for future use.</param>
-        void Unsubscribe(string eventName, EventAction eventAction, bool keepEvent = false);
+        void Unsubscribe(string channel, EventAction eventAction, bool keepEvent = false);
 
         /// <summary>
         /// Unsubscribe all callbacks from event.

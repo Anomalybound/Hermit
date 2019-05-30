@@ -18,17 +18,17 @@ namespace Hermit.Services
 
         public static EventBroker Current => new EventBroker();
 
-        public void Subscribe<T>(string eventName, EventAction<T> eventAction)
+        public void Subscribe<T>(string channel, EventAction<T> eventAction)
         {
             if (eventAction == null) { throw new Exception("No subscriber."); }
 
             var eventType = typeof(T);
 
-            if (!_events.TryGetValue(eventName, out var delegates))
+            if (!_events.TryGetValue(channel, out var delegates))
             {
                 var action = eventAction;
                 delegates = new Dictionary<Type, Delegate> {{eventType, action}};
-                _events.Add(eventName, delegates);
+                _events.Add(channel, delegates);
             }
             else
             {
@@ -44,17 +44,17 @@ namespace Hermit.Services
             }
         }
 
-        public void Subscribe(string eventName, EventAction eventAction)
+        public void Subscribe(string channel, EventAction eventAction)
         {
             if (eventAction == null) { throw new Exception("No subscriber."); }
 
             var eventType = typeof(EventAction);
 
-            if (!_events.TryGetValue(eventName, out var delegates))
+            if (!_events.TryGetValue(channel, out var delegates))
             {
                 var action = eventAction;
                 delegates = new Dictionary<Type, Delegate> {{eventType, action}};
-                _events.Add(eventName, delegates);
+                _events.Add(channel, delegates);
             }
             else
             {
@@ -70,13 +70,13 @@ namespace Hermit.Services
             }
         }
 
-        public void Unsubscribe<T>(string eventName, EventAction<T> eventAction, bool keepEvent = false)
+        public void Unsubscribe<T>(string channel, EventAction<T> eventAction, bool keepEvent = false)
         {
             if (eventAction == null) { throw new Exception("No subscriber."); }
 
             var eventType = typeof(T);
 
-            if (!_events.TryGetValue(eventName, out var delegates)) { return; }
+            if (!_events.TryGetValue(channel, out var delegates)) { return; }
 
             if (!delegates.TryGetValue(eventType, out var del)) { return; }
 
@@ -86,18 +86,18 @@ namespace Hermit.Services
             if (ret == null && !keepEvent)
             {
                 delegates.Remove(eventType);
-                if (delegates.Count <= 0) { _events.Remove(eventName); }
+                if (delegates.Count <= 0) { _events.Remove(channel); }
             }
             else { delegates[eventType] = ret; }
         }
 
-        public void Unsubscribe(string eventName, EventAction eventAction, bool keepEvent = false)
+        public void Unsubscribe(string channel, EventAction eventAction, bool keepEvent = false)
         {
             if (eventAction == null) { throw new Exception("No subscriber."); }
 
             var eventType = typeof(EventAction);
 
-            if (!_events.TryGetValue(eventName, out var delegates)) { return; }
+            if (!_events.TryGetValue(channel, out var delegates)) { return; }
 
             if (!delegates.TryGetValue(eventType, out var del)) { return; }
 
@@ -107,7 +107,7 @@ namespace Hermit.Services
             if (ret == null && !keepEvent)
             {
                 delegates.Remove(eventType);
-                if (delegates.Count <= 0) { _events.Remove(eventName); }
+                if (delegates.Count <= 0) { _events.Remove(channel); }
             }
             else { delegates[eventType] = ret; }
         }
