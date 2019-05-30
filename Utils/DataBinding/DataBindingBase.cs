@@ -21,7 +21,15 @@ namespace Hermit
 
         protected virtual void Awake()
         {
-            if (DataProvider is IViewModelProvider provider) { ViewModel = provider.GetViewModel(); }
+            if (DataProvider != null && DataProvider is IViewModelProvider provider)
+            {
+                ViewModel = provider.GetViewModel();
+            }
+            else
+            {
+                var dataProvider = GetComponentInParent<IViewModelProvider>();
+                ViewModel = dataProvider.GetViewModel();
+            }
         }
 
         protected static (string typeName, string memberName) ParseEntry2TypeMember(string entry)

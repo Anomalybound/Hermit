@@ -53,7 +53,10 @@ namespace Hermit.DataBindings
 
         public override void OnInspectorGUI()
         {
-            EditorGUILayout.PropertyField(serializedObject.FindProperty("DataProvider"));
+            using (new EditorGUI.DisabledScope(true))
+            {
+                EditorGUILayout.PropertyField(serializedObject.FindProperty("DataProvider"));
+            }
         }
 
         private void SetupStyles()
@@ -390,8 +393,9 @@ namespace Hermit.DataBindings
                     var viewModelType = assembly.GetType(dataProvider.GetViewModelTypeName);
                     if (viewModelType == null) { continue; }
 
-                    viewModelTypes.Add(viewModelType);
-                    providerTypeLookup.Add(viewModelType, dataProvider);
+                    if (!viewModelTypes.Contains(viewModelType)) { viewModelTypes.Add(viewModelType); }
+
+                    providerTypeLookup[viewModelType] = dataProvider;
                 }
             }
 

@@ -25,7 +25,7 @@ namespace Hermit
             set
             {
 #if UNITY_EDITOR
-                UnityEditor.EditorUtility.SetDirty(this);
+                if (_viewEventEntry != value) { UnityEditor.EditorUtility.SetDirty(this); }
 #endif
                 _viewEventEntry = value;
             }
@@ -37,7 +37,7 @@ namespace Hermit
             set
             {
 #if UNITY_EDITOR
-                UnityEditor.EditorUtility.SetDirty(this);
+                if (viewModelAdapterType != value) { UnityEditor.EditorUtility.SetDirty(this); }
 #endif
                 viewModelAdapterType = value;
             }
@@ -49,7 +49,7 @@ namespace Hermit
             set
             {
 #if UNITY_EDITOR
-                UnityEditor.EditorUtility.SetDirty(this);
+                if (_viewModelAdapterOptions != value) { UnityEditor.EditorUtility.SetDirty(this); }
 #endif
                 _viewModelAdapterOptions = value;
             }
