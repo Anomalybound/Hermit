@@ -6,7 +6,7 @@ namespace Hermit
 {
     public sealed partial class Her
     {
-        public static Version Version = new Version("0.1.2");
+        public static Version Version = new Version("0.1.3");
 
         private static Her Current
         {
