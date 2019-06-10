@@ -26,7 +26,7 @@ namespace Hermit.Procedure
 
         public TProcedureIndex Current => IndexLookup[Root.ActiveStates.Peek()];
 
-        public override async Task<IState> BuildState()
+        protected override async Task<IState> BuildState()
         {
             var root = new State();
 

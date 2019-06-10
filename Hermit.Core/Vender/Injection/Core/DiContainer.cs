@@ -10,7 +10,7 @@ namespace Hermit.Injection
     {
         protected readonly List<IBindingInfo> BinderInfos = new List<IBindingInfo>();
 
-        protected readonly List<IModule> Modules = new List<IModule>();
+        protected readonly List<IServiceProvider> Modules = new List<IServiceProvider>();
 
         protected readonly Dictionary<(string, Type), object> SingletonInstance =
             new Dictionary<(string, Type), object>();
@@ -23,11 +23,11 @@ namespace Hermit.Injection
 
         protected readonly Queue<object> PendingInjectionQueue = new Queue<object>();
 
-        public IDependencyContainer MountModule(params IModule[] modules)
+        public IDependencyContainer MountModule(params IServiceProvider[] serviceProviders)
         {
-            Modules.AddRange(modules);
+            Modules.AddRange(serviceProviders);
 
-            foreach (var module in modules) { module.RegisterBindings(this); }
+            foreach (var module in serviceProviders) { module.RegisterBindings(this); }
 
             return this;
         }

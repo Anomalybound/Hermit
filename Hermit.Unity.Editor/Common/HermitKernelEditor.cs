@@ -22,16 +22,16 @@ namespace Hermit
             }
 
             var kernelObj = new GameObject("Hermit Kernel",
-                typeof(HermitKernel), typeof(HermitKernelModule), typeof(HermitDataBindingModule)
+                typeof(HermitKernel), typeof(HermitKernelServiceProvider), typeof(HermitDataBindingServiceProvider)
             );
             kernel = kernelObj.GetComponent<HermitKernel>();
 
-            var array = new MonoModule[]
+            var array = new MonoServiceProvider[]
             {
-                kernelObj.GetComponent<HermitKernelModule>(),
-                kernelObj.GetComponent<HermitDataBindingModule>()
+                kernelObj.GetComponent<HermitKernelServiceProvider>(),
+                kernelObj.GetComponent<HermitDataBindingServiceProvider>()
             };
-            var fieldInfo = typeof(HermitKernel).GetField("Modules", BindingFlags.NonPublic | BindingFlags.Instance);
+            var fieldInfo = typeof(HermitKernel).GetField("ServiceProviders", BindingFlags.NonPublic | BindingFlags.Instance);
             fieldInfo?.SetValue(kernel, array);
         }
 

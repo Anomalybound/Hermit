@@ -1,6 +1,6 @@
 ﻿namespace Hermit.Injection
 {
-    public interface IModule
+    public interface IServiceProvider
     {
         void RegisterBindings(IDependencyContainer Container);
 

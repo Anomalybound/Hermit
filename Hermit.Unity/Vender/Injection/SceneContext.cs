@@ -11,7 +11,7 @@ namespace Hermit.Injection
         public IDependencyContainer Container { get; } = new DiContainer();
 
         [SerializeField]
-        protected MonoModule[] Modules = { };
+        protected MonoServiceProvider[] ServiceProviders = { };
 
         protected virtual void Awake()
         {
@@ -20,20 +20,20 @@ namespace Hermit.Injection
             var sw = Stopwatch.StartNew();
             sw.Start();
 
-            foreach (var module in Modules)
+            foreach (var provider in ServiceProviders)
             {
-                if (module == null) { continue; }
+                if (provider == null) { continue; }
 
-                module.RegisterBindings(Container);
+                provider.RegisterBindings(Container);
             }
 
             Container.Build();
 
-            foreach (var module in Modules)
+            foreach (var provider in ServiceProviders)
             {
-                if (module == null) { continue; }
+                if (provider == null) { continue; }
 
-                module.Initialization(Container);
+                provider.Initialization(Container);
             }
 
             foreach (var go in (GameObject[]) Resources.FindObjectsOfTypeAll(typeof(GameObject)))
