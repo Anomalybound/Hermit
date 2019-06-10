@@ -605,7 +605,12 @@ namespace Hermit.DataBindings
                 selection = EditorGUILayout.Popup("Adapters", selection, options.ToArray());
                 selection--;
 
-                if (lookup.Count <= selection || selection < 0) { return (adapterTypeName, null); }
+                if (lookup.Count <= selection || selection < 0)
+                {
+                    if (selection < 0) { return (null, null); }
+
+                    return (adapterTypeName, null);
+                }
 
                 var adapter = data[selection];
                 if (AdapterAttributeLookup.TryGetValue(adapter, out var adapterAttribute))
