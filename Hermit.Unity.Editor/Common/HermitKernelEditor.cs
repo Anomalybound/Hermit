@@ -1,20 +1,24 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Reflection;
 using Hermit.Common;
 using Hermit.Injection;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.Windows.Speech;
+using Object = UnityEngine.Object;
 
 namespace Hermit
 {
-    public class HermitKernelEditor
+    [CustomEditor(typeof(HermitKernel))]
+    public class HermitKernelEditor : Editor
     {
         public const string HERMIT_DOTWEEN = "HERMIT_DOTWEEN";
 
         [MenuItem("Hermit/Quick Scene Setup %#k")]
         public static void Setup()
         {
-            var kernel = Object.FindObjectOfType<HermitKernel>();
+            var kernel = FindObjectOfType<HermitKernel>();
             if (kernel != null)
             {
                 Debug.LogWarning("Kernel already exists.");
@@ -31,7 +35,8 @@ namespace Hermit
                 kernelObj.GetComponent<HermitKernelServiceProvider>(),
                 kernelObj.GetComponent<HermitDataBindingServiceProvider>()
             };
-            var fieldInfo = typeof(HermitKernel).GetField("ServiceProviders", BindingFlags.NonPublic | BindingFlags.Instance);
+            var fieldInfo =
+                typeof(HermitKernel).GetField("ServiceProviders", BindingFlags.NonPublic | BindingFlags.Instance);
             fieldInfo?.SetValue(kernel, array);
         }
 
@@ -52,6 +57,21 @@ namespace Hermit
 #endif
             defineString = string.Join(";", defines);
             PlayerSettings.SetScriptingDefineSymbolsForGroup(targetGroup, defineString);
+        }
+
+        private GUIStyle VersionDisplay;
+
+        private void OnEnable()
+        {
+            VersionDisplay = new GUIStyle(EditorStyles.helpBox) {alignment = TextAnchor.MiddleCenter};
+        }
+
+        public override void OnInspectorGUI()
+        {
+            serializedObject.Update();
+
+            EditorGUILayout.LabelField($"Hermit Version: {Her.Version}", VersionDisplay);
+            EditorGUILayout.PropertyField(serializedObject.FindProperty("ServiceProviders"), true);
         }
     }
 }
