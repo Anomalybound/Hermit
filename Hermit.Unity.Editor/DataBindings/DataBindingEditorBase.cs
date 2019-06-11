@@ -207,7 +207,7 @@ namespace Hermit.DataBindings
 
         #region View
 
-        protected virtual string DrawViewPopup(string viewEntry)
+        protected virtual string DrawViewPropertyPopup(string viewEntry)
         {
             var components = BindingBase.gameObject.GetComponents<Component>().ToList();
             var data = new List<Type>();
@@ -237,6 +237,49 @@ namespace Hermit.DataBindings
             using (var check = new EditorGUI.ChangeCheckScope())
             {
                 selection = EditorGUILayout.Popup("Properties", selection, options.ToArray());
+
+                if (ViewSource == null && selection >= 0) { ViewSource = data[selection]; }
+
+                if (!check.changed) { return viewEntry; }
+
+                ViewSource = data[selection];
+                return lookup[selection];
+            }
+        }
+
+        protected virtual string DrawViewMethodPopup(string viewEntry, bool declaredMethodsOnly)
+        {
+            var components = BindingBase.gameObject.GetComponents<Component>().ToList();
+            var data = new List<Type>();
+            var options = new List<string>();
+            var lookup = new List<string>();
+
+            // Fill data
+            foreach (var component in components)
+            {
+                if (component == BindingBase) { continue; }
+
+                var filter = BindingFlags.Instance | BindingFlags.Public;
+                if (declaredMethodsOnly) { filter |= BindingFlags.DeclaredOnly; }
+
+                var methodInfos = component.GetType()
+                    .GetMethods(filter)
+                    .Where(m => !m.IsSpecialName && m.GetParameters().Length <= 1);
+
+                foreach (var methodInfo in methodInfos)
+                {
+                    var parameter = methodInfo.GetParameters();
+                    var parameterType = parameter.Length == 1 ? parameter[0].ParameterType : typeof(void);
+                    data.Add(parameterType);
+                    lookup.Add($"{component.GetType()}.{methodInfo.Name}");
+                    options.Add($"{component.GetType().Name}/{methodInfo.Name} - [{parameterType.Name}]");
+                }
+            }
+
+            var selection = lookup.IndexOf(viewEntry);
+            using (var check = new EditorGUI.ChangeCheckScope())
+            {
+                selection = EditorGUILayout.Popup("Methods", selection, options.ToArray());
 
                 if (ViewSource == null && selection >= 0) { ViewSource = data[selection]; }
 

@@ -2,20 +2,20 @@ using UnityEditor;
 
 namespace Hermit.DataBindings
 {
-    [CustomEditor(typeof(OneWayPropertyBinding))]
-    public class OneWayDataBindingEditor : DataBindingEditorBase
+    [CustomEditor(typeof(PropertyMethodBinding))]
+    public class PropertyMethodBindingEditor : DataBindingEditorBase
     {
         #region Runtime Variables
 
         protected SerializedProperty ViewAdapterOptions;
 
-        protected OneWayPropertyBinding Target;
+        protected PropertyMethodBinding Target;
 
         #endregion
 
         protected override void OnEnable()
         {
-            Target = target as OneWayPropertyBinding;
+            Target = target as PropertyMethodBinding;
 
             base.OnEnable();
 
@@ -25,7 +25,9 @@ namespace Hermit.DataBindings
         public override void OnInspectorGUI()
         {
             base.OnInspectorGUI();
-            
+
+            EditorGUILayout.PropertyField(serializedObject.FindProperty(nameof(Target.ShowDeclaredMethodsOnly)));
+
             using (new EditorGUILayout.VerticalScope(EditorStyles.helpBox))
             {
                 DrawBindingLabel("View Model", ViewModelSource);
@@ -43,7 +45,7 @@ namespace Hermit.DataBindings
                 EditorGUI.BeginDisabledGroup(Target.ViewModelEntry == null);
 
                 // Draw View Popup
-                Target.ViewEntry = DrawViewPropertyPopup(Target.ViewEntry);
+                Target.ViewEntry = DrawViewMethodPopup(Target.ViewEntry, Target.ShowDeclaredMethodsOnly);
 
                 // Draw View adapter popup
                 Target.ViewAdapterType = DrawViewAdapterPopup(Target.ViewAdapterType, ViewAdapterOptions);

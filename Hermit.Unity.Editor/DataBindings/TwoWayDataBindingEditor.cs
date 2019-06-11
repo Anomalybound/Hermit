@@ -51,7 +51,7 @@ namespace Hermit.DataBindings
                 DrawBindingLabel("View", ViewSource);
 
                 // Draw View Popup
-                Target.ViewEntry = DrawViewPopup(Target.ViewEntry);
+                Target.ViewEntry = DrawViewPropertyPopup(Target.ViewEntry);
 
                 // Draw View Adapter
                 Target.ViewAdapterType = DrawViewAdapterPopup(Target.ViewAdapterType, ViewAdapterOptions);
