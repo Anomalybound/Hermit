@@ -16,8 +16,6 @@ namespace Hermit
         {
             return new TweenAwaiter(self, cancellationToken);
         }
-
-        #endregion
     }
 }
 #endif

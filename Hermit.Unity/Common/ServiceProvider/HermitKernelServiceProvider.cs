@@ -5,7 +5,7 @@ using Hermit.UIStack;
 
 namespace Hermit.Common
 {
-    public class HermitKernelModule : MonoModule
+    public class HermitKernelServiceProvider : MonoServiceProvider
     {
         [Header("General")]
         [SerializeField]
@@ -29,6 +29,7 @@ namespace Hermit.Common
             Container.Bind<ITime>().To<UnityTime>();
             Container.Bind<ILog>().To<UnityLog>().FromInstance(new UnityLog(EnableLog));
             Container.Bind<IUIStack>().FromMethod(BuildUIStackInstance);
+            Container.Bind<IStore>().To<DictionaryStore>();
 
             // View Loader
             Container.Bind<IViewLoader>().To<ResourcesViewLoader>();
@@ -36,6 +37,9 @@ namespace Hermit.Common
             // Essentials
             Container.BindInstance(Container);
             Container.BindAll<Her>();
+
+            // MonoBehaviors
+            Container.Bind<EngineRunner>().FromMethod(EngineRunner.CreateInstance);
         }
 
         protected IUIStack BuildUIStackInstance(IDependencyContainer container)

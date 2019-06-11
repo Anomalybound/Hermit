@@ -4,34 +4,34 @@ namespace Hermit
     {
         #region Events
 
-        public static void On(string eventName, EventAction action)
+        public static void On(string channel, EventAction action)
         {
-            Current._eventBroker.Subscribe(eventName, action);
+            Current.eventBroker.Subscribe(channel, action);
         }
 
-        public static void On<T>(string eventName, EventAction<T> action)
+        public static void On<T>(string channel, EventAction<T> action)
         {
-            Current._eventBroker.Subscribe(eventName, action);
+            Current.eventBroker.Subscribe(channel, action);
         }
 
-        public static void Un(string eventName, EventAction action, bool keepEvent = false)
+        public static void Un(string channel, EventAction action, bool keepEvent = false)
         {
-            Current._eventBroker.Unsubscribe(eventName, action, keepEvent);
+            Current.eventBroker.Unsubscribe(channel, action, keepEvent);
         }
 
-        public static void Un<T>(string eventName, EventAction<T> action, bool keepEvent = false)
+        public static void Un<T>(string channel, EventAction<T> action, bool keepEvent = false)
         {
-            Current._eventBroker.Unsubscribe(eventName, action, keepEvent);
+            Current.eventBroker.Unsubscribe(channel, action, keepEvent);
         }
 
-        public static void Fire(string eventName)
+        public static void Fire(string channel)
         {
-            Current._eventBroker.Publish(eventName);
+            Current.eventBroker.Publish(channel);
         }
 
-        public static void Fire<T>(string eventName, T message)
+        public static void Fire<T>(string channel, T message)
         {
-            Current._eventBroker.Publish(eventName, message);
+            Current.eventBroker.Publish(channel, message);
         }
 
         #endregion

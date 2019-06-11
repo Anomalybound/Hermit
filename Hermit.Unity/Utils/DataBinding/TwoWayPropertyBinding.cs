@@ -92,9 +92,9 @@ namespace Hermit
             UpdateViewProperty();
         }
 
-        protected override void DisConnect()
+        public override void Disconnect()
         {
-            base.DisConnect();
+            base.Disconnect();
 
             ViewEventBinder?.Disconnect();
         }

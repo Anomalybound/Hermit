@@ -6,7 +6,7 @@ namespace Hermit.Injection
     {
         #region Container
 
-        IDependencyContainer MountModule(params IModule[] modules);
+        IDependencyContainer MountModule(params IServiceProvider[] serviceProviders);
 
         void Build();
 

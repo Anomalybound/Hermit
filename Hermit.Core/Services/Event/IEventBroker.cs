@@ -46,21 +46,21 @@
         /// <summary>
         /// Unsubscribe all callbacks from event.
         /// </summary>
-        /// <param name="eventName"></param>
+        /// <param name="channel"></param>
         /// <param name="keepEvent">GC optimization - clear only callback list and keep event for future use.</param>
-        void UnsubscribeAll(string eventName, bool keepEvent = false);
+        void UnsubscribeAll(string channel, bool keepEvent = false);
 
         /// <summary>
         /// Publish event.
         /// </summary>
-        /// <param name="eventName"></param>
+        /// <param name="channel"></param>
         /// <param name="eventMessage">Event message.</param>
-        void Publish<T>(string eventName, T eventMessage);
+        void Publish<T>(string channel, T eventMessage);
 
         /// <summary>
         /// Publish event.
         /// </summary>
-        /// <param name="eventName"></param>
-        void Publish(string eventName);
+        /// <param name="channel"></param>
+        void Publish(string channel);
     }
 }

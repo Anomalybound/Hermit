@@ -2,7 +2,7 @@
 
 namespace Hermit.Injection
 {
-    public abstract class MonoModule : MonoBehaviour, IModule
+    public abstract class MonoServiceProvider : MonoBehaviour, IServiceProvider
     {
         public abstract void RegisterBindings(IDependencyContainer Container);
 

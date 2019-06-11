@@ -1,3 +1,5 @@
+using System;
+
 namespace Hermit
 {
     public interface IViewModelProvider
@@ -7,7 +9,9 @@ namespace Hermit
         ViewModel GetViewModel();
 
         string GetViewModelTypeName { get; }
-        
+
         void ReBindAll();
+
+        event Action DataReadyEvent;
     }
 }

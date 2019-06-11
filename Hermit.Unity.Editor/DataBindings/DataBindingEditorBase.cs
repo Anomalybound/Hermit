@@ -62,7 +62,7 @@ namespace Hermit.DataBindings
 
             using (new EditorGUI.DisabledScope(true))
             {
-                EditorGUILayout.PropertyField(serializedObject.FindProperty("DataProvider"));
+                EditorGUILayout.PropertyField(serializedObject.FindProperty(nameof(BindingBase.DataProviderComponent)));
             }
         }
 
@@ -193,7 +193,7 @@ namespace Hermit.DataBindings
                 if (check.changed)
                 {
                     viewModelEntry = lookup[selection];
-                    BindingBase.DataProvider = providerLookup[viewModelTypeLookup[selection]] as Component;
+                    BindingBase.DataProviderComponent = providerLookup[viewModelTypeLookup[selection]] as Component;
 
                     ViewModelSource = propertyTypeLookup[selection];
                     ViewModelDest = null;
@@ -455,14 +455,14 @@ namespace Hermit.DataBindings
             {
                 selection = EditorGUILayout.Popup("Actions", selection, options.ToArray());
 
-                if (BindingBase.DataProvider == null)
+                if (BindingBase.DataProviderComponent == null)
                 {
-                    BindingBase.DataProvider = providerLookup[arguments.Count][selection];
+                    BindingBase.DataProviderComponent = providerLookup[arguments.Count][selection];
                 }
 
                 if (!check.changed) { return viewModelActionEntry; }
 
-                BindingBase.DataProvider = providerLookup[arguments.Count][selection];
+                BindingBase.DataProviderComponent = providerLookup[arguments.Count][selection];
                 serializedObject.ApplyModifiedProperties();
                 return lookup[selection];
             }
@@ -556,11 +556,11 @@ namespace Hermit.DataBindings
 
                 if (selection < 0) { return viewModelCollectionEntry; }
 
-                if (BindingBase.DataProvider == null) { BindingBase.DataProvider = data[selection]; }
+                if (BindingBase.DataProviderComponent == null) { BindingBase.DataProviderComponent = data[selection]; }
 
                 if (!check.changed) { return viewModelCollectionEntry; }
 
-                BindingBase.DataProvider = data[selection];
+                BindingBase.DataProviderComponent = data[selection];
                 serializedObject.ApplyModifiedProperties();
                 return lookup[selection];
             }
@@ -605,7 +605,12 @@ namespace Hermit.DataBindings
                 selection = EditorGUILayout.Popup("Adapters", selection, options.ToArray());
                 selection--;
 
-                if (lookup.Count <= selection || selection < 0) { return (adapterTypeName, null); }
+                if (lookup.Count <= selection || selection < 0)
+                {
+                    if (selection < 0) { return (null, null); }
+
+                    return (adapterTypeName, null);
+                }
 
                 var adapter = data[selection];
                 if (AdapterAttributeLookup.TryGetValue(adapter, out var adapterAttribute))

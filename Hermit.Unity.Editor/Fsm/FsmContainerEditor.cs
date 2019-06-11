@@ -20,6 +20,8 @@ namespace Hermit
         {
             serializedObject.Update();
 
+            EditorGUILayout.PropertyField(serializedObject.FindProperty(nameof(_fsm.UseFixedUpdate)));
+
             if (_fsm.Root == null)
             {
                 EditorGUILayout.LabelField("Root state not initialized.");

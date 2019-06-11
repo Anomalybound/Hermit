@@ -6,7 +6,7 @@ namespace Hermit
 {
     public sealed partial class Her
     {
-        public static Version Version = new Version("0.0.1");
+        public static Version Version = new Version("0.1.4");
 
         private static Her Current
         {
@@ -20,20 +20,24 @@ namespace Hermit
 
         private static Her current;
 
-        private readonly IDependencyContainer _container;
+        private IDependencyContainer container { get; }
 
-        private readonly IEventBroker _eventBroker;
+        private IEventBroker eventBroker { get; }
 
-        private readonly IUIStack _iuiStack;
+        private IUIStack uiStack { get; }
 
-        private readonly ILog _logger;
+        private ILog logger { get; }
 
-        public Her(IDependencyContainer container, IEventBroker eventBroker, IUIStack iuiStack, ILog logger)
+        public Her(IDependencyContainer container, IEventBroker eventBroker, IUIStack uiStack, ILog logger)
         {
-            _container = container;
-            _eventBroker = eventBroker;
-            _iuiStack = iuiStack;
-            _logger = logger;
+            this.container = container;
+            this.eventBroker = eventBroker;
+            this.uiStack = uiStack;
+            this.logger = logger;
+
+            var store = container.Resolve<IStore>();
+            store.SetStoreId("Global");
+            stores.Add("Global", store);
 
             current = this;
         }

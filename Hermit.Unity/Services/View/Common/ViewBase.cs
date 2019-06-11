@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 namespace Hermit
@@ -10,6 +11,8 @@ namespace Hermit
         {
             if (context is TViewModel viewModel) { DataContext = viewModel; }
             else { Her.Warn($"{context} is not matching {typeof(TViewModel)}"); }
+
+            DataReadyEvent?.Invoke();
         }
 
         public virtual TViewModel GetViewModel()
@@ -31,6 +34,8 @@ namespace Hermit
                 }
             }
         }
+
+        public event Action DataReadyEvent;
 
         ViewModel IViewModelProvider.GetViewModel()
         {

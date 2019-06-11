@@ -6,30 +6,54 @@ namespace Hermit
 {
     public abstract class FsmContainer : MonoBehaviour
     {
+        public bool UseFixedUpdate;
+
         public IState Root { get; protected set; }
 
-        private bool _running;
+        protected bool Running { get; private set; }
 
-        public abstract Task<IState> BuildState();
+        protected abstract Task<IState> BuildState();
 
-        protected virtual async void Awake()
+        protected virtual void OnInit() { }
+
+        protected virtual void OnUpdate(float deltaTime) { }
+
+        protected virtual void OnFixedUpdate(float deltaTime) { }
+
+        protected virtual void OnResume() { }
+
+        protected virtual void OnPause() { }
+
+        private async void Awake()
         {
+            OnInit();
             Root = await BuildState();
         }
 
-        protected virtual void OnEnable()
+        private void OnEnable()
         {
-            _running = true;
+            Running = true;
+            OnResume();
         }
 
-        protected virtual void OnDisable()
+        private void OnDisable()
         {
-            _running = false;
+            Running = false;
+            OnPause();
         }
 
-        protected virtual void Update()
+        private void Update()
         {
-            if (_running) { Root?.Update(Time.deltaTime); }
+            if (Running && !UseFixedUpdate) { Root?.Update(Time.deltaTime); }
+
+            OnUpdate(Time.deltaTime);
+        }
+
+        private void FixedUpdate()
+        {
+            if (Running && UseFixedUpdate) { Root?.Update(Time.fixedDeltaTime); }
+
+            OnFixedUpdate(Time.fixedDeltaTime);
         }
     }
 }

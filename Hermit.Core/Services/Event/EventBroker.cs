@@ -12,8 +12,10 @@ namespace Hermit.Services
 
         private int _eventsInCall;
 
-        private readonly Dictionary<string, Dictionary<Type, Delegate>> _events =
+        private readonly Dictionary<string, Dictionary<Type, Delegate>> _genericEvents =
             new Dictionary<string, Dictionary<Type, Delegate>>(32);
+
+        private readonly Dictionary<string, Delegate> _nonGenericEvents = new Dictionary<string, Delegate>(32);
 
         public static EventBroker Current => new EventBroker();
 
@@ -23,11 +25,11 @@ namespace Hermit.Services
 
             var eventType = typeof(T);
 
-            if (!_events.TryGetValue(channel, out var delegates))
+            if (!_genericEvents.TryGetValue(channel, out var delegates))
             {
                 var action = eventAction;
-                delegates = new Dictionary<Type, Delegate> { { eventType, action } };
-                _events.Add(channel, delegates);
+                delegates = new Dictionary<Type, Delegate> {{eventType, action}};
+                _genericEvents.Add(channel, delegates);
             }
             else
             {
@@ -47,26 +49,8 @@ namespace Hermit.Services
         {
             if (eventAction == null) { throw new Exception("No subscriber."); }
 
-            var eventType = typeof(EventAction);
-
-            if (!_events.TryGetValue(channel, out var delegates))
-            {
-                var action = eventAction;
-                delegates = new Dictionary<Type, Delegate> { { eventType, action } };
-                _events.Add(channel, delegates);
-            }
-            else
-            {
-                if (delegates.TryGetValue(eventType, out var del))
-                {
-                    delegates[eventType] = (del as EventAction) + eventAction;
-                }
-                else
-                {
-                    var action = eventAction;
-                    delegates.Add(eventType, action);
-                }
-            }
+            if (!_nonGenericEvents.TryGetValue(channel, out var del)) { _nonGenericEvents.Add(channel, eventAction); }
+            else { _nonGenericEvents[channel] = (del as EventAction) + eventAction; }
         }
 
         public void Unsubscribe<T>(string channel, EventAction<T> eventAction, bool keepEvent = false)
@@ -75,17 +59,17 @@ namespace Hermit.Services
 
             var eventType = typeof(T);
 
-            if (!_events.TryGetValue(channel, out var delegates)) { return; }
+            if (!_genericEvents.TryGetValue(channel, out var delegates)) { return; }
 
             if (!delegates.TryGetValue(eventType, out var del)) { return; }
 
             if (del == null) { return; }
 
-            var ret = (EventAction<T>)del - eventAction;
+            var ret = (EventAction<T>) del - eventAction;
             if (ret == null && !keepEvent)
             {
                 delegates.Remove(eventType);
-                if (delegates.Count <= 0) { _events.Remove(channel); }
+                if (delegates.Count <= 0) { _genericEvents.Remove(channel); }
             }
             else { delegates[eventType] = ret; }
         }
@@ -96,68 +80,69 @@ namespace Hermit.Services
 
             var eventType = typeof(EventAction);
 
-            if (!_events.TryGetValue(channel, out var delegates)) { return; }
+            if (!_genericEvents.TryGetValue(channel, out var delegates)) { return; }
 
             if (!delegates.TryGetValue(eventType, out var del)) { return; }
 
             if (del == null) { return; }
 
-            var ret = (EventAction)del - eventAction;
+            var ret = (EventAction) del - eventAction;
             if (ret == null && !keepEvent)
             {
                 delegates.Remove(eventType);
-                if (delegates.Count <= 0) { _events.Remove(channel); }
+                if (delegates.Count <= 0) { _genericEvents.Remove(channel); }
             }
             else { delegates[eventType] = ret; }
         }
 
-        public void UnsubscribeAll(string eventName, bool keepEvent = false)
+        public void UnsubscribeAll(string channel, bool keepEvent = false)
         {
-            if (!_events.TryGetValue(eventName, out var delegates)) { return; }
+            if (!_genericEvents.TryGetValue(channel, out var delegates)) { return; }
 
             if (keepEvent)
             {
                 foreach (var valuePair in delegates) { delegates[valuePair.Key] = null; }
             }
-            else { _events[eventName].Clear(); }
+            else { _genericEvents[channel].Clear(); }
         }
 
-        public void Publish<T>(string eventName, T eventMessage)
+        public void Publish<T>(string channel, T eventMessage)
         {
-            if (_eventsInCall >= MaxCallDepth)
-            {
-                throw new Exception("Max call depth reached");
-            }
+            if (_eventsInCall >= MaxCallDepth) { throw new Exception("Max call depth reached"); }
 
             if (eventMessage == null) { throw new Exception("Message is null."); }
 
             var eventType = eventMessage.GetType();
 
-            if (!_events.TryGetValue(eventName, out var delegates)) { return; }
+            _genericEvents.TryGetValue(channel, out var delegates);
 
-            if (!delegates.TryGetValue(eventType, out var del)) { return; }
+            Delegate genericDelegate = null;
 
-            var evtAction = del as EventAction<T>;
+            delegates?.TryGetValue(eventType, out genericDelegate);
+
+            var genericEventAction = genericDelegate as EventAction<T>;
+
+            _nonGenericEvents.TryGetValue(channel, out genericDelegate);
+
+            var nonGenericEventAction = genericDelegate as EventAction;
 
             _eventsInCall++;
-            try { evtAction?.Invoke(eventMessage); }
+
+            try
+            {
+                genericEventAction?.Invoke(eventMessage);
+                nonGenericEventAction?.Invoke();
+            }
             catch (Exception ex) { throw ex; }
 
             _eventsInCall--;
         }
 
-        public void Publish(string eventName)
+        public void Publish(string channel)
         {
-            if (_eventsInCall >= MaxCallDepth)
-            {
-                throw new Exception("Max call depth reached");
-            }
+            if (_eventsInCall >= MaxCallDepth) { throw new Exception("Max call depth reached"); }
 
-            var eventType = typeof(EventAction);
-
-            if (!_events.TryGetValue(eventName, out var delegates)) { return; }
-
-            if (!delegates.TryGetValue(eventType, out var del)) { return; }
+            if (!_nonGenericEvents.TryGetValue(channel, out var del)) { return; }
 
             var evtAction = del as EventAction;
 

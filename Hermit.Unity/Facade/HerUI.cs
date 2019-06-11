@@ -7,55 +7,55 @@ namespace Hermit
     {
         #region UI Manager
 
-        public static async Task<int> Push(string widgetName)
+        public static async Task<int> PushAsync(string widgetName)
         {
-            return await Push<Widget>(widgetName);
+            return await PushAsync<Widget>(widgetName);
         }
 
-        public static async Task<int> Push(string widgetName, UIMessage message)
+        public static async Task<int> PushAsync(string widgetName, UIMessage message)
         {
-            return await Push<Widget>(widgetName, message);
+            return await PushAsync<Widget>(widgetName, message);
         }
 
-        public static async Task<int> Push<TWidget>(string widgetName) where TWidget : Widget
+        public static async Task<int> PushAsync<TWidget>(string widgetName) where TWidget : Widget
         {
-            return await Push<TWidget>(widgetName, UIMessage.Empty);
+            return await PushAsync<TWidget>(widgetName, UIMessage.Empty);
         }
 
-        public static async Task<int> Push<TWidget>(string widgetName, UIMessage message)
+        public static async Task<int> PushAsync<TWidget>(string widgetName, UIMessage message)
             where TWidget : Widget
         {
-            return await Current._iuiStack.Push<TWidget>(widgetName, message);
+            return await Current.uiStack.PushAsync<TWidget>(widgetName, message);
         }
 
         public static async void Pop(bool recycle = false)
         {
-            await Current._iuiStack.Pop(recycle);
+            await Current.uiStack.PopAsync(recycle);
         }
 
         public static async void ClearPopups()
         {
-            await Current._iuiStack.ClearPopups();
+            await Current.uiStack.ClearPopups();
         }
 
         public static async void ClearFixes()
         {
-            await Current._iuiStack.ClearFixes();
+            await Current.uiStack.ClearFixes();
         }
 
         public static async void ClearWindows()
         {
-            await Current._iuiStack.ClearWindows();
+            await Current.uiStack.ClearWindows();
         }
 
         public static async void ClearAll()
         {
-            await Current._iuiStack.ClearAll();
+            await Current.uiStack.ClearAll();
         }
 
         public static async void Close(int widgetId, bool recycle = false)
         {
-            await Current._iuiStack.Close(widgetId, recycle);
+            await Current.uiStack.Close(widgetId, recycle);
         }
 
         #endregion

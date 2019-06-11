@@ -18,13 +18,13 @@ namespace Hermit.Fsm
 
         #region Operations
 
-        Task ChangeState(string stateName);
+        Task ChangeStateAsync(string stateName);
 
-        Task PushState(string stateName);
+        Task PushStateAsync(string stateName);
 
-        Task PopState();
+        Task PopStateAsync();
 
-        Task TriggerEvent(string id, EventArgs eventArgs);
+        Task TriggerEventAsync(string id, EventArgs eventArgs);
 
         #endregion
     }

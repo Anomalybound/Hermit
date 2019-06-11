@@ -1,7 +1,5 @@
 using System;
-using System.ComponentModel;
 using System.Reflection;
-using Hermit.DataBinding;
 using UnityEngine;
 using Component = UnityEngine.Component;
 
@@ -10,11 +8,15 @@ namespace Hermit
     [ScriptOrder(10000)]
     public abstract class DataBindingBase : MonoBehaviour
     {
-        public Component DataProvider;
+        public Component DataProviderComponent;
 
         #region Runtime Variables
 
         protected ViewModel ViewModel;
+
+        protected bool IsDataReady;
+
+        protected IViewModelProvider DataProvider;
 
         #endregion
 
@@ -22,30 +24,45 @@ namespace Hermit
 
         protected virtual void Awake()
         {
-            SetupBinding();
+            if (DataProviderComponent != null && DataProviderComponent is IViewModelProvider provider)
+            {
+                DataProvider = provider;
+                provider.DataReadyEvent += OnDataReady;
+            }
+            else
+            {
+                DataProvider = GetComponentInParent<IViewModelProvider>();
+                DataProvider.DataReadyEvent += OnDataReady;
+            }
         }
 
         protected virtual void OnEnable()
         {
+            if (!IsDataReady) { return; }
+
             Connect();
         }
 
-        protected virtual void DisConnect()
+        protected virtual void OnDisable()
         {
+            if (!IsDataReady) { return; }
+
             Disconnect();
+        }
+
+        private void OnDataReady()
+        {
+            IsDataReady = true;
+            DataProvider.DataReadyEvent -= SetupBinding;
+
+            SetupBinding();
+
+            if (enabled) { Connect(); }
         }
 
         public virtual void SetupBinding()
         {
-            if (DataProvider != null && DataProvider is IViewModelProvider provider)
-            {
-                ViewModel = provider.GetViewModel();
-            }
-            else
-            {
-                var dataProvider = GetComponentInParent<IViewModelProvider>();
-                ViewModel = dataProvider.GetViewModel();
-            }
+            ViewModel = DataProvider.GetViewModel();
         }
 
         public abstract void Connect();

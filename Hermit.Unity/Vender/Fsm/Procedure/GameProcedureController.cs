@@ -26,7 +26,7 @@ namespace Hermit.Procedure
 
         public TProcedureIndex Current => IndexLookup[Root.ActiveStates.Peek()];
 
-        public override async Task<IState> BuildState()
+        protected override async Task<IState> BuildState()
         {
             var root = new State();
 
@@ -81,32 +81,32 @@ namespace Hermit.Procedure
 
         public async Task ChangeState(TProcedureIndex index)
         {
-            await Root.ChangeState(index.ToString(CultureInfo.InvariantCulture));
+            await Root.ChangeStateAsync(index.ToString(CultureInfo.InvariantCulture));
         }
 
         public async Task PushState(TProcedureIndex index)
         {
-            await Root.PushState(index.ToString(CultureInfo.InvariantCulture));
+            await Root.PushStateAsync(index.ToString(CultureInfo.InvariantCulture));
         }
 
         public async Task ChangeState(string stateName)
         {
-            await Root.ChangeState(stateName);
+            await Root.ChangeStateAsync(stateName);
         }
 
         public async Task PushState(string stateName)
         {
-            await Root.PushState(stateName);
+            await Root.PushStateAsync(stateName);
         }
 
         public async Task PopState()
         {
-            await Root.PopState();
+            await Root.PopStateAsync();
         }
 
         public async Task TriggerEvent(string eventId, EventArgs args)
         {
-            await Root.TriggerEvent(eventId, args);
+            await Root.TriggerEventAsync(eventId, args);
         }
 
         #endregion
