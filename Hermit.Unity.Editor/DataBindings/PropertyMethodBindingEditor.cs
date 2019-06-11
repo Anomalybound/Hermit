@@ -26,7 +26,11 @@ namespace Hermit.DataBindings
         {
             base.OnInspectorGUI();
 
-            EditorGUILayout.PropertyField(serializedObject.FindProperty(nameof(Target.ShowDeclaredMethodsOnly)));
+            using (var check = new EditorGUI.ChangeCheckScope())
+            {
+                EditorGUILayout.PropertyField(serializedObject.FindProperty(nameof(Target.ShowDeclaredMethodsOnly)));
+                if (check.changed) { serializedObject.ApplyModifiedProperties(); }
+            }
 
             using (new EditorGUILayout.VerticalScope(EditorStyles.helpBox))
             {

@@ -1,6 +1,5 @@
 using System;
 using System.Reflection;
-using UnityEngine.Assertions;
 
 namespace Hermit.DataBinding
 {

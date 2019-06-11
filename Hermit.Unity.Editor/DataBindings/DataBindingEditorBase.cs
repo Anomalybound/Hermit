@@ -62,7 +62,8 @@ namespace Hermit.DataBindings
 
             using (new EditorGUI.DisabledScope(true))
             {
-                EditorGUILayout.PropertyField(serializedObject.FindProperty(nameof(BindingBase.DataProviderComponent)));
+                var providerProperty = nameof(BindingBase.DataProviderComponent);
+                EditorGUILayout.PropertyField(serializedObject.FindProperty(providerProperty));
             }
         }
 

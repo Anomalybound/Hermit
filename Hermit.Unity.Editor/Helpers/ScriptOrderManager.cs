@@ -1,5 +1,4 @@
 ﻿using System;
-using Hermit;
 using UnityEditor;
 
 namespace Hermit

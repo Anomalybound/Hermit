@@ -1,12 +1,9 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
 using System.Reflection;
 using Hermit.Common;
 using Hermit.Injection;
 using UnityEditor;
 using UnityEngine;
-using UnityEngine.Windows.Speech;
-using Object = UnityEngine.Object;
 
 namespace Hermit
 {
@@ -71,7 +68,11 @@ namespace Hermit
             serializedObject.Update();
 
             EditorGUILayout.LabelField($"Hermit Version: {Her.Version}", VersionDisplay);
-            EditorGUILayout.PropertyField(serializedObject.FindProperty("ServiceProviders"), true);
+            using (var check = new EditorGUI.ChangeCheckScope())
+            {
+                EditorGUILayout.PropertyField(serializedObject.FindProperty("ServiceProviders"), true);
+                if (check.changed) { serializedObject.ApplyModifiedProperties(); }
+            }
         }
     }
 }
