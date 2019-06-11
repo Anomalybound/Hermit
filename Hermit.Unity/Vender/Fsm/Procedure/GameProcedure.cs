@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Globalization;
 using System.Threading.Tasks;
+using UnityEngine.Networking;
 
 namespace Hermit.Procedure
 {
@@ -17,15 +18,15 @@ namespace Hermit.Procedure
             await Init(context);
         }
 
-        public sealed override async Task Enter()
+        public sealed override async Task EnterAsync()
         {
-            await base.Enter();
+            await base.EnterAsync();
             await Enter(Context);
         }
 
-        public sealed override async Task Exit()
+        public sealed override async Task ExitAsync()
         {
-            await base.Exit();
+            await base.ExitAsync();
             await Exit(Context);
         }
 
@@ -35,22 +36,22 @@ namespace Hermit.Procedure
             Update(Context, deltaTime);
         }
 
-        public virtual async Task Init(TProcedureController controller)
+        protected virtual async Task Init(TProcedureController controller)
         {
             await Task.FromResult(default(object));
         }
 
-        public virtual async Task Enter(TProcedureController controller)
+        protected virtual async Task Enter(TProcedureController controller)
         {
             await Task.FromResult(default(object));
         }
 
-        public virtual async Task Exit(TProcedureController controller)
+        protected virtual async Task Exit(TProcedureController controller)
         {
             await Task.FromResult(default(object));
         }
 
-        public virtual void Update(TProcedureController controller, float deltaTime) { }
+        protected virtual void Update(TProcedureController controller, float deltaTime) { }
 
         #region Facade
 
@@ -64,22 +65,22 @@ namespace Hermit.Procedure
             await Context.PushState(index.ToString(CultureInfo.InvariantCulture));
         }
 
-        public new async Task ChangeState(string stateName)
+        public new async Task ChangeStateAsync(string stateName)
         {
             await Context.ChangeState(stateName);
         }
 
-        public new async Task PushState(string stateName)
+        public new async Task PushStateAsync(string stateName)
         {
             await Context.PushState(stateName);
         }
 
-        public new async Task PopState()
+        public new async Task PopStateAsync()
         {
             await Context.PopState();
         }
 
-        public new async Task TriggerEvent(string eventId, EventArgs args)
+        public new async Task TriggerEventAsync(string eventId, EventArgs args)
         {
             await Context.TriggerEvent(eventId, args);
         }

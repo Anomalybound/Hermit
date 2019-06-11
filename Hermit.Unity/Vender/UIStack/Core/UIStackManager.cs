@@ -115,22 +115,22 @@ namespace Hermit.UIStack
 
         #region Push
 
-        public async Task<int> Push(string widgetName)
+        public async Task<int> PushAsync(string widgetName)
         {
-            return await Push<Widget>(widgetName);
+            return await PushAsync<Widget>(widgetName);
         }
 
-        public async Task<int> Push(string widgetName, UIMessage message)
+        public async Task<int> PushAsync(string widgetName, UIMessage message)
         {
-            return await Push<Widget>(widgetName, message);
+            return await PushAsync<Widget>(widgetName, message);
         }
 
-        public async Task<int> Push<TWidget>(string widgetName) where TWidget : Widget
+        public async Task<int> PushAsync<TWidget>(string widgetName) where TWidget : Widget
         {
-            return await Push<TWidget>(widgetName, UIMessage.Empty);
+            return await PushAsync<TWidget>(widgetName, UIMessage.Empty);
         }
 
-        public async Task<int> Push<TWidget>(string widgetName, UIMessage message) where TWidget : Widget
+        public async Task<int> PushAsync<TWidget>(string widgetName, UIMessage message) where TWidget : Widget
         {
             var id = GetId();
             var instance = await GetInstance<TWidget>(widgetName, id, message);
@@ -174,12 +174,12 @@ namespace Hermit.UIStack
 
         #region Pop
 
-        public async Task Pop(bool recycle = false)
+        public async Task PopAsync(bool recycle = false)
         {
-            await Pop(null, recycle);
+            await PopAsync(null, recycle);
         }
 
-        public async Task Pop(Action onDone, bool recycle = false)
+        public async Task PopAsync(Action onDone, bool recycle = false)
         {
             if (StackedWindows.Count < 0)
             {

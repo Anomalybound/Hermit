@@ -6,11 +6,11 @@ namespace Hermit.Fsm
     {
         #region Lifetime
 
-        Task Enter();
+        Task EnterAsync();
 
         void Update(float deltaTime);
 
-        Task Exit();
+        Task ExitAsync();
 
         float ElapsedTime { get; }
 

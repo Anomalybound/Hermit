@@ -7,30 +7,30 @@ namespace Hermit
     {
         #region UI Manager
 
-        public static async Task<int> Push(string widgetName)
+        public static async Task<int> PushAsync(string widgetName)
         {
-            return await Push<Widget>(widgetName);
+            return await PushAsync<Widget>(widgetName);
         }
 
-        public static async Task<int> Push(string widgetName, UIMessage message)
+        public static async Task<int> PushAsync(string widgetName, UIMessage message)
         {
-            return await Push<Widget>(widgetName, message);
+            return await PushAsync<Widget>(widgetName, message);
         }
 
-        public static async Task<int> Push<TWidget>(string widgetName) where TWidget : Widget
+        public static async Task<int> PushAsync<TWidget>(string widgetName) where TWidget : Widget
         {
-            return await Push<TWidget>(widgetName, UIMessage.Empty);
+            return await PushAsync<TWidget>(widgetName, UIMessage.Empty);
         }
 
-        public static async Task<int> Push<TWidget>(string widgetName, UIMessage message)
+        public static async Task<int> PushAsync<TWidget>(string widgetName, UIMessage message)
             where TWidget : Widget
         {
-            return await Current.uiStack.Push<TWidget>(widgetName, message);
+            return await Current.uiStack.PushAsync<TWidget>(widgetName, message);
         }
 
         public static async void Pop(bool recycle = false)
         {
-            await Current.uiStack.Pop(recycle);
+            await Current.uiStack.PopAsync(recycle);
         }
 
         public static async void ClearPopups()

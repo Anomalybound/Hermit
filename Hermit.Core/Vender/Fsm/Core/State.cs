@@ -16,7 +16,7 @@ namespace Hermit.Fsm
 
         public Stack<IState> ActiveStates { get; } = new Stack<IState>();
 
-        public virtual async Task Enter()
+        public virtual async Task EnterAsync()
         {
             await Task.Run(() =>
             {
@@ -46,48 +46,48 @@ namespace Hermit.Fsm
             }
         }
 
-        public virtual async Task Exit()
+        public virtual async Task ExitAsync()
         {
             await Task.Run(() => OnExit?.Invoke());
         }
 
-        public virtual async Task ChangeState(string name)
+        public virtual async Task ChangeStateAsync(string name)
         {
             if (!Children.TryGetValue(name, out var result))
             {
                 throw new ApplicationException($"Child state [{name}] not found.");
             }
 
-            if (ActiveStates.Count > 0) { await PopState(); }
+            if (ActiveStates.Count > 0) { await PopStateAsync(); }
 
-            await InternalPushState(result);
+            await InternalPushStateAsync(result);
         }
 
-        public async Task PushState(string name)
+        public async Task PushStateAsync(string name)
         {
             if (!Children.TryGetValue(name, out var result))
             {
                 throw new ApplicationException($"Child state [{name}] not found.");
             }
 
-            await InternalPushState(result);
+            await InternalPushStateAsync(result);
         }
 
-        public async Task PopState()
+        public async Task PopStateAsync()
         {
-            await PrivatePopState();
+            await PrivatePopStateAsync();
         }
 
-        public async Task TriggerEvent(string id)
+        public async Task TriggerEventAsync(string id)
         {
-            await TriggerEvent(id, EventArgs.Empty);
+            await TriggerEventAsync(id, EventArgs.Empty);
         }
 
-        public async Task TriggerEvent(string id, EventArgs eventArgs)
+        public async Task TriggerEventAsync(string id, EventArgs eventArgs)
         {
             if (ActiveStates.Count > 0)
             {
-                await ActiveStates.Peek().TriggerEvent(id, eventArgs);
+                await ActiveStates.Peek().TriggerEventAsync(id, eventArgs);
                 return;
             }
 
@@ -118,16 +118,16 @@ namespace Hermit.Fsm
 
         #region Private Operations
 
-        private async Task PrivatePopState()
+        private async Task PrivatePopStateAsync()
         {
             var result = ActiveStates.Pop();
-            await result.Exit();
+            await result.ExitAsync();
         }
 
-        private async Task InternalPushState(IState state)
+        private async Task InternalPushStateAsync(IState state)
         {
             ActiveStates.Push(state);
-            await state.Enter();
+            await state.EnterAsync();
         }
 
         #endregion
