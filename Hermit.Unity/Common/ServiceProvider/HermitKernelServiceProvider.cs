@@ -1,3 +1,4 @@
+using System;
 using Hermit.Injection;
 using Hermit.Services;
 using UnityEngine;
@@ -7,20 +8,27 @@ namespace Hermit.Common
 {
     public class HermitKernelServiceProvider : MonoServiceProvider
     {
+        [Serializable]
+        public class UISettings
+        {
+            [SerializeField]
+            public bool IsLandscape = true;
+
+            [SerializeField]
+            public Vector2 ReferenceResolution = new Vector2(1920, 1080);
+
+            [SerializeField]
+            [Tooltip("Can left empty.")]
+            public UIStackManager UiStackInstance;
+        }
+
         [Header("General")]
         [SerializeField]
         protected bool EnableLog = true;
 
         [Header("UI")]
         [SerializeField]
-        protected bool IsLandscape = true;
-
-        [SerializeField]
-        protected Vector2 ReferenceResolution = new Vector2(1920, 1080);
-
-        [SerializeField]
-        [Tooltip("Can left empty.")]
-        protected UIStackManager UiStackInstance;
+        protected UISettings UiSettings;
 
         public override void RegisterBindings(IDependencyContainer Container)
         {
@@ -29,7 +37,7 @@ namespace Hermit.Common
             Container.Bind<ITime>().To<UnityTime>();
             Container.Bind<ILog>().To<UnityLog>().FromInstance(new UnityLog(EnableLog));
             Container.Bind<IUIStack>().FromMethod(BuildUIStackInstance);
-            Container.Bind<IStore>().To<DictionaryStore>();
+            Container.BindAll<DictionaryStore>();
 
             // View
             Container.Bind<IViewLoader>().To<ResourcesViewLoader>();
@@ -45,9 +53,9 @@ namespace Hermit.Common
 
         protected IUIStack BuildUIStackInstance(IDependencyContainer container)
         {
-            return UiStackInstance != null
-                ? UIStackManager.FromInstance(UiStackInstance)
-                : UIStackManager.BuildHierarchy(IsLandscape, ReferenceResolution);
+            return UiSettings.UiStackInstance != null
+                ? UIStackManager.FromInstance(UiSettings.UiStackInstance)
+                : UIStackManager.BuildHierarchy(UiSettings.IsLandscape, UiSettings.ReferenceResolution);
         }
     }
 }

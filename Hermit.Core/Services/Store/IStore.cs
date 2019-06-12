@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 
 namespace Hermit
 {
@@ -6,20 +7,26 @@ namespace Hermit
     {
         string StoreId { get; }
 
+        List<string> Keys { get; }
+
         void SetStoreId(string id);
 
-        bool Has(string id);
+        bool Has(string key);
 
-        bool Is<T>(string id);
+        bool Is<T>(string key);
 
-        T Get<T>(string id);
+        T Get<T>(string key);
 
-        T Set<T>(string id, T data);
+        T Set<T>(string key, T data);
 
-        bool Is(string id, Type type);
+        bool Is(string key, Type type);
 
-        object Get(string id);
+        object Get(string key);
 
-        object Set(string id, object obj);
+        object Set(string key, object obj);
+
+        void Remove(string key);
+
+        void ClearAll();
     }
 }
