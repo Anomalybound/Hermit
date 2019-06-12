@@ -58,14 +58,14 @@ namespace Hermit
 
         private GUIStyle VersionDisplay;
 
-        private void OnEnable()
-        {
-            VersionDisplay = new GUIStyle(EditorStyles.helpBox) {alignment = TextAnchor.MiddleCenter};
-        }
-
         public override void OnInspectorGUI()
         {
             serializedObject.Update();
+
+            if (VersionDisplay == null)
+            {
+                VersionDisplay = new GUIStyle(EditorStyles.helpBox) {alignment = TextAnchor.MiddleCenter};
+            }
 
             EditorGUILayout.LabelField($"Hermit Version: {Her.Version}", VersionDisplay);
             using (var check = new EditorGUI.ChangeCheckScope())

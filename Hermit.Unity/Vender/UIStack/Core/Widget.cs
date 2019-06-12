@@ -4,12 +4,10 @@ using UnityEngine;
 
 namespace Hermit.UIStack
 {
-    public class Widget : MonoBehaviour, IWidget
+    public class Widget : MonoBehaviour, IWidget, IView
     {
         [SerializeField]
         private UILayer _layer = UILayer.Window;
-
-        public int Id { get; private set; }
 
         public string Path { get; private set; }
 
@@ -21,9 +19,8 @@ namespace Hermit.UIStack
 
         protected UIMessage Message { get; private set; } = UIMessage.Empty;
 
-        public void SetManagerInfo(int id, string path, IUIStack manager, UIMessage message)
+        public virtual void SetManagerInfo(string path, IUIStack manager, UIMessage message)
         {
-            Id = id;
             Path = path;
             IuiStack = manager;
             Message = message;
@@ -34,6 +31,8 @@ namespace Hermit.UIStack
         public event Action<Widget> OnDestroyEvent;
 
         #endregion
+
+        #region IWidget
 
         public virtual async Task OnShow()
         {
@@ -64,5 +63,26 @@ namespace Hermit.UIStack
         {
             DestroyWidget();
         }
+
+        #endregion
+
+        #region IView
+
+        public ulong ViewId { get; private set; }
+
+        public GameObject ViewObject => gameObject;
+
+        public Component ViewComponent => this;
+
+        #endregion
+
+        #region Unity LifeTime
+
+        protected virtual void Awake()
+        {
+            ViewId = Her.Resolve<IViewManager>().Register(this);
+        }
+
+        #endregion
     }
 }

@@ -3,7 +3,7 @@ using Hermit.UIStack;
 
 namespace Hermit.View
 {
-    public abstract class UIViewBase<TViewModel> : Widget, IView where TViewModel : ViewModel
+    public abstract class UIViewBase<TViewModel> : Widget, IViewModelProvider where TViewModel : ViewModel
     {
         public TViewModel DataContext { get; protected set; }
 
@@ -44,8 +44,9 @@ namespace Hermit.View
 
         protected DataBindingBase[] DataBindings;
 
-        protected virtual void Awake()
+        protected override void Awake()
         {
+            base.Awake();
             DataBindings = GetComponentsInChildren<DataBindingBase>();
         }
     }

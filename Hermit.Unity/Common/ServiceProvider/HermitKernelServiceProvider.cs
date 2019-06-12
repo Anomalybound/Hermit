@@ -31,8 +31,9 @@ namespace Hermit.Common
             Container.Bind<IUIStack>().FromMethod(BuildUIStackInstance);
             Container.Bind<IStore>().To<DictionaryStore>();
 
-            // View Loader
+            // View
             Container.Bind<IViewLoader>().To<ResourcesViewLoader>();
+            Container.Bind<IViewManager>().To<ViewManager>();
 
             // Essentials
             Container.BindInstance(Container);

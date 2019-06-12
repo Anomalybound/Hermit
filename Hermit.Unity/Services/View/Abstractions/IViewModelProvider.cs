@@ -2,7 +2,7 @@ using System;
 
 namespace Hermit
 {
-    public interface IViewModelProvider
+    public interface IViewModelProvider : IView
     {
         void SetViewModel(object context);
 

@@ -6,13 +6,12 @@ namespace Hermit.UIStack
     [CustomWidgetFactory(typeof(Widget))]
     public class DefaultWidgetFactory : IWidgetFactory<Widget>
     {
-        public async Task<Widget> CreateInstance(IUIStack manager, string name, int assignedId,
-            UIMessage message)
+        public async Task<Widget> CreateInstance(IUIStack manager, string name, UIMessage message)
         {
             var loader = Her.Resolve<IViewLoader>();
             var prefab = await loader.LoadView(name);
             var instance = Object.Instantiate(prefab).GetComponent<Widget>();
-            instance.SetManagerInfo(assignedId, name, manager, message);
+            instance.SetManagerInfo(name, manager, message);
             Her.Inject(instance);
             instance.OnDestroyEvent += ReturnInstance;
             return instance;
@@ -24,13 +23,12 @@ namespace Hermit.UIStack
             Object.Destroy(widget);
         }
 
-        async Task<IWidget> IWidgetFactory.CreateInstance(IUIStack manager, string name, int assignedId,
-            UIMessage message)
+        async Task<IWidget> IWidgetFactory.CreateInstance(IUIStack manager, string name, UIMessage message)
         {
             var loader = Her.Resolve<IViewLoader>();
             var prefab = await loader.LoadView(name);
             var instance = Object.Instantiate(prefab).GetComponent<IWidget>();
-            instance.SetManagerInfo(assignedId, name, manager, message);
+            instance.SetManagerInfo(name, manager, message);
             Her.Inject(instance);
             return instance;
         }

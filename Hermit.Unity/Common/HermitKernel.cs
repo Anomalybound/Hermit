@@ -9,8 +9,11 @@ namespace Hermit.Common
 
         protected override void Awake()
         {
-            base.Awake();
+            RegisterServices();
+
             HerInstance = Singleton<Her>();
+
+            InitServices();
         }
     }
 }

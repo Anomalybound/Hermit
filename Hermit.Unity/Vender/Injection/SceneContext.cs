@@ -15,6 +15,12 @@ namespace Hermit.Injection
 
         protected virtual void Awake()
         {
+            RegisterServices();
+            InitServices();
+        }
+
+        protected void RegisterServices()
+        {
             if (Context.GlobalContext == null) { Context.SetCurrentContext(this); }
 
             var sw = Stopwatch.StartNew();
@@ -28,7 +34,15 @@ namespace Hermit.Injection
             }
 
             Container.Build();
+            sw.Stop();
 
+            Debug.LogFormat($"Services registration finished, cost : {sw.ElapsedMilliseconds}ms. ");
+        }
+
+        protected void InitServices()
+        {
+            var sw = Stopwatch.StartNew();
+            sw.Start();
             foreach (var provider in ServiceProviders)
             {
                 if (provider == null) { continue; }
@@ -45,7 +59,7 @@ namespace Hermit.Injection
             }
 
             sw.Stop();
-            Debug.LogFormat($"Scene context setup finished, cost : {sw.ElapsedMilliseconds}ms. ");
+            Debug.LogFormat($"Services initialization finished, cost : {sw.ElapsedMilliseconds}ms. ");
         }
 
         #region Imeplementation of IContext

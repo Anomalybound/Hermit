@@ -12,6 +12,6 @@ namespace Hermit.UIStack
 
         Task ClearAll();
 
-        Task Close(int widgetId, bool recycle = false);
+        Task Close(ulong widgetId, bool recycle = false);
     }
 }

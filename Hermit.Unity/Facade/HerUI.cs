@@ -7,22 +7,22 @@ namespace Hermit
     {
         #region UI Manager
 
-        public static async Task<int> PushAsync(string widgetName)
+        public static async Task<ulong> PushAsync(string widgetName)
         {
             return await PushAsync<Widget>(widgetName);
         }
 
-        public static async Task<int> PushAsync(string widgetName, UIMessage message)
+        public static async Task<ulong> PushAsync(string widgetName, UIMessage message)
         {
             return await PushAsync<Widget>(widgetName, message);
         }
 
-        public static async Task<int> PushAsync<TWidget>(string widgetName) where TWidget : Widget
+        public static async Task<ulong> PushAsync<TWidget>(string widgetName) where TWidget : Widget
         {
             return await PushAsync<TWidget>(widgetName, UIMessage.Empty);
         }
 
-        public static async Task<int> PushAsync<TWidget>(string widgetName, UIMessage message)
+        public static async Task<ulong> PushAsync<TWidget>(string widgetName, UIMessage message)
             where TWidget : Widget
         {
             return await Current.uiStack.PushAsync<TWidget>(widgetName, message);
@@ -53,7 +53,7 @@ namespace Hermit
             await Current.uiStack.ClearAll();
         }
 
-        public static async void Close(int widgetId, bool recycle = false)
+        public static async void Close(ulong widgetId, bool recycle = false)
         {
             await Current.uiStack.Close(widgetId, recycle);
         }

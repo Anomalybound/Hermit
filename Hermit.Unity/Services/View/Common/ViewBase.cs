@@ -3,8 +3,20 @@ using UnityEngine;
 
 namespace Hermit
 {
-    public abstract class ViewBase<TViewModel> : MonoBehaviour, IView where TViewModel : ViewModel
+    public abstract class ViewBase<TViewModel> : MonoBehaviour, IViewModelProvider where TViewModel : ViewModel
     {
+        #region IView
+
+        public ulong ViewId { get; private set; }
+
+        public GameObject ViewObject => gameObject;
+
+        public Component ViewComponent => this;
+
+        #endregion
+
+        #region IViewModelProvider
+
         public TViewModel DataContext { get; protected set; }
 
         public virtual void SetViewModel(object context)
@@ -42,11 +54,14 @@ namespace Hermit
             return GetViewModel();
         }
 
+        #endregion
+
         protected DataBindingBase[] DataBindings;
 
         protected virtual void Awake()
         {
             DataBindings = GetComponentsInChildren<DataBindingBase>();
+            ViewId = Her.Resolve<IViewManager>().Register(this);
         }
     }
 

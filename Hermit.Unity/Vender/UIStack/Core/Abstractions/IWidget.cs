@@ -14,6 +14,6 @@ namespace Hermit.UIStack
 
         void DestroyWidget();
 
-        void SetManagerInfo(int id, string path, IUIStack manager, UIMessage message);
+        void SetManagerInfo(string path, IUIStack manager, UIMessage message);
     }
 }
