@@ -20,7 +20,11 @@ namespace Hermit
         {
             serializedObject.Update();
 
-            EditorGUILayout.PropertyField(serializedObject.FindProperty(nameof(_fsm.UseFixedUpdate)));
+            using (var check = new EditorGUI.ChangeCheckScope())
+            {
+                EditorGUILayout.PropertyField(serializedObject.FindProperty(nameof(_fsm.UseFixedUpdate)));
+                if (check.changed) { serializedObject.ApplyModifiedProperties(); }
+            }
 
             if (_fsm.Root == null)
             {
@@ -35,23 +39,16 @@ namespace Hermit
 
         private void DrawState(string stateName, IState state)
         {
-            var active = _activeState == state;
-            if (active) { DrawActiveState(stateName, state); }
-            else { DrawNormalState(stateName, state); }
+            using (new GUILayout.VerticalScope(EditorStyles.helpBox))
+            {
+                DrawState(stateName, state, _activeState == state);
 
-            if (state.Children.Count > 0) { DrawChildren(state); }
+                if (state.Children.Count > 0) { DrawChildren(state); }
+            }
         }
 
-        private void DrawNormalState(string stateName, IState state)
+        private void DrawState(string stateName, IState state, bool active)
         {
-            EditorGUILayout.LabelField(
-                $"Name: {stateName}[{state.GetType().FullName}] - Children: [{state.Children.Count}] - Active: [{state.ActiveStates.Count}]");
-        }
-
-        private void DrawActiveState(string stateName, IState state)
-        {
-            var guiCol = GUI.skin.label.normal.textColor;
-
             using (new GUILayout.HorizontalScope())
             {
                 EditorGUILayout.LabelField(
@@ -61,9 +58,7 @@ namespace Hermit
                 var rect = GUILayoutUtility.GetLastRect();
                 rect.width = 20;
 
-                GUI.skin.label.normal.textColor = new Color(0f, 0.78f, 0.2f);
-                GUI.Label(rect, "\u2714");
-                GUI.skin.label.normal.textColor = guiCol;
+                if (_fsm.Root != state) { GUI.Toggle(rect, active, ""); }
             }
         }
 
@@ -93,11 +88,6 @@ namespace Hermit
             }
 
             EditorGUI.indentLevel--;
-        }
-
-        private static Color GetActiveStateColor()
-        {
-            return Color.green;
         }
     }
 }
