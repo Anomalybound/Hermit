@@ -1,19 +1,23 @@
+using System;
+
 namespace Hermit
 {
     public partial class Her
     {
         #region Events
 
-        public static void Subscribe<T>(EventAction<T> action)
+        #region No channel
+
+        public static void Subscribe<T>(Action<T> action)
         {
             Current.eventBroker.Subscribe(action);
         }
 
-        public static void UnSubscribe<T>(EventAction<T> action, bool keepEvent = false)
+        public static void UnSubscribe<T>(Action<T> action, bool keepEvent = false)
         {
             Current.eventBroker.Unsubscribe(action, keepEvent);
         }
-        
+
         public static void UnSubscribeAll(bool keepEvent = false)
         {
             Current.eventBroker.UnsubscribeAll(keepEvent);
@@ -24,22 +28,26 @@ namespace Hermit
             Current.eventBroker.Publish(message);
         }
 
-        public static void Subscribe(string channel, EventAction action)
+        #endregion
+
+        #region With Channel
+
+        public static void Subscribe(string channel, Action action)
         {
             Current.eventBroker.Subscribe(channel, action);
         }
 
-        public static void Subscribe<T>(string channel, EventAction<T> action)
+        public static void Subscribe<T>(string channel, Action<T> action)
         {
             Current.eventBroker.Subscribe(channel, action);
         }
 
-        public static void UnSubscribe(string channel, EventAction action, bool keepEvent = false)
+        public static void UnSubscribe(string channel, Action action, bool keepEvent = false)
         {
             Current.eventBroker.Unsubscribe(channel, action, keepEvent);
         }
 
-        public static void UnSubscribe<T>(string channel, EventAction<T> action, bool keepEvent = false)
+        public static void UnSubscribe<T>(string channel, Action<T> action, bool keepEvent = false)
         {
             Current.eventBroker.Unsubscribe(channel, action, keepEvent);
         }
@@ -58,6 +66,8 @@ namespace Hermit
         {
             Current.eventBroker.UnsubscribeAll(channel, keepEvent);
         }
+
+        #endregion
 
         #endregion
     }

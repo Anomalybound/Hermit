@@ -15,36 +15,39 @@ namespace Hermit.Services
         private readonly Dictionary<string, Dictionary<Type, Delegate>> _genericEvents =
             new Dictionary<string, Dictionary<Type, Delegate>>(32);
 
+        public const string DefaultChannel = "Default";
+
         private readonly Dictionary<string, Delegate> _nonGenericEvents = new Dictionary<string, Delegate>(32);
 
         public static EventBroker Current => new EventBroker();
 
-        public void Subscribe<T>(EventAction<T> eventAction)
+
+        public void Subscribe<T>(Action<T> eventAction)
         {
-            Subscribe(null, eventAction);
+            Subscribe(DefaultChannel, eventAction);
         }
 
-        public void UnSubscribe<T>(EventAction<T> eventAction)
+        public void UnSubscribe<T>(Action<T> eventAction)
         {
-            Unsubscribe(null, eventAction);
+            Unsubscribe(DefaultChannel, eventAction);
         }
 
-        public void Unsubscribe<T>(EventAction<T> eventAction, bool keepEvent = false)
+        public void Unsubscribe<T>(Action<T> eventAction, bool keepEvent = false)
         {
-            Unsubscribe(null, eventAction, keepEvent);
+            Unsubscribe(DefaultChannel, eventAction, keepEvent);
         }
 
         public void UnsubscribeAll(bool keepEvent = false)
         {
-            UnsubscribeAll(null, keepEvent);
+            UnsubscribeAll(DefaultChannel, keepEvent);
         }
 
         public void Publish<T>(T eventMessage)
         {
-            Publish(null, eventMessage);
+            Publish(DefaultChannel, eventMessage);
         }
 
-        public void Subscribe<T>(string channel, EventAction<T> eventAction)
+        public void Subscribe<T>(string channel, Action<T> eventAction)
         {
             if (eventAction == null) { throw new Exception("No subscriber."); }
 
@@ -60,7 +63,7 @@ namespace Hermit.Services
             {
                 if (delegates.TryGetValue(eventType, out var del))
                 {
-                    delegates[eventType] = (del as EventAction<T>) + eventAction;
+                    delegates[eventType] = (del as Action<T>) + eventAction;
                 }
                 else
                 {
@@ -70,15 +73,15 @@ namespace Hermit.Services
             }
         }
 
-        public void Subscribe(string channel, EventAction eventAction)
+        public void Subscribe(string channel, Action eventAction)
         {
             if (eventAction == null) { throw new Exception("No subscriber."); }
 
             if (!_nonGenericEvents.TryGetValue(channel, out var del)) { _nonGenericEvents.Add(channel, eventAction); }
-            else { _nonGenericEvents[channel] = (del as EventAction) + eventAction; }
+            else { _nonGenericEvents[channel] = (del as Action) + eventAction; }
         }
 
-        public void Unsubscribe<T>(string channel, EventAction<T> eventAction, bool keepEvent = false)
+        public void Unsubscribe<T>(string channel, Action<T> eventAction, bool keepEvent = false)
         {
             if (eventAction == null) { throw new Exception("No subscriber."); }
 
@@ -90,7 +93,7 @@ namespace Hermit.Services
 
             if (del == null) { return; }
 
-            var ret = (EventAction<T>) del - eventAction;
+            var ret = (Action<T>) del - eventAction;
             if (ret == null && !keepEvent)
             {
                 delegates.Remove(eventType);
@@ -99,11 +102,11 @@ namespace Hermit.Services
             else { delegates[eventType] = ret; }
         }
 
-        public void Unsubscribe(string channel, EventAction eventAction, bool keepEvent = false)
+        public void Unsubscribe(string channel, Action eventAction, bool keepEvent = false)
         {
             if (eventAction == null) { throw new Exception("No subscriber."); }
 
-            var eventType = typeof(EventAction);
+            var eventType = typeof(Action);
 
             if (!_genericEvents.TryGetValue(channel, out var delegates)) { return; }
 
@@ -111,7 +114,7 @@ namespace Hermit.Services
 
             if (del == null) { return; }
 
-            var ret = (EventAction) del - eventAction;
+            var ret = (Action) del - eventAction;
             if (ret == null && !keepEvent)
             {
                 delegates.Remove(eventType);
@@ -145,11 +148,11 @@ namespace Hermit.Services
 
             delegates?.TryGetValue(eventType, out genericDelegate);
 
-            var genericEventAction = genericDelegate as EventAction<T>;
+            var genericEventAction = genericDelegate as Action<T>;
 
             _nonGenericEvents.TryGetValue(channel, out genericDelegate);
 
-            var nonGenericEventAction = genericDelegate as EventAction;
+            var nonGenericEventAction = genericDelegate as Action;
 
             _eventsInCall++;
 
@@ -169,7 +172,7 @@ namespace Hermit.Services
 
             if (!_nonGenericEvents.TryGetValue(channel, out var del)) { return; }
 
-            var evtAction = del as EventAction;
+            var evtAction = del as Action;
 
             _eventsInCall++;
             try { evtAction?.Invoke(); }
