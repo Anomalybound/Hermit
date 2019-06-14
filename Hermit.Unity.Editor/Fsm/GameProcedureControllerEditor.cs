@@ -8,6 +8,8 @@ namespace Hermit
     {
         public override void OnInspectorGUI()
         {
+            serializedObject.Update();
+            
             using (var check = new EditorGUI.ChangeCheckScope())
             {
                 EditorGUILayout.PropertyField(serializedObject.FindProperty("_initState"));

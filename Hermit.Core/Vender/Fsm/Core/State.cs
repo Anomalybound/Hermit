@@ -21,7 +21,7 @@ namespace Hermit.Fsm
             await Task.Run(() =>
             {
                 OnEnter?.Invoke();
-                
+
                 ElapsedTime = 0f;
             });
         }
@@ -58,7 +58,7 @@ namespace Hermit.Fsm
                 throw new ApplicationException($"Child state [{name}] not found.");
             }
 
-            if (ActiveStates.Count > 0) { await PopStateAsync(); }
+            while (ActiveStates.Count > 0) { await PopStateAsync(); }
 
             await InternalPushStateAsync(result);
         }

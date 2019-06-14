@@ -14,19 +14,19 @@ namespace Hermit.Procedure
         public override async Task SetContext(TProcedureController context)
         {
             await base.SetContext(context);
-            await Init(context);
+            await InitAsync(context);
         }
 
         public sealed override async Task EnterAsync()
         {
             await base.EnterAsync();
-            await Enter(Context);
+            await EnterAsync(Context);
         }
 
         public sealed override async Task ExitAsync()
         {
             await base.ExitAsync();
-            await Exit(Context);
+            await ExitAsync(Context);
         }
 
         public sealed override void Update(float deltaTime)
@@ -35,17 +35,17 @@ namespace Hermit.Procedure
             Update(Context, deltaTime);
         }
 
-        protected virtual async Task Init(TProcedureController controller)
+        protected virtual async Task InitAsync(TProcedureController controller)
         {
             await Task.FromResult(default(object));
         }
 
-        protected virtual async Task Enter(TProcedureController controller)
+        protected virtual async Task EnterAsync(TProcedureController controller)
         {
             await Task.FromResult(default(object));
         }
 
-        protected virtual async Task Exit(TProcedureController controller)
+        protected virtual async Task ExitAsync(TProcedureController controller)
         {
             await Task.FromResult(default(object));
         }
@@ -54,34 +54,34 @@ namespace Hermit.Procedure
 
         #region Facade
 
-        public async Task ChangeState(TProcedureIndex index)
+        public async Task ChangeStateAsync(TProcedureIndex index)
         {
-            await Context.ChangeState(index.ToString(CultureInfo.InvariantCulture));
+            await Context.ChangeStateAsync(index.ToString(CultureInfo.InvariantCulture));
         }
 
-        public async Task PushState(TProcedureIndex index)
+        public async Task PushStateAsync(TProcedureIndex index)
         {
-            await Context.PushState(index.ToString(CultureInfo.InvariantCulture));
+            await Context.PushStateAsync(index.ToString(CultureInfo.InvariantCulture));
         }
 
         public new async Task ChangeStateAsync(string stateName)
         {
-            await Context.ChangeState(stateName);
+            await Context.ChangeStateAsync(stateName);
         }
 
         public new async Task PushStateAsync(string stateName)
         {
-            await Context.PushState(stateName);
+            await Context.PushStateAsync(stateName);
         }
 
         public new async Task PopStateAsync()
         {
-            await Context.PopState();
+            await Context.PopStateAsync();
         }
 
         public new async Task TriggerEventAsync(string eventId, EventArgs args)
         {
-            await Context.TriggerEvent(eventId, args);
+            await Context.TriggerEventAsync(eventId, args);
         }
 
         #endregion

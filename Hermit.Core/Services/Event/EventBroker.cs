@@ -19,6 +19,26 @@ namespace Hermit.Services
 
         public static EventBroker Current => new EventBroker();
 
+        public void Subscribe<T>(EventAction<T> eventAction)
+        {
+            Subscribe(null, eventAction);
+        }
+
+        public void UnSubscribe<T>(EventAction<T> eventAction)
+        {
+            Unsubscribe(null, eventAction);
+        }
+
+        public void UnsubscribeAll(bool keepEvent = false)
+        {
+            UnsubscribeAll(null, keepEvent);
+        }
+
+        public void Publish<T>(T eventMessage)
+        {
+            Publish(null, eventMessage);
+        }
+
         public void Subscribe<T>(string channel, EventAction<T> eventAction)
         {
             if (eventAction == null) { throw new Exception("No subscriber."); }

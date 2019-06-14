@@ -16,6 +16,8 @@ namespace Hermit
 
         protected virtual void OnInit() { }
 
+        protected virtual void OnDestroy() { }
+
         protected virtual void OnUpdate(float deltaTime) { }
 
         protected virtual void OnFixedUpdate(float deltaTime) { }
