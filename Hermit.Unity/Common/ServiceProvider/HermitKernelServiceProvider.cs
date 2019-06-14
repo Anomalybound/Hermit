@@ -1,4 +1,3 @@
-using System;
 using Hermit.Injection;
 using Hermit.Services;
 using UnityEngine;
@@ -8,27 +7,13 @@ namespace Hermit.Common
 {
     public class HermitKernelServiceProvider : MonoServiceProvider
     {
-        [Serializable]
-        public class UISettings
-        {
-            [SerializeField]
-            public bool IsLandscape = true;
-
-            [SerializeField]
-            public Vector2 ReferenceResolution = new Vector2(1920, 1080);
-
-            [SerializeField]
-            [Tooltip("Can left empty.")]
-            public UIStackManager UiStackInstance;
-        }
-
         [Header("General")]
         [SerializeField]
         protected bool EnableLog = true;
 
         [Header("UI")]
         [SerializeField]
-        protected UISettings UiSettings;
+        protected UIManagerSettings uiManagerSettings;
 
         public override void RegisterBindings(IDependencyContainer Container)
         {
@@ -53,9 +38,7 @@ namespace Hermit.Common
 
         protected IUIStack BuildUIStackInstance(IDependencyContainer container)
         {
-            return UiSettings.UiStackInstance != null
-                ? UIStackManager.FromInstance(UiSettings.UiStackInstance)
-                : UIStackManager.BuildHierarchy(UiSettings.IsLandscape, UiSettings.ReferenceResolution);
+            return UIStackManager.BuildHierarchy(uiManagerSettings);
         }
     }
 }

@@ -10,6 +10,14 @@ using UnityEngine.UI;
 
 namespace Hermit.UIStack
 {
+    [Serializable]
+    public class UIManagerSettings
+    {
+        public bool IsLandscape = true;
+
+        public Vector2 ReferenceResolution = new Vector2(1920, 1080);
+    }
+
     public enum UILayer
     {
         UIHidden = -1,
@@ -58,19 +66,11 @@ namespace Hermit.UIStack
             return instance;
         }
 
-        public static UIStackManager BuildHierarchy(bool landscapeOrientation = true, Vector2? refResolution = null)
+        public static UIStackManager BuildHierarchy(UIManagerSettings settings)
         {
             CollectFactories();
 
             var manager = new GameObject("UI Stack Manager").AddComponent<UIStackManager>();
-
-            var uiCam = new GameObject("UI Camera", typeof(Camera)).GetComponent<Camera>();
-            uiCam.clearFlags = CameraClearFlags.Depth;
-            uiCam.cullingMask = 1 << LayerMask.NameToLayer("UI");
-            uiCam.orthographic = true;
-            uiCam.depth = 10;
-            uiCam.transform.SetParent(manager.transform);
-            uiCam.transform.localPosition = Vector3.zero;
 
             foreach (UILayer layer in Enum.GetValues(typeof(UILayer)))
             {
@@ -78,16 +78,13 @@ namespace Hermit.UIStack
                 manager.LayerLookup.Add(layer, layerObj);
 
                 var layerCanvas = layerObj.AddComponent<Canvas>();
-                layerCanvas.renderMode = RenderMode.ScreenSpaceCamera;
-                layerCanvas.worldCamera = uiCam;
+                layerCanvas.renderMode = RenderMode.ScreenSpaceOverlay;
                 layerCanvas.sortingOrder = (int) layer;
 
                 var layerCanvasScaler = layerObj.AddComponent<CanvasScaler>();
                 layerCanvasScaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
-                layerCanvasScaler.referenceResolution = refResolution ?? (landscapeOrientation
-                                                            ? new Vector2(1920, 1080)
-                                                            : new Vector2(1080, 1920));
-                layerCanvasScaler.matchWidthOrHeight = landscapeOrientation ? 1 : 0;
+                layerCanvasScaler.referenceResolution = settings.ReferenceResolution;
+                layerCanvasScaler.matchWidthOrHeight = settings.IsLandscape ? 1 : 0;
 
                 var layerRaycaster = layerObj.AddComponent<GraphicRaycaster>();
                 layerRaycaster.name = layer.ToString();
