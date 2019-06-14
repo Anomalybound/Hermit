@@ -31,9 +31,6 @@ namespace Hermit.Common
             // Essentials
             Container.BindInstance(Container);
             Container.BindAll<Her>();
-
-            // MonoBehaviors
-            Container.Bind<EngineRunner>().FromMethod(EngineRunner.CreateInstance);
         }
 
         protected IUIStack BuildUIStackInstance(IDependencyContainer container)

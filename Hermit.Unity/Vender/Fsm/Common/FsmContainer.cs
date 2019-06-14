@@ -1,6 +1,5 @@
 ﻿using Hermit.Fsm;
 using UnityEngine;
-using System.Threading.Tasks;
 
 namespace Hermit
 {
@@ -12,7 +11,7 @@ namespace Hermit
 
         protected bool Running { get; private set; }
 
-        protected abstract Task<IState> BuildState();
+        protected abstract IState BuildState();
 
         protected virtual void OnInit() { }
 
@@ -26,10 +25,10 @@ namespace Hermit
 
         protected virtual void OnPause() { }
 
-        private async void Awake()
+        private void Awake()
         {
             OnInit();
-            Root = await BuildState();
+            Root = BuildState();
         }
 
         private void OnEnable()

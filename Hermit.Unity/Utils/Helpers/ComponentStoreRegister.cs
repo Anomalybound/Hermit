@@ -2,7 +2,8 @@ using UnityEngine;
 
 namespace Hermit.Unity
 {
-    public sealed class StoreComponentRegister : MonoBehaviour
+    [ScriptOrder(-5000)]
+    public sealed class ComponentStoreRegister : MonoBehaviour
     {
         [SerializeField]
         private string _storeId = "Global";

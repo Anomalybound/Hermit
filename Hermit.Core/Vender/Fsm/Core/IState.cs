@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Threading.Tasks;
 
 namespace Hermit.Fsm
 {
@@ -18,13 +17,13 @@ namespace Hermit.Fsm
 
         #region Operations
 
-        Task ChangeStateAsync(string stateName);
+        void ChangeState(string stateName);
 
-        Task PushStateAsync(string stateName);
+        void PushState(string stateName);
 
-        Task PopStateAsync();
+        void PopState();
 
-        Task TriggerEventAsync(string id, EventArgs eventArgs);
+        void TriggerEvent(string id, EventArgs eventArgs);
 
         #endregion
     }

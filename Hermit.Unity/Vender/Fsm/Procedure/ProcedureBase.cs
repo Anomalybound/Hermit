@@ -1,5 +1,4 @@
-﻿using System.Threading.Tasks;
-using Hermit.Fsm;
+﻿using Hermit.Fsm;
 
 namespace Hermit.Procedure
 {
@@ -7,9 +6,9 @@ namespace Hermit.Procedure
     {
         public override TProcedureManager Context { get; protected set; }
 
-        public override async Task SetContext(TProcedureManager context)
+        public override void SetContext(TProcedureManager context)
         {
-            await Task.Run(() => Context = context);
+            Context = context;
         }
     }
 }

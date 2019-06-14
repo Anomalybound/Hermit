@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Threading.Tasks;
 
 namespace Hermit.Fsm
 {
@@ -16,14 +15,11 @@ namespace Hermit.Fsm
 
         public Stack<IState> ActiveStates { get; } = new Stack<IState>();
 
-        public virtual async Task EnterAsync()
+        public virtual void Enter()
         {
-            await Task.Run(() =>
-            {
-                OnEnter?.Invoke();
+            OnEnter?.Invoke();
 
-                ElapsedTime = 0f;
-            });
+            ElapsedTime = 0f;
         }
 
         public virtual void Update(float deltaTime)
@@ -46,48 +42,48 @@ namespace Hermit.Fsm
             }
         }
 
-        public virtual async Task ExitAsync()
+        public virtual void Exit()
         {
-            await Task.Run(() => OnExit?.Invoke());
+            OnExit?.Invoke();
         }
 
-        public virtual async Task ChangeStateAsync(string name)
-        {
-            if (!Children.TryGetValue(name, out var result))
-            {
-                throw new ApplicationException($"Child state [{name}] not found.");
-            }
-
-            while (ActiveStates.Count > 0) { await PopStateAsync(); }
-
-            await InternalPushStateAsync(result);
-        }
-
-        public async Task PushStateAsync(string name)
+        public virtual void ChangeState(string name)
         {
             if (!Children.TryGetValue(name, out var result))
             {
                 throw new ApplicationException($"Child state [{name}] not found.");
             }
 
-            await InternalPushStateAsync(result);
+            while (ActiveStates.Count > 0) { PopState(); }
+
+            InternalPushState(result);
         }
 
-        public async Task PopStateAsync()
+        public void PushState(string name)
         {
-            await PrivatePopStateAsync();
+            if (!Children.TryGetValue(name, out var result))
+            {
+                throw new ApplicationException($"Child state [{name}] not found.");
+            }
+
+            InternalPushState(result);
         }
 
-        public async Task TriggerEventAsync(string id)
+        public void PopState()
         {
-            await TriggerEventAsync(id, EventArgs.Empty);
+            PrivatePopState();
         }
 
-        public async Task TriggerEventAsync(string id, EventArgs eventArgs)
+        public void TriggerEvent(string id)
+        {
+            TriggerEvent(id, EventArgs.Empty);
+        }
+
+        public void TriggerEvent(string id, EventArgs eventArgs)
         {
             if (ActiveStates.Count > 0)
             {
-                await ActiveStates.Peek().TriggerEventAsync(id, eventArgs);
+                ActiveStates.Peek().TriggerEvent(id, eventArgs);
                 return;
             }
 
@@ -104,7 +100,9 @@ namespace Hermit.Fsm
         #region Actions
 
         public event Action OnEnter;
+
         public event Action OnExit;
+
         public event Action<float> OnUpdate;
 
         #endregion
@@ -112,22 +110,23 @@ namespace Hermit.Fsm
         #region Runtime
 
         private readonly Dictionary<string, Action<EventArgs>> _events = new Dictionary<string, Action<EventArgs>>();
+
         private readonly Dictionary<Func<bool>, Action> _conditions = new Dictionary<Func<bool>, Action>();
 
         #endregion
 
         #region Private Operations
 
-        private async Task PrivatePopStateAsync()
+        private void PrivatePopState()
         {
             var result = ActiveStates.Pop();
-            await result.ExitAsync();
+            result.Exit();
         }
 
-        private async Task InternalPushStateAsync(IState state)
+        private void InternalPushState(IState state)
         {
             ActiveStates.Push(state);
-            await state.EnterAsync();
+            state.Enter();
         }
 
         #endregion

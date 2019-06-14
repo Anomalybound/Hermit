@@ -1,9 +1,7 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using System.Threading.Tasks;
 using Hermit.Fsm;
 using UnityEngine;
 using Hermit.Injection;
@@ -29,7 +27,7 @@ namespace Hermit.Procedure
 
         public event Action<IState, IState> OnStateChanged;
 
-        protected override async Task<IState> BuildState()
+        protected override IState BuildState()
         {
             var root = new State();
 
@@ -47,7 +45,7 @@ namespace Hermit.Procedure
                     continue;
                 }
 
-                await instance.SetContext((TProcedureController) this);
+                instance.SetContext((TProcedureController) this);
                 procedures.Add(instance);
             }
 
@@ -71,12 +69,12 @@ namespace Hermit.Procedure
             Root = root;
             if (procedures.Count <= 0) { return Root; }
 
-            if (procedures.Any(p => p.Index.Equals(InitState))) { await ChangeStateAsync(InitState); }
+            if (procedures.Any(p => p.Index.Equals(InitState))) { ChangeState(InitState); }
             else
             {
                 var first = procedures[0].Index;
                 Her.Warn($"Procedure of [{InitState}] is no available, change to {first} instead.");
-                await ChangeStateAsync(first);
+                ChangeState(first);
             }
 
             return Root;
@@ -84,51 +82,42 @@ namespace Hermit.Procedure
 
         #region Facade
 
-        public async Task ChangeStateAsync(TProcedureIndex index)
+        public void ChangeState(TProcedureIndex index)
+        {
+            TrackStateEvent(() => Root.ChangeState(index.ToString(CultureInfo.InvariantCulture)));
+        }
+
+        public void PushState(TProcedureIndex index)
+        {
+            TrackStateEvent(() => Root.PushState(index.ToString(CultureInfo.InvariantCulture)));
+        }
+
+        public void ChangeState(string stateName)
+        {
+            TrackStateEvent(() => Root.ChangeState(stateName));
+        }
+
+        public void PushState(string stateName)
+        {
+            TrackStateEvent(() => Root.PushState(stateName));
+        }
+
+        public void PopState()
+        {
+            TrackStateEvent(() => Root.PopState());
+        }
+
+        public void TriggerEvent(string eventId, EventArgs args)
+        {
+            TrackStateEvent(() => Root.TriggerEvent(eventId, args));
+        }
+
+        private void TrackStateEvent(Action asyncAction)
         {
             var previousActiveState = Root.ActiveStates.Count > 0 ? Root.ActiveStates.Peek() : null;
 
-            await TrackStateEventAsync(previousActiveState, Root.ChangeStateAsync(index.ToString(CultureInfo.InvariantCulture)));
-        }
+            asyncAction?.Invoke();
 
-        public async Task PushStateAsync(TProcedureIndex index)
-        {
-            var previousActiveState = Root.ActiveStates.Count > 0 ? Root.ActiveStates.Peek() : null;
-            
-            await TrackStateEventAsync(previousActiveState, Root.PushStateAsync(index.ToString(CultureInfo.InvariantCulture)));
-        }
-
-        public async Task ChangeStateAsync(string stateName)
-        {            
-            var previousActiveState = Root.ActiveStates.Count > 0 ? Root.ActiveStates.Peek() : null;
-
-            await TrackStateEventAsync(previousActiveState, Root.ChangeStateAsync(stateName));
-        }
-
-        public async Task PushStateAsync(string stateName)
-        {            
-            var previousActiveState = Root.ActiveStates.Count > 0 ? Root.ActiveStates.Peek() : null;
-
-            await TrackStateEventAsync(previousActiveState, Root.PushStateAsync(stateName));
-        }
-
-        public async Task PopStateAsync()
-        {
-            var previousActiveState = Root.ActiveStates.Count > 0 ? Root.ActiveStates.Peek() : null;
-
-            await TrackStateEventAsync(previousActiveState, Root.PopStateAsync());
-        }
-
-        public async Task TriggerEventAsync(string eventId, EventArgs args)
-        {
-            var previousActiveState = Root.ActiveStates.Count > 0 ? Root.ActiveStates.Peek() : null;
-
-            await TrackStateEventAsync(previousActiveState, Root.TriggerEventAsync(eventId, args));
-        }
-
-        private async Task TrackStateEventAsync(IState previousActiveState, Task asyncAction)
-        {
-            await asyncAction;
             var currentActiveStates = Root.ActiveStates.Count > 0 ? Root.ActiveStates.Peek() : null;
 
             if (previousActiveState != currentActiveStates)

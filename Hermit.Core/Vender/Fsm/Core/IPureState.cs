@@ -1,16 +1,14 @@
-﻿using System.Threading.Tasks;
-
-namespace Hermit.Fsm
+﻿namespace Hermit.Fsm
 {
     public interface IPureState
     {
         #region Lifetime
 
-        Task EnterAsync();
+        void Enter();
 
         void Update(float deltaTime);
 
-        Task ExitAsync();
+        void Exit();
 
         float ElapsedTime { get; }
 

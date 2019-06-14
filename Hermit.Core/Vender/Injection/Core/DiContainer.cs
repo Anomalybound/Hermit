@@ -37,7 +37,7 @@ namespace Hermit.Injection
             foreach (var binderInfo in BinderInfos) { Build(binderInfo); }
         }
 
-        private void Build(IBindingInfo bindingInfo)
+        public void Build(IBindingInfo bindingInfo)
         {
             if (!(bindingInfo is BindingInfo info)) { return; }
 
@@ -46,7 +46,7 @@ namespace Hermit.Injection
                 throw new Exception($"Fatal error, no contract types included in building binding info.");
             }
 
-            // add contract type as default oen if implement type is not assigned
+            // add contract type as default if implement type is not assigned
             if (info.ImplementType == null) { info.To(info.ContractTypes[0]); }
 
             foreach (var contractType in info.ContractTypes)

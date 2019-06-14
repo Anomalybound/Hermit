@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Globalization;
-using System.Threading.Tasks;
 
 namespace Hermit.Procedure
 {
@@ -11,22 +10,22 @@ namespace Hermit.Procedure
     {
         public abstract TProcedureIndex Index { get; }
 
-        public override async Task SetContext(TProcedureController context)
+        public override void SetContext(TProcedureController context)
         {
-            await base.SetContext(context);
-            await InitAsync(context);
+            base.SetContext(context);
+            Init(context);
         }
 
-        public sealed override async Task EnterAsync()
+        public sealed override void Enter()
         {
-            await base.EnterAsync();
-            await EnterAsync(Context);
+            base.Enter();
+            Enter(Context);
         }
 
-        public sealed override async Task ExitAsync()
+        public sealed override void Exit()
         {
-            await base.ExitAsync();
-            await ExitAsync(Context);
+            base.Exit();
+            Exit(Context);
         }
 
         public sealed override void Update(float deltaTime)
@@ -35,53 +34,44 @@ namespace Hermit.Procedure
             Update(Context, deltaTime);
         }
 
-        protected virtual async Task InitAsync(TProcedureController controller)
-        {
-            await Task.FromResult(default(object));
-        }
+        protected virtual void Init(TProcedureController controller) { }
 
-        protected virtual async Task EnterAsync(TProcedureController controller)
-        {
-            await Task.FromResult(default(object));
-        }
+        protected virtual void Enter(TProcedureController controller) { }
 
-        protected virtual async Task ExitAsync(TProcedureController controller)
-        {
-            await Task.FromResult(default(object));
-        }
+        protected virtual void Exit(TProcedureController controller) { }
 
         protected virtual void Update(TProcedureController controller, float deltaTime) { }
 
         #region Facade
 
-        public async Task ChangeStateAsync(TProcedureIndex index)
+        public void ChangeState(TProcedureIndex index)
         {
-            await Context.ChangeStateAsync(index.ToString(CultureInfo.InvariantCulture));
+            Context.ChangeState(index.ToString(CultureInfo.InvariantCulture));
         }
 
-        public async Task PushStateAsync(TProcedureIndex index)
+        public void PushState(TProcedureIndex index)
         {
-            await Context.PushStateAsync(index.ToString(CultureInfo.InvariantCulture));
+            Context.PushState(index.ToString(CultureInfo.InvariantCulture));
         }
 
-        public new async Task ChangeStateAsync(string stateName)
+        public new void ChangeState(string stateName)
         {
-            await Context.ChangeStateAsync(stateName);
+            Context.ChangeState(stateName);
         }
 
-        public new async Task PushStateAsync(string stateName)
+        public new void PushState(string stateName)
         {
-            await Context.PushStateAsync(stateName);
+            Context.PushState(stateName);
         }
 
-        public new async Task PopStateAsync()
+        public new void PopState()
         {
-            await Context.PopStateAsync();
+            Context.PopState();
         }
 
-        public new async Task TriggerEventAsync(string eventId, EventArgs args)
+        public new void TriggerEvent(string eventId, EventArgs args)
         {
-            await Context.TriggerEventAsync(eventId, args);
+            Context.TriggerEvent(eventId, args);
         }
 
         #endregion
