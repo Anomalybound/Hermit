@@ -42,6 +42,13 @@
         void Subscribe(string channel, EventAction eventAction);
 
         /// <summary>
+        /// Unsubscribe callback.
+        /// </summary>
+        /// <param name="eventAction">Event action.</param>
+        /// <param name="keepEvent">GC optimization - clear only callback list and keep event for future use.</param>
+        void Unsubscribe<T>(EventAction<T> eventAction, bool keepEvent = false);
+
+        /// <summary>
         /// Unsubscribe all callbacks from event.
         /// </summary>
         /// <param name="keepEvent"></param>

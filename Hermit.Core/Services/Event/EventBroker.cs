@@ -29,6 +29,11 @@ namespace Hermit.Services
             Unsubscribe(null, eventAction);
         }
 
+        public void Unsubscribe<T>(EventAction<T> eventAction, bool keepEvent = false)
+        {
+            Unsubscribe(null, eventAction, keepEvent);
+        }
+
         public void UnsubscribeAll(bool keepEvent = false)
         {
             UnsubscribeAll(null, keepEvent);

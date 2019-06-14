@@ -4,14 +4,14 @@ namespace Hermit.UIStack
 {
     public interface IUIController
     {
-        Task ClearPopups();
+        Task ClearPopupsAsync();
 
-        Task ClearFixes();
+        Task ClearFixesAsync();
 
-        Task ClearWindows();
+        Task ClearWindowsAsync();
 
-        Task ClearAll();
+        Task ClearAllAsync();
 
-        Task Close(ulong widgetId, bool recycle = false);
+        Task CloseAsync(ulong widgetId, bool recycle = false);
     }
 }

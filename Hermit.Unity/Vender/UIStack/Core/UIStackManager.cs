@@ -222,37 +222,37 @@ namespace Hermit.UIStack
 
         #region Clear
 
-        public async Task ClearPopups()
+        public async Task ClearPopupsAsync()
         {
-            foreach (var popup in Popups) { await Close(popup); }
+            foreach (var popup in Popups) { await CloseAsync(popup); }
 
             Popups.Clear();
         }
 
-        public async Task ClearFixes()
+        public async Task ClearFixesAsync()
         {
-            foreach (var fix in Fixes) { await Close(fix); }
+            foreach (var fix in Fixes) { await CloseAsync(fix); }
 
             Fixes.Clear();
         }
 
-        public async Task ClearWindows()
+        public async Task ClearWindowsAsync()
         {
             while (StackedWindows.Count > 0)
             {
                 var window = StackedWindows.Pop();
-                await Close(window.ViewId);
+                await CloseAsync(window.ViewId);
             }
         }
 
-        public async Task ClearAll()
+        public async Task ClearAllAsync()
         {
-            await ClearPopups();
-            await ClearFixes();
-            await ClearWindows();
+            await ClearPopupsAsync();
+            await ClearFixesAsync();
+            await ClearWindowsAsync();
         }
 
-        public async Task Close(ulong widgetId, bool recycle = false)
+        public async Task CloseAsync(ulong widgetId, bool recycle = false)
         {
             await Close(widgetId, null, recycle);
         }
