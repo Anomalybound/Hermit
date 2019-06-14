@@ -13,15 +13,15 @@ namespace Hermit
         {
             Current.eventBroker.Unsubscribe(action, keepEvent);
         }
-
-        public static void Publish<T>(EventAction<T> action)
-        {
-            Current.eventBroker.Publish(action);
-        }
-
+        
         public static void UnSubscribeAll(bool keepEvent = false)
         {
             Current.eventBroker.UnsubscribeAll(keepEvent);
+        }
+
+        public static void Publish<T>(T message)
+        {
+            Current.eventBroker.Publish(message);
         }
 
         public static void Subscribe(string channel, EventAction action)
