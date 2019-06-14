@@ -24,6 +24,8 @@ namespace Hermit.DataBindings
 
         #region Styles
 
+        protected bool StyleInitialized;
+
         protected GUIStyle BindingTypeLabelStyle;
         protected GUIStyle BindingLabelContainerStyle;
         protected GUIStyle AlignToRightStyle;
@@ -47,8 +49,6 @@ namespace Hermit.DataBindings
 
         protected virtual void OnEnable()
         {
-            SetupStyles();
-
             BindingBase = target as DataBindingBase;
 
             if (AdapterLookup.Count <= 0) { CollectAdapters(); }
@@ -58,6 +58,8 @@ namespace Hermit.DataBindings
 
         public override void OnInspectorGUI()
         {
+            if (!StyleInitialized) { SetupStyles(); }
+
             serializedObject.Update();
 
             using (new EditorGUI.DisabledScope(true))
@@ -69,6 +71,8 @@ namespace Hermit.DataBindings
 
         private void SetupStyles()
         {
+            StyleInitialized = true;
+
             if (AlignToRightStyle == null)
             {
                 AlignToRightStyle = new GUIStyle(EditorStyles.label)
@@ -499,7 +503,7 @@ namespace Hermit.DataBindings
             {
                 selection = EditorGUILayout.Popup("Actions", selection, options.ToArray());
 
-                if (BindingBase.DataProviderComponent == null)
+                if (BindingBase.DataProviderComponent == null && selection >= 0)
                 {
                     BindingBase.DataProviderComponent = providerLookup[arguments.Count][selection];
                 }
