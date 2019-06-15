@@ -7,7 +7,13 @@ namespace Hermit.View
     {
         public TViewModel DataContext { get; protected set; }
 
-        public virtual void SetViewModel(object context)
+        public void SetViewModel(TViewModel dataContext)
+        {
+            DataContext = dataContext;
+            DataReadyEvent?.Invoke();
+        }
+
+        public void SetViewModel(object context)
         {
             if (context is TViewModel viewModel) { DataContext = viewModel; }
             else { Her.Warn($"{context} is not matching {typeof(TViewModel)}"); }
@@ -15,7 +21,7 @@ namespace Hermit.View
             DataReadyEvent?.Invoke();
         }
 
-        public virtual TViewModel GetViewModel()
+        public TViewModel GetViewModel()
         {
             return DataContext;
         }
@@ -51,12 +57,5 @@ namespace Hermit.View
         }
     }
 
-    public abstract class UIViewBase : UIViewBase<EmptyViewModel>
-    {
-        public override void SetViewModel(object context)
-        {
-            DataContext = (EmptyViewModel) ViewModel.Empty;
-            if (context != null) { Her.Log($"{GetType().Name} will not receive any models."); }
-        }
-    }
+    public abstract class UIViewBase : UIViewBase<EmptyViewModel> { }
 }

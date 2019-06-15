@@ -5,7 +5,7 @@ using Component = UnityEngine.Component;
 
 namespace Hermit
 {
-    [ScriptOrder(10000)]
+    [ScriptOrder(-2000)]
     public abstract class DataBindingBase : MonoBehaviour
     {
         public Component DataProviderComponent;
