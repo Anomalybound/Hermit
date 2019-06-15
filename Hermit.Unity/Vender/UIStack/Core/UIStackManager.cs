@@ -257,7 +257,7 @@ namespace Hermit.UIStack
         public async Task Close(ulong widgetId, Action onClosed, bool recycle = false)
         {
             var targetWidget = _viewManager.GetView<Widget>(widgetId);
-            if (targetWidget.Layer != UILayer.Window || !WindowsInDisplay.Contains(widgetId))
+            if (targetWidget.Layer != UILayer.Window || WindowsInDisplay.Contains(widgetId))
             {
                 await targetWidget.OnHide();
 
