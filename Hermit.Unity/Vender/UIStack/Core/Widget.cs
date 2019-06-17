@@ -24,6 +24,8 @@ namespace Hermit.UIStack
             Path = path;
             IuiStack = manager;
             Message = message;
+            
+            ViewId = Her.Resolve<IViewManager>().Register(this);
         }
 
         #region Events
@@ -73,15 +75,6 @@ namespace Hermit.UIStack
         public GameObject ViewObject => gameObject;
 
         public Component ViewComponent => this;
-
-        #endregion
-
-        #region Unity LifeTime
-
-        protected virtual void Awake()
-        {
-            ViewId = Her.Resolve<IViewManager>().Register(this);
-        }
 
         #endregion
     }

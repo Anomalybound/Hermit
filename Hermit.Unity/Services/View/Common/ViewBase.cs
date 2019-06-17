@@ -64,7 +64,10 @@ namespace Hermit
 
         protected DataBindingBase[] DataBindings;
 
-        protected virtual void Awake()
+        /// <summary>
+        /// Should be call manually.
+        /// </summary>
+        public void SetUpView()
         {
             DataBindings = GetComponentsInChildren<DataBindingBase>();
             ViewId = Her.Resolve<IViewManager>().Register(this);
