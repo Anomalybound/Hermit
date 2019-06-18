@@ -67,7 +67,7 @@ namespace Hermit
         /// <summary>
         /// Should be call manually.
         /// </summary>
-        public void SetUpView()
+        public void SetUpViewInfo()
         {
             DataBindings = GetComponentsInChildren<DataBindingBase>();
             ViewId = Her.Resolve<IViewManager>().Register(this);

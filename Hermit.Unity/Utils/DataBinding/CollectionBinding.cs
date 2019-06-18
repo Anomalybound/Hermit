@@ -21,7 +21,6 @@ namespace Hermit
         [SerializeField]
         private Transform _viewContainer;
 
-
         #region Propertyies
 
         public string ViewModelCollectionEntry
@@ -109,7 +108,6 @@ namespace Hermit
         {
             if (CollectionValue == null) { return; }
 
-            Assert.IsNotNull(ChangedHandler);
             CollectionValue.CollectionChanged += ChangedHandler.OnCollectionChanged;
         }
 
@@ -117,7 +115,6 @@ namespace Hermit
         {
             if (CollectionValue == null) { return; }
 
-            Assert.IsNotNull(ChangedHandler);
             CollectionValue.CollectionChanged -= ChangedHandler.OnCollectionChanged;
         }
 

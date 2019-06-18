@@ -24,7 +24,12 @@ namespace Hermit.UIStack
             Path = path;
             IuiStack = manager;
             Message = message;
-            
+
+            SetUpViewInfo();
+        }
+
+        protected virtual void SetUpViewInfo()
+        {
             ViewId = Her.Resolve<IViewManager>().Register(this);
         }
 

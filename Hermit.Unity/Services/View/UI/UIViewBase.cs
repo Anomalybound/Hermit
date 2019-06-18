@@ -50,9 +50,9 @@ namespace Hermit.View
 
         protected DataBindingBase[] DataBindings;
 
-        public override void SetManagerInfo(string path, IUIStack manager, UIMessage message)
+        protected override void SetUpViewInfo()
         {
-            base.SetManagerInfo(path, manager, message);
+            base.SetUpViewInfo();
             DataBindings = GetComponentsInChildren<DataBindingBase>();
         }
     }

@@ -12,6 +12,13 @@ namespace Hermit
 
         protected Transform ViewContainer;
 
+        protected IViewManager ViewManager { get; }
+
+        public DefaultCollectionChangedHandler()
+        {
+            ViewManager = Her.Resolve<IViewManager>();
+        }
+
         public void SetUp(GameObject viewTemplate, Transform viewContainer)
         {
             ViewTemplate = viewTemplate;
@@ -27,8 +34,17 @@ namespace Hermit
                     {
                         var eNewItem = e.NewItems[i];
                         var instance = Object.Instantiate(ViewTemplate, ViewContainer, false);
+
+                        // View SetUp
+                        var viewInstance = instance.GetComponent<IView>();
+                        if (viewInstance != null)
+                        {
+                            if (viewInstance is ViewBase viewBase) { viewBase.SetUpViewInfo(); }
+                        }
+
+                        // View Model Inject
                         var dataProvider = instance.GetComponent<IViewModelProvider>();
-                        dataProvider.SetViewModel(eNewItem);
+                        dataProvider?.SetViewModel(eNewItem);
 
                         instance.gameObject.SetActive(true);
                         instance.transform.SetSiblingIndex(e.NewStartingIndex + i);
@@ -40,7 +56,13 @@ namespace Hermit
 
                     for (var i = 0; i < e.OldItems.Count; i++)
                     {
-                        Object.Destroy(ViewContainer.GetChild(index).gameObject);
+                        var child = ViewContainer.GetChild(index);
+
+                        // View
+                        var viewInstance = child.GetComponent<IView>();
+                        if (viewInstance != null) { ViewManager.UnRegister(viewInstance.ViewId); }
+
+                        Object.Destroy(child.gameObject);
                     }
 
                     break;
