@@ -36,10 +36,10 @@ namespace Hermit.Unity
             switch (_bindingType)
             {
                 case BindingRegisterType.BindSelf:
-                    bindingInfo = container.Bind(_target.GetType()).FromInstance(_target).WithId(_bindingId);
+                    bindingInfo = container.Bind(_target.GetType()).FromInstance(_target);
                     break;
                 case BindingRegisterType.BindAll:
-                    bindingInfo = container.BindAll(_target.GetType()).FromInstance(_target).WithId(_bindingId);
+                    bindingInfo = container.BindAll(_target.GetType()).FromInstance(_target);
                     break;
                 default:
                     throw new ArgumentOutOfRangeException();
@@ -56,6 +56,8 @@ namespace Hermit.Unity
                 default:
                     throw new ArgumentOutOfRangeException();
             }
+
+            bindingInfo.WithId(_bindingId.Trim());
 
             (container as DiContainer)?.Build(bindingInfo);
         }

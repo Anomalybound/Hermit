@@ -5,6 +5,8 @@ namespace Hermit
 {
     public abstract class ViewBase<TViewModel> : MonoBehaviour, IViewModelProvider where TViewModel : ViewModel
     {
+        protected IViewManager ViewManager { get; private set; }
+
         #region IView
 
         public ulong ViewId { get; private set; }
@@ -69,8 +71,18 @@ namespace Hermit
         /// </summary>
         public void SetUpViewInfo()
         {
+            ViewManager = Her.Resolve<IViewManager>();
+            
             DataBindings = GetComponentsInChildren<DataBindingBase>();
-            ViewId = Her.Resolve<IViewManager>().Register(this);
+            ViewId = ViewManager.Register(this);
+        }
+
+        /// <summary>
+        /// Should be call manually.
+        /// </summary>
+        public void CleanUpViewInfo()
+        {
+            ViewManager.UnRegister(ViewId);
         }
     }
 

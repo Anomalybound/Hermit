@@ -23,6 +23,8 @@ namespace Hermit.Injection
 
         protected readonly Queue<object> PendingInjectionQueue = new Queue<object>();
 
+        protected const string DEFAULT_INJECTION_KEY = "Default";
+
         public IDependencyContainer MountModule(params IServiceProvider[] serviceProviders)
         {
             Modules.AddRange(serviceProviders);
@@ -48,6 +50,9 @@ namespace Hermit.Injection
 
             // add contract type as default if implement type is not assigned
             if (info.ImplementType == null) { info.To(info.ContractTypes[0]); }
+
+            // add default injection key if null
+            if (string.IsNullOrEmpty(info.BindingId)) { info.WithId(DEFAULT_INJECTION_KEY); }
 
             foreach (var contractType in info.ContractTypes)
             {
@@ -197,11 +202,14 @@ namespace Hermit.Injection
 
         public object Singleton(Type contract, string id = null)
         {
+            // add default injection key if null
             return OperationHelper(Singleton, contract, id);
         }
 
         public object Create(Type type, string id = null)
         {
+            if (string.IsNullOrEmpty(id)) { id = DEFAULT_INJECTION_KEY; }
+
             return ContractTypeLookup.ContainsKey((id, type))
                 ? Instance(type, id)
                 : CreateInstanceFromNew(type);
@@ -316,8 +324,13 @@ namespace Hermit.Injection
 
         protected object OperationHelper(Func<BindingInfo, object> operation, Type contractType, string id)
         {
+            // add default injection key if null
+            if (string.IsNullOrEmpty(id)) { id = DEFAULT_INJECTION_KEY; }
+
             if (!ContractTypeLookup.TryGetValue((id, contractType), out var binderInfos))
             {
+                if (string.IsNullOrEmpty(id)) { throw new Exception($"Resolve type: {contractType} failed!"); }
+
                 throw new Exception($"Resolve type: {contractType} with id: {id} failed!");
             }
 

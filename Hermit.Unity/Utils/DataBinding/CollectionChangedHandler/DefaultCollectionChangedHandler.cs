@@ -60,7 +60,10 @@ namespace Hermit
 
                         // View
                         var viewInstance = child.GetComponent<IView>();
-                        if (viewInstance != null) { ViewManager.UnRegister(viewInstance.ViewId); }
+                        if (viewInstance != null)
+                        {
+                            if (viewInstance is ViewBase viewBase) { viewBase.CleanUpViewInfo(); }
+                        }
 
                         Object.Destroy(child.gameObject);
                     }
