@@ -69,7 +69,7 @@ namespace Hermit
         /// <summary>
         /// Should be call manually.
         /// </summary>
-        public void SetUpViewInfo()
+        public virtual void SetUpViewInfo()
         {
             ViewManager = Her.Resolve<IViewManager>();
             
@@ -80,7 +80,7 @@ namespace Hermit
         /// <summary>
         /// Should be call manually.
         /// </summary>
-        public void CleanUpViewInfo()
+        public virtual void CleanUpViewInfo()
         {
             ViewManager.UnRegister(ViewId);
         }
