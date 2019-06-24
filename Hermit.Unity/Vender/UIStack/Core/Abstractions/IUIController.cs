@@ -4,14 +4,16 @@ namespace Hermit.UIStack
 {
     public interface IUIController
     {
-        Task ClearPopupsAsync();
+        void RegisterDefaultFactory(IWidgetFactory factory);
 
-        Task ClearFixesAsync();
+        Task ClearPopupsAsync(bool reuse = false);
 
-        Task ClearWindowsAsync();
+        Task ClearFixesAsync(bool reuse = false);
 
-        Task ClearAllAsync();
+        Task ClearWindowsAsync(bool reuse = false);
 
-        Task CloseAsync(ulong widgetId, bool recycle = false);
+        Task ClearAllAsync(bool reuse = false);
+
+        Task CloseAsync(ulong widgetId, bool reuse = false);
     }
 }

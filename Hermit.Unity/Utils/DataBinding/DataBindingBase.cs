@@ -27,12 +27,23 @@ namespace Hermit
             if (DataProviderComponent != null && DataProviderComponent is IViewModelProvider provider)
             {
                 DataProvider = provider;
-                provider.DataReadyEvent += OnDataReady;
+                if (DataProvider.GetViewModel() != null)
+                {
+                    IsDataReady = true;
+                    SetupBinding();
+                }
+                else { DataProvider.DataReadyEvent += OnDataReady; }
             }
             else
             {
                 DataProvider = GetComponentInParent<IViewModelProvider>();
-                DataProvider.DataReadyEvent += OnDataReady;
+
+                if (DataProvider.GetViewModel() != null)
+                {
+                    IsDataReady = true;
+                    SetupBinding();
+                }
+                else { DataProvider.DataReadyEvent += OnDataReady; }
             }
         }
 

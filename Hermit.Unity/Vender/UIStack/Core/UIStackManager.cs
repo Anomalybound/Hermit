@@ -1,9 +1,6 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
-using Hermit.Injection;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
@@ -36,7 +33,8 @@ namespace Hermit.UIStack
         private readonly List<ulong> Fixes = new List<ulong>();
 
         private readonly Dictionary<UILayer, GameObject> LayerLookup = new Dictionary<UILayer, GameObject>();
-        private static readonly Dictionary<Type, IWidgetFactory> FactoryLookup = new Dictionary<Type, IWidgetFactory>();
+        private IWidgetFactory DefaultFactory = new DefaultWidgetFactory();
+        private Dictionary<ulong, IWidgetFactory> FactoryLookup = new Dictionary<ulong, IWidgetFactory>();
 
         private readonly Dictionary<string, Stack<Widget>> PoolingWidgets =
             new Dictionary<string, Stack<Widget>>();
@@ -45,8 +43,6 @@ namespace Hermit.UIStack
 
         public static UIStackManager FromInstance(UIStackManager uiStackManagerPrefab)
         {
-            CollectFactories();
-
             var instance = Instantiate(uiStackManagerPrefab);
 
             foreach (UILayer layer in Enum.GetValues(typeof(UILayer)))
@@ -68,8 +64,6 @@ namespace Hermit.UIStack
 
         public static UIStackManager BuildHierarchy(UIManagerSettings settings)
         {
-            CollectFactories();
-
             var manager = new GameObject("UI Stack Manager").AddComponent<UIStackManager>();
 
             foreach (UILayer layer in Enum.GetValues(typeof(UILayer)))
@@ -109,24 +103,26 @@ namespace Hermit.UIStack
 
         #region Push
 
-        public async Task<ulong> PushAsync(string widgetName)
+        public async Task<ulong> PushAsync(string widgetName, IWidgetFactory factory = null)
         {
-            return await PushAsync<Widget>(widgetName);
+            return await PushAsync<Widget>(widgetName, factory);
         }
 
-        public async Task<ulong> PushAsync(string widgetName, UIMessage message)
+        public async Task<ulong> PushAsync(string widgetName, UIMessage message, IWidgetFactory factory = null)
         {
-            return await PushAsync<Widget>(widgetName, message);
+            return await PushAsync<Widget>(widgetName, message, factory);
         }
 
-        public async Task<ulong> PushAsync<TWidget>(string widgetName) where TWidget : Widget
+        public async Task<ulong> PushAsync<TWidget>(string widgetName, IWidgetFactory factory = null)
+            where TWidget : Widget
         {
-            return await PushAsync<TWidget>(widgetName, UIMessage.Empty);
+            return await PushAsync<TWidget>(widgetName, UIMessage.Empty, factory);
         }
 
-        public async Task<ulong> PushAsync<TWidget>(string widgetName, UIMessage message) where TWidget : Widget
+        public async Task<ulong> PushAsync<TWidget>(string widgetName, UIMessage message, IWidgetFactory factory = null)
+            where TWidget : Widget
         {
-            var instance = await GetInstance<TWidget>(widgetName, message);
+            var instance = await GetInstance<TWidget>(widgetName, message, factory);
             var parent = LayerLookup[instance.Layer];
             instance.transform.SetParent(parent.transform, false);
 
@@ -144,12 +140,15 @@ namespace Hermit.UIStack
             {
                 var prevWidget = StackedWindows.Peek();
 
-                await prevWidget.OnFreeze();
-
-                // Window will overlay previous windows.
-                if (instance.Layer == UILayer.Window && WindowsInDisplay.Contains(prevWidget.ViewId))
+                if (prevWidget != null)
                 {
-                    WindowsInDisplay.Remove(prevWidget.ViewId);
+                    await prevWidget.OnFreeze();
+
+                    // Window will overlay previous windows.
+                    if (instance.Layer == UILayer.Window && WindowsInDisplay.Contains(prevWidget.ViewId))
+                    {
+                        WindowsInDisplay.Remove(prevWidget.ViewId);
+                    }
                 }
             }
 
@@ -165,12 +164,7 @@ namespace Hermit.UIStack
 
         #region Pop
 
-        public async Task PopAsync(bool recycle = false)
-        {
-            await PopAsync(null, recycle);
-        }
-
-        public async Task PopAsync(Action onDone, bool recycle = false)
+        public async Task PopAsync(bool reuse = false)
         {
             if (StackedWindows.Count < 0)
             {
@@ -180,38 +174,16 @@ namespace Hermit.UIStack
 
             var current = StackedWindows.Pop();
 
+            await current.OnHide();
+
+            if (reuse) { MoveToHidden(current); }
+            else { ReturnWidget(current); }
+
             if (StackedWindows.Count > 0)
             {
-                await current.OnHide();
-
-                if (recycle) { MoveToHidden(current); }
-                else
-                {
-                    _viewManager.UnRegister(current.ViewId);
-                    Destroy(current.gameObject);
-                }
-
-                current.Controller?.OnDestroy();
-                onDone?.Invoke();
-
                 // resume previous window
                 var resumeWindow = StackedWindows.Peek();
-
                 await resumeWindow.OnResume();
-            }
-            else
-            {
-                await current.OnHide();
-
-                if (recycle) { MoveToHidden(current); }
-                else
-                {
-                    _viewManager.UnRegister(current.ViewId);
-                    Destroy(current.gameObject);
-                }
-
-                current.Controller?.OnDestroy();
-                onDone?.Invoke();
             }
         }
 
@@ -219,57 +191,45 @@ namespace Hermit.UIStack
 
         #region Clear
 
-        public async Task ClearPopupsAsync()
+        public async Task ClearPopupsAsync(bool reuse = false)
         {
-            foreach (var popup in Popups) { await CloseAsync(popup); }
+            foreach (var popup in Popups) { await CloseAsync(popup, reuse); }
 
             Popups.Clear();
         }
 
-        public async Task ClearFixesAsync()
+        public async Task ClearFixesAsync(bool reuse = false)
         {
-            foreach (var fix in Fixes) { await CloseAsync(fix); }
+            foreach (var fix in Fixes) { await CloseAsync(fix, reuse); }
 
             Fixes.Clear();
         }
 
-        public async Task ClearWindowsAsync()
+        public async Task ClearWindowsAsync(bool reuse = false)
         {
             while (StackedWindows.Count > 0)
             {
                 var window = StackedWindows.Pop();
-                await CloseAsync(window.ViewId);
+                await CloseAsync(window.ViewId, reuse);
             }
         }
 
-        public async Task ClearAllAsync()
+        public async Task ClearAllAsync(bool reuse = false)
         {
-            await ClearPopupsAsync();
-            await ClearFixesAsync();
-            await ClearWindowsAsync();
+            await ClearPopupsAsync(reuse);
+            await ClearFixesAsync(reuse);
+            await ClearWindowsAsync(reuse);
         }
 
-        public async Task CloseAsync(ulong widgetId, bool recycle = false)
-        {
-            await Close(widgetId, null, recycle);
-        }
-
-        public async Task Close(ulong widgetId, Action onClosed, bool recycle = false)
+        public async Task CloseAsync(ulong widgetId, bool reuse = false)
         {
             var targetWidget = _viewManager.GetView<Widget>(widgetId);
             if (targetWidget.Layer != UILayer.Window || WindowsInDisplay.Contains(widgetId))
             {
                 await targetWidget.OnHide();
 
-                if (recycle) { MoveToHidden(targetWidget); }
-                else
-                {
-                    _viewManager.UnRegister(targetWidget.ViewId);
-                    Destroy(targetWidget.gameObject);
-                }
-
-                targetWidget.Controller?.OnDestroy();
-                onClosed?.Invoke();
+                if (reuse) { MoveToHidden(targetWidget); }
+                else { ReturnWidget(targetWidget); }
 
                 if (WindowsInDisplay.Contains(widgetId)) { WindowsInDisplay.Remove(widgetId); }
             }
@@ -279,116 +239,53 @@ namespace Hermit.UIStack
 
         #region Helpers
 
-        public static void RegisterFactory(Type type, IWidgetFactory factory)
+        public void RegisterDefaultFactory(IWidgetFactory factory)
         {
-            if (FactoryLookup.ContainsKey(type))
-            {
-                Debug.LogErrorFormat("Factory already registered for type: {0}.", type);
-            }
+            DefaultFactory = factory ?? throw new ArgumentNullException();
+        }
 
-            FactoryLookup[type] = factory;
+        private void ReturnWidget(Widget widget)
+        {
+            if (FactoryLookup.TryGetValue(widget.ViewId, out var factory))
+            {
+                FactoryLookup.Remove(widget.ViewId);
+                factory.ReturnInstance(widget);
+            }
+            else { DefaultFactory.ReturnInstance(widget); }
         }
 
         #endregion
 
         #region Internal Funtions
 
-        private static void CollectFactories()
-        {
-            if (FactoryLookup.Count > 0) { return; }
-
-            var types = AppDomain.CurrentDomain.GetAssemblies().SelectMany(x => x.GetTypes())
-                .Where(x => typeof(IWidgetFactory).IsAssignableFrom(x));
-
-            foreach (var factoryType in types)
-            {
-                if (!factoryType.IsAbstract && !factoryType.IsInterface)
-                {
-                    var attributes = factoryType.GetCustomAttributes(typeof(CustomWidgetFactoryAttribute), true);
-                    if (attributes.Length <= 0) { continue; }
-
-                    if (!(attributes[0] is CustomWidgetFactoryAttribute attribute)) { continue; }
-
-                    if (!(Context.GlobalContext.Create(factoryType) is IWidgetFactory factoryInstance)) { continue; }
-
-                    RegisterFactory(attribute.WidgetType, factoryInstance);
-                }
-            }
-        }
-
-        private async Task<TWidget> GetInstance<TWidget>(string widgetPath, UIMessage message)
+        private async Task<TWidget> GetInstance<TWidget>(string widgetPath, UIMessage message,
+            IWidgetFactory factory = null)
             where TWidget : Widget
         {
-            var resolveType = typeof(TWidget);
             if (PoolingWidgets.ContainsKey(widgetPath))
             {
                 var pool = PoolingWidgets[widgetPath];
                 if (pool.Count > 0)
                 {
                     var instance = pool.Pop();
-
-                    if (instance.Controller == null) { return instance as TWidget; }
-
-                    try
-                    {
-                        instance.Controller?.SetControllerInfo(instance, this, message);
-                        instance.Controller?.Initialize();
-                    }
-                    catch (Exception ex) { Debug.LogException(ex); }
-
                     return instance as TWidget;
                 }
             }
 
-            var useSpecifiedFactory = false;
-            if (!FactoryLookup.TryGetValue(resolveType, out var factory))
-            {
-                while (factory == null && resolveType.BaseType != null)
-                {
-                    resolveType = resolveType.BaseType;
-                    FactoryLookup.TryGetValue(resolveType, out factory);
-                }
+            if (factory == null) { factory = DefaultFactory; }
 
-                if (factory == null)
-                {
-                    Debug.LogError($"Widget factory not found for type: {typeof(TWidget)}, no fallback.");
-                    return null;
-                }
-            }
-            else { useSpecifiedFactory = true; }
-
-            TWidget ret = null;
-
-            // fallback
-            if (useSpecifiedFactory)
+            TWidget widget;
+            try { widget = (TWidget) await factory.CreateInstance(this, widgetPath, message); }
+            catch (Exception e)
             {
-                if (factory is IWidgetFactory<TWidget> specifiedFactory)
-                {
-                    ret = await specifiedFactory.CreateInstance(this, widgetPath, message);
-                }
-            }
-            else
-            {
-                var widgetCreated = await factory.CreateInstance(this, widgetPath, message);
-                ret = widgetCreated as TWidget;
-                if (ret == null)
-                {
-                    Debug.LogWarningFormat("Can not convert [{0}] to type: {1}", widgetCreated, typeof(TWidget));
-                }
+                Her.Error(e);
+                throw;
             }
 
-            return ret;
-        }
+            // mark widget factory
+            FactoryLookup.Add(widget.ViewId, factory);
 
-        private void RunCoroutine(IEnumerator target, Action onDone)
-        {
-            StartCoroutine(MonitorCoroutine(target, onDone));
-        }
-
-        private IEnumerator MonitorCoroutine(IEnumerator target, Action onDone)
-        {
-            yield return target;
-            onDone?.Invoke();
+            return widget;
         }
 
         private void MoveToHidden(Widget toHide)
@@ -396,7 +293,6 @@ namespace Hermit.UIStack
             var hiddenLayer = LayerLookup[UILayer.UIHidden];
             toHide.transform.SetParent(hiddenLayer.transform);
 
-            var type = toHide.GetType();
             if (PoolingWidgets.ContainsKey(toHide.Path)) { PoolingWidgets[toHide.Path].Push(toHide); }
             else
             {

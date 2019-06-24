@@ -22,7 +22,7 @@ namespace Hermit.Common
             Container.Bind<ITime>().To<UnityTime>();
             Container.Bind<ILog>().To<UnityLog>().FromInstance(new UnityLog(EnableLog));
             Container.Bind<IUIStack>().FromMethod(BuildUIStackInstance);
-            Container.BindAll<DictionaryStore>();
+            Container.Bind<IStore>().To<DictionaryStore>().FromInstance(new DictionaryStore());
 
             // View
             Container.Bind<IViewLoader>().To<ResourcesViewLoader>();

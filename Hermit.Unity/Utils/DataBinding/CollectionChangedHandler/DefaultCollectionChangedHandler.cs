@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Specialized;
 using Hermit.DataBinding;
+using Hermit.View;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
@@ -35,12 +36,9 @@ namespace Hermit
                         var eNewItem = e.NewItems[i];
                         var instance = Object.Instantiate(ViewTemplate, ViewContainer, false);
 
-                        // View SetUp
-                        var viewInstance = instance.GetComponent<IView>();
-                        if (viewInstance != null)
-                        {
-                            if (viewInstance is ViewBase viewBase) { viewBase.SetUpViewInfo(); }
-                        }
+                        // View
+                        var viewBase = instance.GetComponent<IView>();
+                        viewBase?.SetUpViewInfo();
 
                         // View Model Inject
                         var dataProvider = instance.GetComponent<IViewModelProvider>();
@@ -59,11 +57,8 @@ namespace Hermit
                         var child = ViewContainer.GetChild(index);
 
                         // View
-                        var viewInstance = child.GetComponent<IView>();
-                        if (viewInstance != null)
-                        {
-                            if (viewInstance is ViewBase viewBase) { viewBase.CleanUpViewInfo(); }
-                        }
+                        var viewBase = child.GetComponent<IView>();
+                        viewBase?.CleanUpViewInfo();
 
                         Object.Destroy(child.gameObject);
                     }

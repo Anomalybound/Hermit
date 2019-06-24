@@ -50,12 +50,10 @@ namespace Hermit.View
 
         protected DataBindingBase[] DataBindings;
 
-        protected override void SetUpViewInfo()
+        public override void SetUpViewInfo()
         {
             base.SetUpViewInfo();
             DataBindings = GetComponentsInChildren<DataBindingBase>();
         }
     }
-
-    public abstract class UIViewBase : UIViewBase<EmptyViewModel> { }
 }

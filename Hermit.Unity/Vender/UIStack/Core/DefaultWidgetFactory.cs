@@ -3,8 +3,7 @@ using Object = UnityEngine.Object;
 
 namespace Hermit.UIStack
 {
-    [CustomWidgetFactory(typeof(Widget))]
-    public class DefaultWidgetFactory : IWidgetFactory<Widget>
+    public class DefaultWidgetFactory : IWidgetFactory
     {
         public async Task<Widget> CreateInstance(IUIStack manager, string name, UIMessage message)
         {
@@ -12,25 +11,13 @@ namespace Hermit.UIStack
             var prefab = await loader.LoadView(name);
             var instance = Object.Instantiate(prefab).GetComponent<Widget>();
             instance.SetManagerInfo(name, manager, message);
-            Her.Inject(instance);
-            instance.OnDestroyEvent += ReturnInstance;
             return instance;
         }
 
         public void ReturnInstance(Widget widget)
         {
-            widget.OnDestroyEvent -= ReturnInstance;
-            Object.Destroy(widget);
-        }
-
-        async Task<IWidget> IWidgetFactory.CreateInstance(IUIStack manager, string name, UIMessage message)
-        {
-            var loader = Her.Resolve<IViewLoader>();
-            var prefab = await loader.LoadView(name);
-            var instance = Object.Instantiate(prefab).GetComponent<IWidget>();
-            instance.SetManagerInfo(name, manager, message);
-            Her.Inject(instance);
-            return instance;
+            widget.CleanUpViewInfo();
+            Object.Destroy(widget.gameObject);
         }
     }
 }

@@ -2,7 +2,7 @@
 
 namespace Hermit.UIStack
 {
-    public interface IWidget
+    public interface IWidget : IView
     {
         Task OnShow();
 

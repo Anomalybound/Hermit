@@ -4,14 +4,12 @@ using UnityEngine;
 
 namespace Hermit.UIStack
 {
-    public class Widget : MonoBehaviour, IWidget, IView
+    public class Widget : MonoBehaviour, IWidget
     {
         [SerializeField]
         private UILayer _layer = UILayer.Window;
 
         public string Path { get; private set; }
-
-        public IWidgetController Controller { get; set; }
 
         public virtual UILayer Layer => _layer;
 
@@ -28,9 +26,14 @@ namespace Hermit.UIStack
             SetUpViewInfo();
         }
 
-        protected virtual void SetUpViewInfo()
+        public virtual void SetUpViewInfo()
         {
             ViewId = Her.Resolve<IViewManager>().Register(this);
+        }
+
+        public virtual void CleanUpViewInfo()
+        {
+            Her.Resolve<IViewManager>().UnRegister(ViewId);
         }
 
         #region Events

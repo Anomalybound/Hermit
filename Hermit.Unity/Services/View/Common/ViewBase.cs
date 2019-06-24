@@ -72,7 +72,7 @@ namespace Hermit
         public virtual void SetUpViewInfo()
         {
             ViewManager = Her.Resolve<IViewManager>();
-            
+
             DataBindings = GetComponentsInChildren<DataBindingBase>();
             ViewId = ViewManager.Register(this);
         }
@@ -85,6 +85,4 @@ namespace Hermit
             ViewManager.UnRegister(ViewId);
         }
     }
-
-    public abstract class ViewBase : ViewBase<EmptyViewModel> { }
 }

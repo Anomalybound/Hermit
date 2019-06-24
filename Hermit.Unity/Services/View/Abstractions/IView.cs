@@ -9,5 +9,9 @@ namespace Hermit
         GameObject ViewObject { get; }
 
         Component ViewComponent { get; }
+
+        void SetUpViewInfo();
+
+        void CleanUpViewInfo();
     }
 }

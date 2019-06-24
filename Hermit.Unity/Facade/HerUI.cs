@@ -28,34 +28,34 @@ namespace Hermit
             return await Current.uiStack.PushAsync<TWidget>(widgetName, message);
         }
 
-        public static async void PopUIAsync(bool recycle = false)
+        public static async void PopUIAsync(bool reuse = false)
         {
-            await Current.uiStack.PopAsync(recycle);
+            await Current.uiStack.PopAsync(reuse);
         }
 
-        public static async void ClearUIPopupsAsync()
+        public static async void ClearUIPopupsAsync(bool reuse = false)
         {
-            await Current.uiStack.ClearPopupsAsync();
+            await Current.uiStack.ClearPopupsAsync(reuse);
         }
 
-        public static async void ClearUIFixesAsync()
+        public static async void ClearUIFixesAsync(bool reuse = false)
         {
-            await Current.uiStack.ClearFixesAsync();
+            await Current.uiStack.ClearFixesAsync(reuse);
         }
 
-        public static async void ClearUIWindowsAsync()
+        public static async void ClearUIWindowsAsync(bool reuse = false)
         {
-            await Current.uiStack.ClearWindowsAsync();
+            await Current.uiStack.ClearWindowsAsync(reuse);
         }
 
-        public static async void ClearAllUIAsync()
+        public static async void ClearAllUIAsync(bool reuse = false)
         {
-            await Current.uiStack.ClearAllAsync();
+            await Current.uiStack.ClearAllAsync(reuse);
         }
 
-        public static async void CloseUIAsync(ulong widgetId, bool recycle = false)
+        public static async void CloseUIAsync(ulong widgetId, bool reuse = false)
         {
-            await Current.uiStack.CloseAsync(widgetId, recycle);
+            await Current.uiStack.CloseAsync(widgetId, reuse);
         }
 
         #endregion
