@@ -17,7 +17,7 @@ namespace Hermit.Fsm
 
         public virtual void Enter()
         {
-            OnEnter?.Invoke();
+            OnEnterAction?.Invoke();
 
             ElapsedTime = 0f;
         }
@@ -31,7 +31,7 @@ namespace Hermit.Fsm
                 return;
             }
 
-            OnUpdate?.Invoke(deltaTime);
+            OnUpdateAction?.Invoke(deltaTime);
 
             ElapsedTime += deltaTime;
 
@@ -44,7 +44,7 @@ namespace Hermit.Fsm
 
         public virtual void Exit()
         {
-            OnExit?.Invoke();
+            OnExitAction?.Invoke();
         }
 
         public virtual void ChangeState(string name)
@@ -99,11 +99,11 @@ namespace Hermit.Fsm
 
         #region Actions
 
-        public event Action OnEnter;
+        public event Action OnEnterAction;
 
-        public event Action OnExit;
+        public event Action OnExitAction;
 
-        public event Action<float> OnUpdate;
+        public event Action<float> OnUpdateAction;
 
         #endregion
 
@@ -143,19 +143,19 @@ namespace Hermit.Fsm
             else { throw new ApplicationException($"Child state already exists: {name}"); }
         }
 
-        public void SetEnterAction(Action onEnter)
+        public void SetEnterAction(Action onEnterAction)
         {
-            OnEnter = onEnter;
+            OnEnterAction = onEnterAction;
         }
 
-        public void SetExitAction(Action onExit)
+        public void SetExitAction(Action onExitAction)
         {
-            OnExit = onExit;
+            OnExitAction = onExitAction;
         }
 
-        public void SetUpdateAction(Action<float> onUpdate)
+        public void SetUpdateAction(Action<float> onUpdateAction)
         {
-            OnUpdate = onUpdate;
+            OnUpdateAction = onUpdateAction;
         }
 
         public void AddEvent(string id, Action<EventArgs> action)

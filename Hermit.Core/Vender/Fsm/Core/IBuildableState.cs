@@ -6,11 +6,11 @@ namespace Hermit.Fsm
     {
         void AddChild(string name, IState state);
 
-        void SetEnterAction(Action onEnter);
+        void SetEnterAction(Action onEnterAction);
 
-        void SetExitAction(Action onExit);
+        void SetExitAction(Action onExitAction);
 
-        void SetUpdateAction(Action<float> onUpdate);
+        void SetUpdateAction(Action<float> onUpdateAction);
 
         void AddEvent(string id, Action<EventArgs> action);
 

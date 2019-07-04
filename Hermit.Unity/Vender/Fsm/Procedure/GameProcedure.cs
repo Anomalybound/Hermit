@@ -10,68 +10,68 @@ namespace Hermit.Procedure
     {
         public abstract TProcedureIndex Index { get; }
 
-        public override void SetContext(TProcedureController context)
+        public override void SetContext(TProcedureController controller)
         {
-            base.SetContext(context);
-            Init(context);
+            base.SetContext(controller);
+            OnInit();
         }
 
         public sealed override void Enter()
         {
             base.Enter();
-            Enter(Context);
+            OnEnter();
         }
 
         public sealed override void Exit()
         {
             base.Exit();
-            Exit(Context);
+            OnExit();
         }
 
         public sealed override void Update(float deltaTime)
         {
             base.Update(deltaTime);
-            Update(Context, deltaTime);
+            OnUpdate(deltaTime);
         }
 
-        protected virtual void Init(TProcedureController controller) { }
+        protected virtual void OnInit() { }
 
-        protected virtual void Enter(TProcedureController controller) { }
+        protected virtual void OnEnter() { }
 
-        protected virtual void Exit(TProcedureController controller) { }
+        protected virtual void OnExit() { }
 
-        protected virtual void Update(TProcedureController controller, float deltaTime) { }
+        protected virtual void OnUpdate(float deltaTime) { }
 
         #region Facade
 
         public void ChangeState(TProcedureIndex index)
         {
-            Context.ChangeState(index.ToString(CultureInfo.InvariantCulture));
+            Controller.ChangeState(index.ToString(CultureInfo.InvariantCulture));
         }
 
         public void PushState(TProcedureIndex index)
         {
-            Context.PushState(index.ToString(CultureInfo.InvariantCulture));
+            Controller.PushState(index.ToString(CultureInfo.InvariantCulture));
         }
 
         public new void ChangeState(string stateName)
         {
-            Context.ChangeState(stateName);
+            Controller.ChangeState(stateName);
         }
 
         public new void PushState(string stateName)
         {
-            Context.PushState(stateName);
+            Controller.PushState(stateName);
         }
 
         public new void PopState()
         {
-            Context.PopState();
+            Controller.PopState();
         }
 
         public new void TriggerEvent(string eventId, EventArgs args)
         {
-            Context.TriggerEvent(eventId, args);
+            Controller.TriggerEvent(eventId, args);
         }
 
         #endregion

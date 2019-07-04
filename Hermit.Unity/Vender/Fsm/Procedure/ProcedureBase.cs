@@ -2,13 +2,13 @@
 
 namespace Hermit.Procedure
 {
-    public abstract class ProcedureBase<TProcedureManager> : ContextState<TProcedureManager>
+    public abstract class ProcedureBase<TProcedureController> : ContextState<TProcedureController>
     {
-        public override TProcedureManager Context { get; protected set; }
+        public override TProcedureController Controller { get; protected set; }
 
-        public override void SetContext(TProcedureManager context)
+        public override void SetContext(TProcedureController controller)
         {
-            Context = context;
+            Controller = controller;
         }
     }
 }
