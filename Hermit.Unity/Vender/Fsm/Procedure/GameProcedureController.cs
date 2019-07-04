@@ -18,7 +18,7 @@ namespace Hermit.Procedure
 
         private readonly Dictionary<IState, TProcedureIndex> IndexLookup = new Dictionary<IState, TProcedureIndex>();
 
-        [SerializeField]
+        [SerializeField, HideInInspector]
         private TProcedureIndex _initState = default(TProcedureIndex);
 
         public TProcedureIndex InitState => _initState;

@@ -8,15 +8,13 @@ namespace Hermit
     {
         public override void OnInspectorGUI()
         {
-            serializedObject.Update();
+            base.OnInspectorGUI();
             
             using (var check = new EditorGUI.ChangeCheckScope())
             {
                 EditorGUILayout.PropertyField(serializedObject.FindProperty("_initState"));
                 if (check.changed) { serializedObject.ApplyModifiedProperties(); }
             }
-
-            base.OnInspectorGUI();
         }
     }
 }

@@ -18,21 +18,21 @@ namespace Hermit.DataBindings
         {
             base.OnInspectorGUI();
 
-            Target.CollectionHandlerTypeName = DrawCollectionHandlerPopup(Target.CollectionHandlerTypeName);
-
-            using (new EditorGUILayout.VerticalScope(EditorStyles.helpBox))
+            using (var check = new EditorGUI.ChangeCheckScope())
             {
-                DrawBindingLabel("View Model");
+                Target.CollectionHandlerTypeName = DrawCollectionHandlerPopup(Target.CollectionHandlerTypeName);
 
-                Target.ViewModelCollectionEntry = DrawViewModelCollectionPopup(Target.ViewModelCollectionEntry);
-            }
-
-            using (new EditorGUILayout.VerticalScope(EditorStyles.helpBox))
-            {
-                DrawBindingLabel("View");
-
-                using (var check = new EditorGUI.ChangeCheckScope())
+                using (new EditorGUILayout.VerticalScope(EditorStyles.helpBox))
                 {
+                    DrawBindingLabel("View Model");
+
+                    Target.ViewModelCollectionEntry = DrawViewModelCollectionPopup(Target.ViewModelCollectionEntry);
+                }
+
+                using (new EditorGUILayout.VerticalScope(EditorStyles.helpBox))
+                {
+                    DrawBindingLabel("View");
+
                     EditorGUILayout.PropertyField(serializedObject.FindProperty("_viewTemplate"));
 
                     if (Target.ViewTemplate != null &&
@@ -42,9 +42,9 @@ namespace Hermit.DataBindings
                     }
 
                     EditorGUILayout.PropertyField(serializedObject.FindProperty("_viewContainer"));
-
-                    if (check.changed) { serializedObject.ApplyModifiedProperties(); }
                 }
+
+                if (check.changed) { serializedObject.ApplyModifiedProperties(); }
             }
         }
     }

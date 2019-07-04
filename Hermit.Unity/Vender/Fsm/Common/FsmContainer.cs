@@ -5,7 +5,10 @@ namespace Hermit
 {
     public abstract class FsmContainer : MonoBehaviour
     {
-        public bool UseFixedUpdate;
+        [SerializeField, HideInInspector]
+        private bool _useFixedUpdate = false;
+
+        public bool UseFixedUpdate => _useFixedUpdate;
 
         public IState Root { get; protected set; }
 

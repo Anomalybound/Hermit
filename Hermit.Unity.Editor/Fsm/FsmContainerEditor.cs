@@ -18,11 +18,13 @@ namespace Hermit
 
         public override void OnInspectorGUI()
         {
+            base.OnInspectorGUI();
+            
             serializedObject.Update();
 
             using (var check = new EditorGUI.ChangeCheckScope())
             {
-                EditorGUILayout.PropertyField(serializedObject.FindProperty(nameof(_fsm.UseFixedUpdate)));
+                EditorGUILayout.PropertyField(serializedObject.FindProperty("_useFixedUpdate"));
                 if (check.changed) { serializedObject.ApplyModifiedProperties(); }
             }
 
@@ -52,7 +54,7 @@ namespace Hermit
             using (new GUILayout.HorizontalScope())
             {
                 EditorGUILayout.LabelField(
-                    $"Name: {stateName}[{state.GetType().FullName}] - Children: [{state.Children.Count}] - Active: [{state.ActiveStates.Count}]",
+                    $"{stateName}[{state.GetType().FullName}] - Children: [{state.Children.Count}] - Active: [{state.ActiveStates.Count}]",
                     GUILayout.ExpandWidth(true));
 
                 var rect = GUILayoutUtility.GetLastRect();

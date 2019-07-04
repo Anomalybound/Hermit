@@ -82,10 +82,10 @@ namespace Hermit
 
         public abstract void UpdateBinding();
 
-        protected static (string typeName, string memberName) ParseEntry2TypeMember(string entry)
+        protected (string typeName, string memberName) ParseEntry2TypeMember(string entry)
         {
             var lastPeriodIndex = entry.LastIndexOf('.');
-            if (lastPeriodIndex == -1) { throw new Exception($"No period was found: {entry}"); }
+            if (lastPeriodIndex == -1) { throw new Exception($"No period was found[{entry}] on {name}"); }
 
             var typeName = entry.Substring(0, lastPeriodIndex);
             var memberName = entry.Substring(lastPeriodIndex + 1);
@@ -102,7 +102,7 @@ namespace Hermit
             return (typeName, memberName);
         }
 
-        protected static MemberInfo ParseViewModelEntry(ViewModel viewModel, string entry)
+        protected MemberInfo ParseViewModelEntry(ViewModel viewModel, string entry)
         {
             var (_, memberName) = ParseEntry2TypeMember(entry);
 
@@ -116,7 +116,7 @@ namespace Hermit
             return memberInfo;
         }
 
-        protected static (Component component, MemberInfo memberInfo) ParseViewEntry(Component viewProvider,
+        protected (Component component, MemberInfo memberInfo) ParseViewEntry(Component viewProvider,
             string entry)
         {
             var (typeName, memberName) = ParseEntry2TypeMember(entry);

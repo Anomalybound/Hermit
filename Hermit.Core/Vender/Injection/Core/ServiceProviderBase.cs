@@ -4,6 +4,6 @@
     {
         public abstract void RegisterBindings(IDependencyContainer Container);
 
-        public abstract void Initialization(IDependencyContainer Container);
+        public virtual void Initialization(IDependencyContainer Container) { }
     }
 }
