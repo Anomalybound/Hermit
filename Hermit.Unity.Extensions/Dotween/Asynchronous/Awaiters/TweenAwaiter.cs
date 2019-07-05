@@ -5,7 +5,7 @@ using System.Runtime.CompilerServices;
 using System.Threading;
 using DG.Tweening;
 
-namespace Hermit.Utils
+namespace Hermit
 {
     public struct TweenAwaiter : ICriticalNotifyCompletion
     {

@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace Hermit.UIStack
 {
-    public class Widget : MonoBehaviour, IWidget
+    public abstract class Widget : MonoBehaviour, IWidget
     {
         [SerializeField]
         private UILayer _layer = UILayer.Window;

@@ -3,7 +3,7 @@ using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using UnityEngine;
 
-namespace Hermit.Utils
+namespace Hermit
 {
     public struct ResourcesRequestAwaiter : ICriticalNotifyCompletion
     {
