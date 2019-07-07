@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Hermit
 {
@@ -25,10 +26,10 @@ namespace Hermit
 
         public ulong Register<TView>(TView view) where TView : IView
         {
-            ViewCaches.Add(ViewIdCounter, view);
             var viewId = ViewIdCounter;
-            ViewIdCounter++;
+            ViewCaches.Add(viewId, view);
 
+            ViewIdCounter++;
             return viewId;
         }
 
@@ -36,7 +37,8 @@ namespace Hermit
         {
             if (!ViewCaches.ContainsKey(id))
             {
-                throw new IndexOutOfRangeException($"Failed to unregister view of id: {id}");
+                throw new IndexOutOfRangeException(
+                    $"Failed to unregister view of id: {id}, view caches contains: {string.Join("-", ViewCaches.Select(v => v.Key.ToString()))}.");
             }
 
             ViewCaches.Remove(id);
