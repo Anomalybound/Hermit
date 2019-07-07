@@ -45,7 +45,11 @@ namespace Hermit.DataBindings
                     EditorGUI.EndDisabledGroup();
                 }
 
-                if (check.changed) { serializedObject.ApplyModifiedProperties(); }
+                if (check.changed)
+                {
+                    serializedObject.ApplyModifiedProperties();
+                    EditorUtility.SetDirty(target);
+                }
             }
         }
     }

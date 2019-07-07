@@ -44,7 +44,11 @@ namespace Hermit.DataBindings
                     EditorGUILayout.PropertyField(serializedObject.FindProperty("_viewContainer"));
                 }
 
-                if (check.changed) { serializedObject.ApplyModifiedProperties(); }
+                if (check.changed)
+                {
+                    serializedObject.ApplyModifiedProperties();
+                    EditorUtility.SetDirty(target);
+                }
             }
         }
     }

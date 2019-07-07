@@ -29,7 +29,7 @@ namespace Hermit.DataBindings
             base.OnInspectorGUI();
 
             serializedObject.Update();
-            
+
             using (var check = new EditorGUI.ChangeCheckScope())
             {
                 using (new EditorGUILayout.VerticalScope(EditorStyles.helpBox))
@@ -64,7 +64,11 @@ namespace Hermit.DataBindings
 
                 EditorGUI.EndDisabledGroup();
 
-                if (check.changed) { serializedObject.ApplyModifiedProperties(); }
+                if (check.changed)
+                {
+                    serializedObject.ApplyModifiedProperties();
+                    EditorUtility.SetDirty(target);
+                }
             }
         }
     }
