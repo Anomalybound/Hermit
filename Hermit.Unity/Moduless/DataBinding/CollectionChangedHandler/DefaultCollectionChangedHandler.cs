@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Collections.Specialized;
 using Hermit.DataBinding;
 using Hermit.View;
@@ -14,6 +15,8 @@ namespace Hermit
         protected Transform ViewContainer;
 
         protected IViewManager ViewManager { get; }
+
+        protected Dictionary<object, GameObject> instantiatedGameObjects = new Dictionary<object, GameObject>();
 
         public DefaultCollectionChangedHandler()
         {
@@ -36,6 +39,9 @@ namespace Hermit
                         var eNewItem = e.NewItems[i];
                         var instance = Object.Instantiate(ViewTemplate, ViewContainer, false);
 
+                        // Add to caches
+                        instantiatedGameObjects.Add(eNewItem, instance);
+
                         // View
                         var viewBase = instance.GetComponent<IView>();
                         viewBase?.SetUpViewInfo();
@@ -50,17 +56,19 @@ namespace Hermit
 
                     break;
                 case NotifyCollectionChangedAction.Remove:
-                    var index = e.OldStartingIndex;
 
                     for (var i = 0; i < e.OldItems.Count; i++)
                     {
-                        var child = ViewContainer.GetChild(index);
+                        var index = e.OldItems[i];
+                        if (!instantiatedGameObjects.TryGetValue(index, out var instance)) { throw new Exception($"Index: {index} has no founded instances.");}
+
+                        instantiatedGameObjects.Remove(index);
 
                         // View
-                        var viewBase = child.GetComponent<IView>();
+                        var viewBase = instance.GetComponent<IView>();
                         viewBase?.CleanUpViewInfo();
 
-                        Object.Destroy(child.gameObject);
+                        Object.Destroy(instance.gameObject);
                     }
 
                     break;
