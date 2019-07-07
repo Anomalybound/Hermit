@@ -16,7 +16,8 @@ namespace Hermit.Common
             var viewHandlers = AssemblyHelper.GetInheritancesInParentAssembly(typeof(IViewCollectionChangedHandler));
             foreach (var viewHandler in viewHandlers)
             {
-                Container.Bind<IViewCollectionChangedHandler>().To(viewHandler).WithId(viewHandler.FullName);
+                Container.Bind<IViewCollectionChangedHandler>().To(viewHandler)
+                    .AsTransient().WithId(viewHandler.FullName);
             }
         }
     }

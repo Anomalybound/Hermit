@@ -60,7 +60,10 @@ namespace Hermit
                     for (var i = 0; i < e.OldItems.Count; i++)
                     {
                         var index = e.OldItems[i];
-                        if (!instantiatedGameObjects.TryGetValue(index, out var instance)) { throw new Exception($"Index: {index} has no founded instances.");}
+                        if (!instantiatedGameObjects.TryGetValue(index, out var instance))
+                        {
+                            throw new Exception($"Index: {index} has no founded instances.");
+                        }
 
                         instantiatedGameObjects.Remove(index);
 
@@ -89,8 +92,15 @@ namespace Hermit
 
                     break;
                 case NotifyCollectionChangedAction.Reset:
-                    var childCount = ViewContainer.childCount;
-                    for (var i = childCount - 1; i >= 0; i--) { Object.Destroy(ViewContainer.GetChild(i).gameObject); }
+                    foreach (var generatedChild in instantiatedGameObjects.Values)
+                    {
+                        var viewBase = generatedChild.GetComponent<IView>();
+                        viewBase?.CleanUpViewInfo();
+                        
+                        Object.Destroy(generatedChild);
+                    }
+
+                    instantiatedGameObjects.Clear();
 
                     break;
                 default:
