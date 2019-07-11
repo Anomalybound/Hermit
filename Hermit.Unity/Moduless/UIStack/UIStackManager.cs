@@ -10,7 +10,10 @@ namespace Hermit.UIStack
     [Serializable]
     public class UIManagerSettings
     {
-        public bool IsLandscape = true;
+        public bool ScreenSpaceCameraMode = true;
+
+        [Range(0, 1)]
+        public float MatchWidthOrHeight = 0.5f;
 
         public Vector2 ReferenceResolution = new Vector2(1920, 1080);
     }
@@ -20,9 +23,7 @@ namespace Hermit.UIStack
         UIHidden = -1,
         Background = 0,
         Window = 1,
-        Fixed = 2,
-        Popup = 3,
-        Mask = 4
+        Popup = 2
     }
 
     public class UIStackManager : MonoBehaviour, IUIStack
@@ -30,11 +31,10 @@ namespace Hermit.UIStack
         private readonly Stack<Widget> StackedWindows = new Stack<Widget>();
         private readonly List<ulong> WindowsInDisplay = new List<ulong>();
         private readonly List<ulong> Popups = new List<ulong>();
-        private readonly List<ulong> Fixes = new List<ulong>();
 
         private readonly Dictionary<UILayer, GameObject> LayerLookup = new Dictionary<UILayer, GameObject>();
         private IWidgetFactory DefaultFactory = new DefaultWidgetFactory();
-        private Dictionary<ulong, IWidgetFactory> FactoryLookup = new Dictionary<ulong, IWidgetFactory>();
+        private readonly Dictionary<ulong, IWidgetFactory> FactoryLookup = new Dictionary<ulong, IWidgetFactory>();
 
         private readonly Dictionary<string, Stack<Widget>> PoolingWidgets =
             new Dictionary<string, Stack<Widget>>();
@@ -66,19 +66,35 @@ namespace Hermit.UIStack
         {
             var manager = new GameObject("UI Stack Manager").AddComponent<UIStackManager>();
 
+            var cam = Camera.main;
+            if (settings.ScreenSpaceCameraMode)
+            {
+                cam = new GameObject("UI Camera").AddComponent<Camera>();
+                cam.orthographic = true;
+                cam.transform.SetParent(manager.transform, false);
+                cam.clearFlags = CameraClearFlags.Depth;
+                cam.cullingMask = LayerMask.GetMask("UI");
+            }
+
             foreach (UILayer layer in Enum.GetValues(typeof(UILayer)))
             {
                 var layerObj = new GameObject(layer.ToString());
                 manager.LayerLookup.Add(layer, layerObj);
 
                 var layerCanvas = layerObj.AddComponent<Canvas>();
-                layerCanvas.renderMode = RenderMode.ScreenSpaceOverlay;
+                if (settings.ScreenSpaceCameraMode)
+                {
+                    layerCanvas.renderMode = RenderMode.ScreenSpaceCamera;
+                    layerCanvas.worldCamera = cam;
+                }
+                else { layerCanvas.renderMode = RenderMode.ScreenSpaceOverlay; }
+
                 layerCanvas.sortingOrder = (int) layer;
 
                 var layerCanvasScaler = layerObj.AddComponent<CanvasScaler>();
                 layerCanvasScaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
                 layerCanvasScaler.referenceResolution = settings.ReferenceResolution;
-                layerCanvasScaler.matchWidthOrHeight = settings.IsLandscape ? 1 : 0;
+                layerCanvasScaler.matchWidthOrHeight = settings.MatchWidthOrHeight;
 
                 var layerRaycaster = layerObj.AddComponent<GraphicRaycaster>();
                 layerRaycaster.name = layer.ToString();
@@ -130,9 +146,6 @@ namespace Hermit.UIStack
             {
                 case UILayer.Popup:
                     Popups.Add(instance.ViewId);
-                    break;
-                case UILayer.Fixed:
-                    Fixes.Add(instance.ViewId);
                     break;
             }
 
@@ -198,13 +211,6 @@ namespace Hermit.UIStack
             Popups.Clear();
         }
 
-        public async Task ClearFixesAsync(bool reuse = false)
-        {
-            foreach (var fix in Fixes) { await CloseAsync(fix, reuse); }
-
-            Fixes.Clear();
-        }
-
         public async Task ClearWindowsAsync(bool reuse = false)
         {
             while (StackedWindows.Count > 0)
@@ -217,7 +223,6 @@ namespace Hermit.UIStack
         public async Task ClearAllAsync(bool reuse = false)
         {
             await ClearPopupsAsync(reuse);
-            await ClearFixesAsync(reuse);
             await ClearWindowsAsync(reuse);
         }
 

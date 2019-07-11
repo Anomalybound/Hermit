@@ -8,8 +8,6 @@ namespace Hermit.UIStack
 
         Task ClearPopupsAsync(bool reuse = false);
 
-        Task ClearFixesAsync(bool reuse = false);
-
         Task ClearWindowsAsync(bool reuse = false);
 
         Task ClearAllAsync(bool reuse = false);

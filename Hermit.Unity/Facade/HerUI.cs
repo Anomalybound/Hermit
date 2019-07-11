@@ -38,11 +38,6 @@ namespace Hermit
             await Current.uiStack.ClearPopupsAsync(reuse);
         }
 
-        public static async void ClearUIFixesAsync(bool reuse = false)
-        {
-            await Current.uiStack.ClearFixesAsync(reuse);
-        }
-
         public static async void ClearUIWindowsAsync(bool reuse = false)
         {
             await Current.uiStack.ClearWindowsAsync(reuse);
