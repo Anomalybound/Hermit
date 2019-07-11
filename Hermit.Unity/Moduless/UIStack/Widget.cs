@@ -22,8 +22,6 @@ namespace Hermit.UIStack
             Path = path;
             IuiStack = manager;
             Message = message;
-
-            SetUpViewInfo();
         }
 
         public virtual void SetUpViewInfo()
@@ -34,6 +32,11 @@ namespace Hermit.UIStack
         public virtual void CleanUpViewInfo()
         {
             Her.Resolve<IViewManager>().UnRegister(ViewId);
+        }
+
+        public async void CloseSelf(bool reuse)
+        {
+            await IuiStack.CloseAsync(ViewId, reuse);
         }
 
         #region Events

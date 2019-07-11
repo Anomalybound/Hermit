@@ -50,6 +50,11 @@ namespace Hermit.View
 
         protected DataBindingBase[] DataBindings;
 
+        protected virtual void Awake()
+        {
+            SetUpViewInfo();
+        }
+
         public override void SetUpViewInfo()
         {
             base.SetUpViewInfo();
