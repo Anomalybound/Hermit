@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using Object = UnityEngine.Object;
 
 namespace Hermit.UIStack
@@ -9,6 +10,8 @@ namespace Hermit.UIStack
         {
             var loader = Her.Resolve<IViewLoader>();
             var prefab = await loader.LoadView(name);
+            if (prefab == null) { throw new NullReferenceException($"Load view: {name} failed"); }
+
             var instance = Object.Instantiate(prefab).GetComponent<Widget>();
             instance.SetManagerInfo(name, manager, message);
             return instance;
