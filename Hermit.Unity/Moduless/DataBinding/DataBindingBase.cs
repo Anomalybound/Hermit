@@ -96,7 +96,8 @@ namespace Hermit
 
             if (typeName.Length == 0 || memberName.Length == 0)
             {
-                throw new Exception($"Bad formatting! Expected [<type-name>.<member-name>]: {entry} ");
+                Her.Error($"Bad formatting! Expected [<type-name>.<member-name>]: {entry} ", this);
+                return (null, null);
             }
 
             return (typeName, memberName);
@@ -109,7 +110,8 @@ namespace Hermit
             var viewMemberInfos = viewModel.GetType().GetMember(memberName);
             if (viewMemberInfos.Length <= 0)
             {
-                throw new Exception($"Can't find member of name: {memberName} on {viewModel}.");
+                Her.Error($"Can't find member of name: {memberName} on {viewModel}.", this);
+                return null;
             }
 
             var memberInfo = viewMemberInfos[0];
@@ -124,13 +126,15 @@ namespace Hermit
             var component = viewProvider.GetComponent(typeName);
             if (component == null)
             {
-                throw new Exception($"Can't find component of type: {typeName} on {viewProvider}.");
+                Her.Error($"Can't find component of type: {typeName} on {viewProvider}.", this);
+                return (null, null);
             }
 
             var viewMemberInfos = component.GetType().GetMember(memberName);
             if (viewMemberInfos.Length <= 0)
             {
-                throw new Exception($"Can't find member of name: {memberName} on {component}.");
+                Her.Error($"Can't find member of name: {memberName} on {component}.", this);
+                return (null, null);
             }
 
             var memberInfo = viewMemberInfos[0];
