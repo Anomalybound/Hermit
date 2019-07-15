@@ -3,7 +3,7 @@
 namespace Hermit.UIStack
 {
     [Serializable]
-    public struct UIMessage
+    public class UIMessage
     {
         public static readonly UIMessage Empty = new UIMessage();
     }
