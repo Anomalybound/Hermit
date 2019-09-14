@@ -21,7 +21,6 @@ namespace Hermit.Services
 
         public static EventBroker Current => new EventBroker();
 
-
         public void Subscribe<T>(Action<T> eventAction)
         {
             Subscribe(DefaultChannel, eventAction);

@@ -20,21 +20,26 @@ namespace Hermit
 
         private static Her current;
 
-        private IDependencyContainer container { get; }
+        private IDependencyContainer _container { get; }
 
-        private IEventBroker eventBroker { get; }
+        private IEventBroker _eventBroker { get; }
 
-        private IUIStack uiStack { get; }
+        private IUIStack _uiStack { get; }
 
-        private ILog logger { get; }
+        private ILog _logger { get; }
 
-        public Her(IDependencyContainer container, IEventBroker eventBroker, IUIStack uiStack, ILog logger)
+        private IViewManager _viewManager { get; }
+
+        public Her(IDependencyContainer container, IEventBroker eventBroker, IUIStack uiStack, ILog logger,
+            IViewManager viewManager)
         {
-            this.container = container;
-            this.eventBroker = eventBroker;
-            this.uiStack = uiStack;
-            this.logger = logger;
+            _container = container;
+            _eventBroker = eventBroker;
+            _uiStack = uiStack;
+            _logger = logger;
+            _viewManager = viewManager;
 
+            // Setup stores
             var store = container.Resolve<IStore>();
             store.SetStoreId("Global");
             stores.Add("Global", store);
