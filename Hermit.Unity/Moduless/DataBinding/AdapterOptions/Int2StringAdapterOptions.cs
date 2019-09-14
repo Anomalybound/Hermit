@@ -6,6 +6,11 @@ namespace Hermit.DataBinding
     public class Int2StringAdapterOptions : AdapterOptions
     {
         [Header("Options")]
-        public string Format = "0.00";
+        public string Format = "{0}";
+
+        public override object Convert(object fromObj)
+        {
+            return string.Format(Format, fromObj);
+        }
     }
 }

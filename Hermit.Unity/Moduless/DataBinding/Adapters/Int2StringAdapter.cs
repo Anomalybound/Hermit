@@ -1,12 +1,11 @@
 namespace Hermit.DataBinding
 {
-    [Adapter(typeof(int), typeof(string), typeof(Int2StringAdapterOptions))]
-    public class Int2StringAdapter : IAdapter
+    [Adapter(typeof(int), typeof(string))]
+    public class Int2StringAdapter : AdapterBase
     {
-        public object Covert(object fromObj, AdapterOptions options)
+        public override object Convert(object fromObj)
         {
-            var format = ((Float2StringAdapterOptions) options).Format;
-            return ((int) fromObj).ToString(format);
+            return fromObj.ToString();
         }
     }
 }

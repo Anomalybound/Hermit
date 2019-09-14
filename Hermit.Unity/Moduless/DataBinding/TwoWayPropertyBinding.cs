@@ -79,7 +79,7 @@ namespace Hermit
         public override void UpdateBinding()
         {
             base.UpdateBinding();
-            
+
             UpdateViewProperty();
         }
 
@@ -153,7 +153,10 @@ namespace Hermit
             PropertyChanging = true;
 
             var rawValue = ViewGetter.Invoke();
-            var convertedValue = ViewModelAdapter?.Covert(rawValue, ViewModelAdapterOptions);
+            var convertedValue = ViewModelAdapterOptions != null
+                ? ViewAdapterInstance?.Convert(rawValue, ViewModelAdapterOptions)
+                : ViewAdapterInstance?.Convert(rawValue);
+            
             ViewModelSetter.Invoke(ViewModelAdapter != null ? convertedValue : rawValue);
 
             PropertyChanging = false;

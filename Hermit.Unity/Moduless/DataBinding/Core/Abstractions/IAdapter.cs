@@ -2,6 +2,8 @@ namespace Hermit.DataBinding
 {
     public interface IAdapter
     {
-        object Covert(object fromObj, AdapterOptions options);
+        object Convert(object fromObj);
+
+        object Convert(object fromObj, AdapterOptions options);
     }
 }

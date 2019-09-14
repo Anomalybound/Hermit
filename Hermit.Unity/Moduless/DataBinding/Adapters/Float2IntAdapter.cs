@@ -1,27 +1,13 @@
-using System;
 using UnityEngine;
 
 namespace Hermit.DataBinding
 {
-    [Adapter(typeof(float), typeof(int), typeof(Float2IntAdapterOptions))]
-    public class Float2IntAdapter : IAdapter
+    [Adapter(typeof(float), typeof(int))]
+    public class Float2IntAdapter : AdapterBase
     {
-        public object Covert(object fromObj, AdapterOptions options)
+        public override object Convert(object fromObj)
         {
-            if (options == null) { return Mathf.RoundToInt((float) fromObj); }
-
-            var type = ((Float2IntAdapterOptions) options).parseType;
-            switch (type)
-            {
-                case Float2IntAdapterOptions.ParseType.Ceil:
-                    return Mathf.CeilToInt((float) fromObj);
-                case Float2IntAdapterOptions.ParseType.Floor:
-                    return Mathf.FloorToInt((float) fromObj);
-                case Float2IntAdapterOptions.ParseType.Round:
-                    return Mathf.RoundToInt((float) fromObj);
-                default:
-                    throw new ArgumentOutOfRangeException();
-            }
+            return Mathf.RoundToInt((float) fromObj).ToString();
         }
     }
 }

@@ -87,7 +87,7 @@ namespace Hermit
         public override void SetupBinding()
         {
             base.SetupBinding();
-            
+
             BindView2ViewModel();
 
             GetViewAdapterInstance();
@@ -120,7 +120,10 @@ namespace Hermit
         protected void UpdateProperty()
         {
             var rawValue = ViewModelGetter.Invoke();
-            var convertedValue = ViewAdapterInstance?.Covert(rawValue, _viewAdapterOptions);
+            var convertedValue = _viewAdapterOptions != null
+                ? ViewAdapterInstance?.Convert(rawValue, _viewAdapterOptions)
+                : ViewAdapterInstance?.Convert(rawValue);
+
             ViewSetter.Invoke(ViewAdapterInstance != null ? convertedValue : rawValue);
         }
 

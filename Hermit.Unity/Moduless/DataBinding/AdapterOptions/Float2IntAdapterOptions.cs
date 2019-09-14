@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 namespace Hermit.DataBinding
@@ -12,6 +13,22 @@ namespace Hermit.DataBinding
             Round
         }
 
-        public ParseType parseType = ParseType.Round;
+        public ParseType FloatParseType = ParseType.Round;
+
+
+        public override object Convert(object fromObj)
+        {
+            switch (FloatParseType)
+            {
+                case ParseType.Ceil:
+                    return Mathf.CeilToInt((float) fromObj);
+                case ParseType.Floor:
+                    return Mathf.FloorToInt((float) fromObj);
+                case ParseType.Round:
+                    return Mathf.RoundToInt((float) fromObj);
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
+        }
     }
 }

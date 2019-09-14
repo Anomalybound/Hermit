@@ -3,9 +3,9 @@ using System;
 namespace Hermit.DataBinding
 {
     [Adapter(typeof(string), typeof(float))]
-    public class String2FloatAdapter : IAdapter
+    public class String2FloatAdapter : AdapterBase
     {
-        public object Covert(object fromObj, AdapterOptions options)
+        public override object Convert(object fromObj)
         {
             if (float.TryParse((string) fromObj, out var value)) { return value; }
 

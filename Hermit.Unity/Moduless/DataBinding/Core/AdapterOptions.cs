@@ -2,5 +2,8 @@ using UnityEngine;
 
 namespace Hermit.DataBinding
 {
-    public class AdapterOptions : ScriptableObject { }
+    public abstract class AdapterOptions : ScriptableObject
+    {
+        public abstract object Convert(object fromObj);
+    }
 }

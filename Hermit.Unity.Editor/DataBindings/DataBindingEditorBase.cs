@@ -661,9 +661,10 @@ namespace Hermit.DataBindings
                 }
 
                 var adapter = data[selection];
+                
                 if (AdapterAttributeLookup.TryGetValue(adapter, out var adapterAttribute))
                 {
-                    if (adapterAttribute.OptionType != null) { EditorGUILayout.PropertyField(adapterOptionSp); }
+                    EditorGUILayout.PropertyField(adapterOptionSp);
 
                     destinationType = adapterAttribute.ToType;
                 }
