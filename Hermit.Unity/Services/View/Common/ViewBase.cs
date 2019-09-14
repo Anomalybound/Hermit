@@ -85,4 +85,6 @@ namespace Hermit
             ViewManager.UnRegister(ViewId);
         }
     }
+
+    public abstract class ViewBase : ViewBase<ViewModel> { }
 }

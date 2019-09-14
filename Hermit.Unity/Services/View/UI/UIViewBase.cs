@@ -55,10 +55,19 @@ namespace Hermit.View
             SetUpViewInfo();
         }
 
+        public override void CleanUpViewInfo()
+        {
+            base.CleanUpViewInfo();
+
+            if (!DataContext.Reusable && DataContext is IDisposable disposable) { disposable.Dispose(); }
+        }
+
         public override void SetUpViewInfo()
         {
             base.SetUpViewInfo();
             DataBindings = GetComponentsInChildren<DataBindingBase>();
         }
     }
+
+    public abstract class UIViewBase : UIViewBase<ViewModel> { }
 }
