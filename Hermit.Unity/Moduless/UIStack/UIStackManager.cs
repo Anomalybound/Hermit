@@ -119,23 +119,14 @@ namespace Hermit.UIStack
 
         #region Push
 
-        public async Task<ulong> PushAsync(string widgetName, IWidgetFactory factory = null)
-        {
-            return await PushAsync<Widget>(widgetName, factory);
-        }
-
-        public async Task<ulong> PushAsync(string widgetName, UIMessage message, IWidgetFactory factory = null)
+        public async Task<ulong> PushAsync(string widgetName, UIMessage message,
+            IWidgetFactory factory = null)
         {
             return await PushAsync<Widget>(widgetName, message, factory);
         }
 
-        public async Task<ulong> PushAsync<TWidget>(string widgetName, IWidgetFactory factory = null)
-            where TWidget : Widget
-        {
-            return await PushAsync<TWidget>(widgetName, UIMessage.Empty, factory);
-        }
-
-        public async Task<ulong> PushAsync<TWidget>(string widgetName, UIMessage message, IWidgetFactory factory = null)
+        public async Task<ulong> PushAsync<TWidget>(string widgetName, UIMessage message,
+            IWidgetFactory factory = null)
             where TWidget : Widget
         {
             var instance = await GetInstance<TWidget>(widgetName, message, factory);
@@ -229,6 +220,8 @@ namespace Hermit.UIStack
         public async Task CloseAsync(ulong widgetId, bool reuse = false)
         {
             var targetWidget = _viewManager.GetView<Widget>(widgetId);
+            if (targetWidget == null) { return; }
+
             if (targetWidget.Layer != UILayer.Window || WindowsInDisplay.Contains(widgetId))
             {
                 await targetWidget.OnHide();

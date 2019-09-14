@@ -30,7 +30,7 @@ namespace Hermit.Services
         public async Task<TView> LoadView<TView>(string key) where TView : IView
         {
             var request = Resources.LoadAsync<GameObject>(key);
-            
+
             await request;
 
             await Task.Delay(10);
