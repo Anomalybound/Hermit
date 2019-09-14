@@ -34,6 +34,9 @@ namespace Hermit.Injection
             return this;
         }
 
+        /// <summary>
+        /// Build dependency map, should be called by the framework itself.
+        /// </summary>
         public void Build()
         {
             foreach (var binderInfo in BinderInfos) { Build(binderInfo); }
@@ -59,6 +62,11 @@ namespace Hermit.Injection
                 if (ContractTypeLookup.ContainsKey((info.BindingId, contractType)))
                 {
                     BindEnumerableType(info.BindingId, contractType, info);
+
+                    // set active resolve result to newest one
+                    var resultList = ContractTypeLookup[(info.BindingId, contractType)];
+                    resultList.Clear();
+                    resultList.Add(info);
                 }
                 else { ContractTypeLookup.Add((info.BindingId, contractType), new List<BindingInfo> {info}); }
             }
