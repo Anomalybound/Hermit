@@ -16,9 +16,7 @@ namespace Hermit.Services
         {
             var request = Resources.LoadAsync<GameObject>(key);
 
-            await request;
-
-            await Task.Delay(10);
+            while (!request.isDone) { await Task.Delay(10); }
 
             var go = request.asset as GameObject;
             if (go != null) { return go; }
@@ -31,9 +29,7 @@ namespace Hermit.Services
         {
             var request = Resources.LoadAsync<GameObject>(key);
 
-            await request;
-
-            await Task.Delay(10);
+            while (!request.isDone) { await Task.Delay(10); }
 
             var go = request.asset as GameObject;
             if (go != null)
