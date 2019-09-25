@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace Hermit
 {
-    public sealed class ViewManager : IViewManager
+    public sealed class ViewManager : Singleton<ViewManager>, IViewManager
     {
         private readonly Dictionary<ulong, IView> ViewCaches = new Dictionary<ulong, IView>();
 

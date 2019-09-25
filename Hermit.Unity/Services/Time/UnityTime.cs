@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace Hermit.Services
 {
-    public class UnityTime : ITime
+    public class UnityTime : Singleton<UnityTime>, ITime
     {
         public float LogicTime => Time.time;
 

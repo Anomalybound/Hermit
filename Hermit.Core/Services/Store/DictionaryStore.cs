@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Hermit
 {
-    public class DictionaryStore : IStore, IDisposable
+    public class DictionaryStore : Singleton<DictionaryStore>, IStore, IDisposable
     {
         private readonly Dictionary<string, object> _cache = new Dictionary<string, object>();
 

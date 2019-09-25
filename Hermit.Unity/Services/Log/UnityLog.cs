@@ -1,34 +1,26 @@
+using System.Diagnostics;
 using UnityEngine;
+using Debug = UnityEngine.Debug;
 
 namespace Hermit.Services
 {
-    public class UnityLog : ILog
+    public class UnityLog : Singleton<UnityLog>, ILog
     {
-        private readonly bool _enable;
-
-        public UnityLog(bool logEnable = true)
-        {
-            _enable = logEnable;
-        }
-
+        [Conditional("DEBUG")]
         public void Log(object obj, Object context = null)
         {
-            if (!_enable) { return; }
-
             Debug.Log(obj, context);
         }
 
+        [Conditional("DEBUG")]
         public void Warn(object warning, Object context = null)
         {
-            if (!_enable) { return; }
-
             Debug.LogWarning(warning, context);
         }
 
+        [Conditional("DEBUG")]
         public void Error(object error, Object context = null)
         {
-            if (!_enable) { return; }
-
             Debug.LogError(error, context);
         }
     }

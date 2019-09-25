@@ -1,17 +1,11 @@
+using System;
 using System.Threading.Tasks;
 using UnityEngine;
 
 namespace Hermit.Services
 {
-    public class ResourcesViewLoader : IViewLoader
+    public class ResourcesViewLoader : Singleton<ResourcesViewLoader>, IViewLoader
     {
-        private ILog Logger { get; }
-
-        public ResourcesViewLoader(ILog logger)
-        {
-            Logger = logger;
-        }
-
         public async Task<GameObject> LoadView(string key)
         {
             var request = Resources.LoadAsync<GameObject>(key);
@@ -21,8 +15,7 @@ namespace Hermit.Services
             var go = request.asset as GameObject;
             if (go != null) { return go; }
 
-            Logger.Warn($"Can't load view at key:{key}", go);
-            return null;
+            throw new Exception($"Can't load view at key:{key}");
         }
 
         public async Task<TView> LoadView<TView>(string key) where TView : IView
@@ -38,8 +31,7 @@ namespace Hermit.Services
                 if (view != null) { return view; }
             }
 
-            Logger.Warn($"Can't load view at key:{key}", go);
-            return default;
+            throw new Exception($"Can't load view at key:{key}");
         }
     }
 }

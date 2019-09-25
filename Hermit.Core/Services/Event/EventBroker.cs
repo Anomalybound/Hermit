@@ -6,7 +6,7 @@ namespace Hermit.Services
     /// <summary>
     /// IEventBroker implementation.
     /// </summary>
-    public sealed class EventBroker : IEventBroker
+    public sealed class EventBroker : Singleton<EventBroker>, IEventBroker
     {
         private const int MaxCallDepth = 5;
 
@@ -18,8 +18,6 @@ namespace Hermit.Services
         public const string DefaultChannel = "Default";
 
         private readonly Dictionary<string, Delegate> _nonGenericEvents = new Dictionary<string, Delegate>(32);
-
-        public static EventBroker Current => new EventBroker();
 
         public void Subscribe<T>(Action<T> eventAction)
         {
