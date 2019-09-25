@@ -8,7 +8,7 @@ namespace Hermit.Injection
     [ScriptOrder(-10000)]
     public class SceneContext : MonoBehaviour, IContext
     {
-        public IDependencyContainer Container { get; } = new DiContainer();
+        public virtual IDependencyContainer Container { get; } = new DiContainer();
 
         [SerializeField]
         protected MonoServiceProvider[] ServiceProviders = { };
@@ -19,7 +19,7 @@ namespace Hermit.Injection
             InitServices();
         }
 
-        protected void RegisterServices()
+        protected virtual void RegisterServices()
         {
             if (Context.GlobalContext == null) { Context.SetCurrentContext(this); }
 
@@ -39,7 +39,7 @@ namespace Hermit.Injection
             Debug.LogFormat($"Services registration finished, cost : {sw.ElapsedMilliseconds}ms. ");
         }
 
-        protected void InitServices()
+        protected virtual void InitServices()
         {
             var sw = Stopwatch.StartNew();
             sw.Start();

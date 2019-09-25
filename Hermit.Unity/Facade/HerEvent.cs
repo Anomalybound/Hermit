@@ -2,6 +2,9 @@ using System;
 
 namespace Hermit
 {
+    /// <summary>
+    /// Her.Event would be available anytime.
+    /// </summary>
     public partial class Her
     {
         #region Events
@@ -10,22 +13,22 @@ namespace Hermit
 
         public static void Subscribe<T>(Action<T> action)
         {
-            Current._eventBroker.Subscribe(action);
+            Current.EventBroker.Subscribe(action);
         }
 
         public static void UnSubscribe<T>(Action<T> action, bool keepEvent = false)
         {
-            Current._eventBroker.Unsubscribe(action, keepEvent);
+            Current.EventBroker.Unsubscribe(action, keepEvent);
         }
 
         public static void UnSubscribeAll(bool keepEvent = false)
         {
-            Current._eventBroker.UnsubscribeAll(keepEvent);
+            Current.EventBroker.UnsubscribeAll(keepEvent);
         }
 
         public static void Publish<T>(T message)
         {
-            Current._eventBroker.Publish(message);
+            Current.EventBroker.Publish(message);
         }
 
         #endregion
@@ -34,37 +37,37 @@ namespace Hermit
 
         public static void Subscribe(string channel, Action action)
         {
-            Current._eventBroker.Subscribe(channel, action);
+            Current.EventBroker.Subscribe(channel, action);
         }
 
         public static void Subscribe<T>(string channel, Action<T> action)
         {
-            Current._eventBroker.Subscribe(channel, action);
+            Current.EventBroker.Subscribe(channel, action);
         }
 
         public static void UnSubscribe(string channel, Action action, bool keepEvent = false)
         {
-            Current._eventBroker.Unsubscribe(channel, action, keepEvent);
+            Current.EventBroker.Unsubscribe(channel, action, keepEvent);
         }
 
         public static void UnSubscribe<T>(string channel, Action<T> action, bool keepEvent = false)
         {
-            Current._eventBroker.Unsubscribe(channel, action, keepEvent);
+            Current.EventBroker.Unsubscribe(channel, action, keepEvent);
         }
 
         public static void Publish(string channel)
         {
-            Current._eventBroker.Publish(channel);
+            Current.EventBroker.Publish(channel);
         }
 
         public static void Publish<T>(string channel, T message)
         {
-            Current._eventBroker.Publish(channel, message);
+            Current.EventBroker.Publish(channel, message);
         }
 
         public static void UnSubscribeAll(string channel, bool keepEvent = false)
         {
-            Current._eventBroker.UnsubscribeAll(channel, keepEvent);
+            Current.EventBroker.UnsubscribeAll(channel, keepEvent);
         }
 
         #endregion

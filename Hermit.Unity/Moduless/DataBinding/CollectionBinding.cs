@@ -3,7 +3,6 @@ using System.Collections.Specialized;
 using System.Reflection;
 using Hermit.DataBinding;
 using UnityEngine;
-using UnityEngine.Assertions;
 
 namespace Hermit
 {

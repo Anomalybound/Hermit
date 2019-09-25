@@ -5,15 +5,21 @@ namespace Hermit.Common
     [ScriptOrder(-10000)]
     public class HermitKernel : SceneContext
     {
-        public static Her HerInstance { get; private set; }
+        private static HermitKernel _instance;
 
         protected override void Awake()
         {
+            if (_instance == null) { _instance = this; }
+            else
+            {
+                Destroy(gameObject);
+                return;
+            }
+
             RegisterServices();
-
-            HerInstance = Singleton<Her>();
-
             InitServices();
+
+            Inject(Her.Current);
         }
     }
 }

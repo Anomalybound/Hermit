@@ -7,10 +7,6 @@ namespace Hermit.Common
 {
     public class HermitKernelServiceProvider : MonoServiceProvider
     {
-        [Header("General")]
-        [SerializeField]
-        protected bool EnableLog = true;
-
         [Header("UI")]
         [SerializeField]
         protected UIManagerSettings uiManagerSettings;
@@ -18,11 +14,11 @@ namespace Hermit.Common
         public override void RegisterBindings(IDependencyContainer Container)
         {
             // Built-in Services
-            Container.Bind<IEventBroker>().To<EventBroker>().FromInstance(EventBroker.Current);
-            Container.Bind<ITime>().To<UnityTime>();
-            Container.Bind<ILog>().To<UnityLog>().FromInstance(new UnityLog(EnableLog));
+            Container.Bind<IEventBroker>().To<EventBroker>().FromInstance(Her.Current.EventBroker);
+            Container.Bind<ILog>().To<UnityLog>().FromInstance(Her.Current.Logger);
+            Container.Bind<ITime>().To<UnityTime>().FromInstance(UnityTime.Instance);
             Container.Bind<IUIStack>().FromMethod(BuildUIStackInstance);
-            Container.Bind<IStore>().To<DictionaryStore>().FromInstance(new DictionaryStore());
+            Container.Bind<IStore>().To<DictionaryStore>().FromInstance(DictionaryStore.Instance);
 
             // View
             Container.Bind<IViewLoader>().To<ResourcesViewLoader>();

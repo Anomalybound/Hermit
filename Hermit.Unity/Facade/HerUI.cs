@@ -1,6 +1,5 @@
 using System.Threading.Tasks;
 using Hermit.UIStack;
-using Hermit.View;
 
 namespace Hermit
 {
