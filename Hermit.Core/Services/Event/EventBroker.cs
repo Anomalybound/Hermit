@@ -153,12 +153,8 @@ namespace Hermit.Services
 
             _eventsInCall++;
 
-            try
-            {
-                genericEventAction?.Invoke(eventMessage);
-                nonGenericEventAction?.Invoke();
-            }
-            catch (Exception ex) { throw ex; }
+            genericEventAction?.Invoke(eventMessage);
+            nonGenericEventAction?.Invoke();
 
             _eventsInCall--;
         }
@@ -172,8 +168,8 @@ namespace Hermit.Services
             var evtAction = del as Action;
 
             _eventsInCall++;
-            try { evtAction?.Invoke(); }
-            catch (Exception ex) { throw ex; }
+
+            evtAction?.Invoke();
 
             _eventsInCall--;
         }
