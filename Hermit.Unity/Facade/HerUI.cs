@@ -14,7 +14,7 @@ namespace Hermit
 
         public static async Task<IViewModelProvider> PushUIAsync(string widgetName, UIMessage message)
         {
-            var id = await Current._uiStack.PushAsync(widgetName, message);
+            var id = await Current.UiStack.PushAsync(widgetName, message);
             return Current._viewManager.GetView(id) as IViewModelProvider;
         }
 
@@ -26,33 +26,33 @@ namespace Hermit
         public static async Task<IViewModelProvider> PushUIAsync<TWidget>(string widgetName, UIMessage message)
             where TWidget : Widget
         {
-            var id = await Current._uiStack.PushAsync<TWidget>(widgetName, message);
+            var id = await Current.UiStack.PushAsync<TWidget>(widgetName, message);
             return Current._viewManager.GetView(id) as IViewModelProvider;
         }
 
         public static async void PopUIAsync(bool reuse = false)
         {
-            await Current._uiStack.PopAsync(reuse);
+            await Current.UiStack.PopAsync(reuse);
         }
 
         public static async void ClearUIPopupsAsync(bool reuse = false)
         {
-            await Current._uiStack.ClearPopupsAsync(reuse);
+            await Current.UiStack.ClearPopupsAsync(reuse);
         }
 
         public static async void ClearUIWindowsAsync(bool reuse = false)
         {
-            await Current._uiStack.ClearWindowsAsync(reuse);
+            await Current.UiStack.ClearWindowsAsync(reuse);
         }
 
         public static async void ClearAllUIAsync(bool reuse = false)
         {
-            await Current._uiStack.ClearAllAsync(reuse);
+            await Current.UiStack.ClearAllAsync(reuse);
         }
 
         public static async void CloseUIAsync(ulong widgetId, bool reuse = false)
         {
-            await Current._uiStack.CloseAsync(widgetId, reuse);
+            await Current.UiStack.CloseAsync(widgetId, reuse);
         }
 
         #endregion

@@ -9,7 +9,7 @@ namespace Hermit.Common
     {
         [Header("UI")]
         [SerializeField]
-        protected UIManagerSettings uiManagerSettings;
+        protected UIManagerSettings uiManagerSettings = new UIManagerSettings();
 
         public override void RegisterBindings(IDependencyContainer Container)
         {
@@ -17,16 +17,16 @@ namespace Hermit.Common
             Container.Bind<IEventBroker>().To<EventBroker>().FromInstance(Her.Current.EventBroker);
             Container.Bind<ILog>().To<UnityLog>().FromInstance(Her.Current.Logger);
             Container.Bind<ITime>().To<UnityTime>().FromInstance(UnityTime.Instance);
-            Container.Bind<IUIStack>().FromMethod(BuildUIStackInstance);
             Container.Bind<IStore>().To<DictionaryStore>().FromInstance(DictionaryStore.Instance);
+            Container.Bind<IUIStack>().FromMethod(BuildUIStackInstance);
 
             // View
-            Container.Bind<IViewLoader>().To<ResourcesViewLoader>();
-            Container.Bind<IViewManager>().To<ViewManager>();
+            Container.Bind<IViewLoader>().To<ResourcesViewLoader>().FromInstance(ResourcesViewLoader.Instance);
+            Container.Bind<IViewManager>().To<ViewManager>().FromInstance(ViewManager.Instance);
 
             // Essentials
+            Container.BindAll<Her>().FromInstance(Her.Current);
             Container.BindInstance(Container);
-            Container.BindAll<Her>();
         }
 
         protected IUIStack BuildUIStackInstance(IDependencyContainer container)

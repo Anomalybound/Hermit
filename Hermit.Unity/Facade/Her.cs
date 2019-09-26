@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Reflection;
 using Hermit.Common;
 using Hermit.Injection;
 using Hermit.Services;
@@ -24,7 +25,17 @@ namespace Hermit
 
                     Log("HermitKernel not found, add one to this scene.");
                     var kernelObj = new GameObject("Hermit Kernel");
-                    kernelObj.AddComponent<HermitKernel>();
+
+                    var array = new MonoServiceProvider[]
+                    {
+                        kernelObj.AddComponent<HermitKernelServiceProvider>(),
+                        kernelObj.AddComponent<HermitDataBindingServiceProvider>()
+                    };
+                    kernel = kernelObj.AddComponent<HermitKernel>();
+
+                    var fieldInfo = typeof(HermitKernel).GetField("ServiceProviders"
+                        , BindingFlags.NonPublic | BindingFlags.Instance);
+                    fieldInfo?.SetValue(kernel, array);
                 }
 
                 return current;
@@ -37,9 +48,11 @@ namespace Hermit
 
         public ILog Logger { get; }
 
-        private IDependencyContainer _container { get; set; }
+        public IUIStack UiStack => _uiStack ?? (_uiStack = _container.Resolve<IUIStack>());
 
         private IUIStack _uiStack { get; set; }
+
+        private IDependencyContainer _container { get; set; }
 
         private IViewManager _viewManager { get; set; }
 
@@ -47,15 +60,12 @@ namespace Hermit
         {
             Logger = UnityLog.Instance;
             EventBroker = Services.EventBroker.Instance;
-
-            current = this;
         }
 
         [Inject]
-        public void Injection(IDependencyContainer container, IUIStack uiStack, IViewManager viewManager)
+        public void Injection(IDependencyContainer container, IViewManager viewManager)
         {
             _container = container;
-            _uiStack = uiStack;
             _viewManager = viewManager;
 
             // Setup stores

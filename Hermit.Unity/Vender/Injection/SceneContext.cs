@@ -23,6 +23,11 @@ namespace Hermit.Injection
         {
             if (Context.GlobalContext == null) { Context.SetCurrentContext(this); }
 
+            if (ServiceProviders == null || ServiceProviders.Length == 0)
+            {
+                ServiceProviders = GetComponentsInChildren<MonoServiceProvider>();
+            }
+
             var sw = Stopwatch.StartNew();
             sw.Start();
 

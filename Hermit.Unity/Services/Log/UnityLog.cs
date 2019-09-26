@@ -1,27 +1,27 @@
-using System.Diagnostics;
-using UnityEngine;
 using Debug = UnityEngine.Debug;
 
 namespace Hermit.Services
 {
     public class UnityLog : Singleton<UnityLog>, ILog
     {
-        [Conditional("DEBUG")]
-        public void Log(object obj, Object context = null)
+        public void Log(object obj)
         {
-            Debug.Log(obj, context);
+            Debug.Log(obj);
         }
 
-        [Conditional("DEBUG")]
-        public void Warn(object warning, Object context = null)
+        public void Warn(object warning)
         {
-            Debug.LogWarning(warning, context);
+            Debug.LogWarning(warning);
         }
 
-        [Conditional("DEBUG")]
-        public void Error(object error, Object context = null)
+        public void Error(object error)
         {
-            Debug.LogError(error, context);
+            Debug.LogError(error);
+        }
+
+        public void Assert(bool condition, string message)
+        {
+            Debug.Assert(condition, message);
         }
     }
 }

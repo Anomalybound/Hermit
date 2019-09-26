@@ -10,11 +10,7 @@ namespace Hermit.Common
         protected override void Awake()
         {
             if (_instance == null) { _instance = this; }
-            else
-            {
-                Destroy(gameObject);
-                return;
-            }
+            else { Destroy(gameObject); }
 
             RegisterServices();
             InitServices();
