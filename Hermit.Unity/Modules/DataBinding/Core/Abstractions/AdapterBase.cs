@@ -11,7 +11,7 @@ namespace Hermit.DataBinding
             try { return options.Convert(fromObj); }
             catch (Exception e)
             {
-                Her.Error(e, options);
+                Her.Error(e);
                 throw;
             }
         }
