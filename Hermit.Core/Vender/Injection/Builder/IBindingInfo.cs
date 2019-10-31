@@ -49,7 +49,7 @@ namespace Hermit.Injection
 
         new IBindingInfo<TContract> To(Type implementType);
 
-        new IBindingInfo<TContract> To<TImplement>();
+        new IBindingInfo<TContract> To<TImplement>() where TImplement : TContract;
 
         #endregion
 

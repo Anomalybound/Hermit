@@ -126,7 +126,7 @@ namespace Hermit.Injection
             return this;
         }
 
-        public new IBindingInfo<TContract> To<TImplement>()
+        public new IBindingInfo<TContract> To<TImplement>() where TImplement : TContract
         {
             ToCheck(typeof(TImplement));
             ImplementType = typeof(TImplement);
