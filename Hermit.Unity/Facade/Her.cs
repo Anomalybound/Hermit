@@ -11,7 +11,7 @@ namespace Hermit
 {
     public sealed partial class Her
     {
-        public static readonly Version Version = new Version("0.3.0");
+        public static readonly Version Version = new Version("0.3.1");
 
         public static Her Current
         {
