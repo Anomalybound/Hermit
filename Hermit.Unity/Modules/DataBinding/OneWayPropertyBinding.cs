@@ -95,6 +95,8 @@ namespace Hermit
 
         public override void Connect()
         {
+            base.Connect();
+
             if (ViewModel != null) { ViewModel.PropertyChanged += OnPropertyChanged; }
 
             UpdateBinding();
@@ -102,6 +104,8 @@ namespace Hermit
 
         public override void Disconnect()
         {
+            base.Disconnect();
+
             if (ViewModel != null) { ViewModel.PropertyChanged -= OnPropertyChanged; }
         }
 

@@ -16,6 +16,8 @@ namespace Hermit
 
         protected bool IsDataReady;
 
+        protected bool IsBindingConnected;
+
         protected IViewModelProvider DataProvider;
 
         #endregion
@@ -47,9 +49,16 @@ namespace Hermit
             }
         }
 
+        protected virtual void OnDestroy()
+        {
+            if (DataProvider != null) { DataProvider.DataReadyEvent -= OnDataReady; }
+        }
+
         protected virtual void OnEnable()
         {
             if (!IsDataReady) { return; }
+
+            if (IsBindingConnected) { return; }
 
             Connect();
         }
@@ -58,17 +67,22 @@ namespace Hermit
         {
             if (!IsDataReady) { return; }
 
+            if (!IsBindingConnected) { return; }
+
             Disconnect();
         }
 
         private void OnDataReady()
         {
-            IsDataReady = true;
-            DataProvider.DataReadyEvent -= SetupBinding;
+            if (!IsDataReady)
+            {
+                IsDataReady = true;
+                SetupBinding();
+            }
 
-            SetupBinding();
+            if (!enabled || IsBindingConnected) { return; }
 
-            if (enabled) { Connect(); }
+            Connect();
         }
 
         public virtual void SetupBinding()
@@ -76,9 +90,15 @@ namespace Hermit
             ViewModel = DataProvider.GetViewModel();
         }
 
-        public abstract void Connect();
+        public virtual void Connect()
+        {
+            IsBindingConnected = true;
+        }
 
-        public abstract void Disconnect();
+        public virtual void Disconnect()
+        {
+            IsBindingConnected = false;
+        }
 
         public abstract void UpdateBinding();
 

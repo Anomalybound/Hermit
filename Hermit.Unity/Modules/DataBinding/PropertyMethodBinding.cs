@@ -10,7 +10,7 @@ namespace Hermit
     public class PropertyMethodBinding : DataBindingBase
     {
         public bool ShowDeclaredMethodsOnly = true;
-        
+
         [SerializeField]
         private string _viewModelEntry;
 
@@ -96,6 +96,8 @@ namespace Hermit
 
         public override void Connect()
         {
+            base.Connect();
+
             if (ViewModel != null) { ViewModel.PropertyChanged += OnPropertyChanged; }
 
             UpdateBinding();
@@ -103,6 +105,8 @@ namespace Hermit
 
         public override void Disconnect()
         {
+            base.Disconnect();
+
             if (ViewModel != null) { ViewModel.PropertyChanged -= OnPropertyChanged; }
         }
 
@@ -124,7 +128,7 @@ namespace Hermit
             var convertedValue = _viewAdapterOptions != null
                 ? ViewAdapterInstance?.Convert(rawValue, _viewAdapterOptions)
                 : ViewAdapterInstance?.Convert(rawValue);
-            
+
             var parameter = new[] {ViewAdapterInstance != null ? convertedValue : rawValue};
 
             if (MethodInvoker.GetParameters().Length > 0) { MethodInvoker.Invoke(ViewComponentInstance, parameter); }

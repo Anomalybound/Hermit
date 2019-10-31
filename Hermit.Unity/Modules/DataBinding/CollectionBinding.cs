@@ -105,6 +105,8 @@ namespace Hermit
 
         public override void Connect()
         {
+            base.Connect();
+
             if (CollectionValue == null) { return; }
 
             CollectionValue.CollectionChanged += ChangedHandler.OnCollectionChanged;
@@ -112,6 +114,8 @@ namespace Hermit
 
         public override void Disconnect()
         {
+            base.Disconnect();
+            
             if (CollectionValue == null) { return; }
 
             CollectionValue.CollectionChanged -= ChangedHandler.OnCollectionChanged;

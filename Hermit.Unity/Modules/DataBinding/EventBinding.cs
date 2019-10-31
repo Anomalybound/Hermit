@@ -99,17 +99,21 @@ namespace Hermit
         public override void SetupBinding()
         {
             base.SetupBinding();
-            
+
             BindViewAction2ViewModelFunction();
         }
 
         public override void Connect()
         {
+            base.Connect();
+
             ViewEventBinder?.Connect();
         }
 
         public override void Disconnect()
         {
+            base.Disconnect();
+            
             ViewEventBinder?.Disconnect();
         }
 
