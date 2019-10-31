@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace Hermit
 {
-    public abstract class ViewBase<TViewModel> : MonoBehaviour, IViewModelProvider where TViewModel : ViewModel
+    public abstract class ViewBase<TViewModel> : MonoBehaviour, IViewModelProvider, IView where TViewModel : ViewModel
     {
         protected IViewManager ViewManager { get; private set; }
 
