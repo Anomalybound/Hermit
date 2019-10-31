@@ -740,7 +740,7 @@ namespace Hermit.DataBindings
                 if (oneWay)
                 {
                     content = ViewModelCurrentType != null && ViewCurrentType != null &&
-                              ViewModelCurrentType.IsAssignableFrom(ViewCurrentType)
+                              ViewCurrentType.IsAssignableFrom(ViewModelCurrentType)
                         ? $"<color=#006400>{viewModelText} {connectionSign} {viewText}</color>"
                         : $"<color=#640000>{viewModelText} {connectionSign} {viewText}</color>";
                 }
