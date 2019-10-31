@@ -39,25 +39,6 @@ namespace Hermit
             EditorUtility.SetDirty(kernelObj);
         }
 
-#if HERMIT_DOTWEEN
-        [MenuItem("Hermit/Extensions/Disable DoTween Extensions")]
-#else
-        [MenuItem("Hermit/Extensions/Enable DoTween Extensions")]
-#endif
-        public static void ToggleDoTweenSupport()
-        {
-            var targetGroup = EditorUserBuildSettings.selectedBuildTargetGroup;
-            var defineString = PlayerSettings.GetScriptingDefineSymbolsForGroup(targetGroup);
-            var defines = defineString.Split(';').ToList();
-#if HERMIT_DOTWEEN
-            if (defines.Contains(HERMIT_DOTWEEN)) { defines.Remove(HERMIT_DOTWEEN); }
-#else
-            if (!defines.Contains(HERMIT_DOTWEEN)) { defines.Add(HERMIT_DOTWEEN); }
-#endif
-            defineString = string.Join(";", defines);
-            PlayerSettings.SetScriptingDefineSymbolsForGroup(targetGroup, defineString);
-        }
-
         private GUIStyle VersionDisplay;
 
         public override void OnInspectorGUI()
