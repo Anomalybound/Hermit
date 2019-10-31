@@ -174,7 +174,8 @@ namespace Hermit.DataBindings
                 var properties = info.Value.Select(p =>
                 {
                     var provider = (Component) providerLookup[info.Key];
-                    return $"{provider.name}/{info.Key.Name}/{p} - [{p.PropertyType.Name}]";
+                    var property = $"{provider.name}/{info.Key.PrettyName()}/{p.Name} - [{p.PropertyType.PrettyName()}]";
+                    return property;
                 });
                 var items = info.Value.Select(p => $"{info.Key.FullName}.{p.Name}");
                 var vmType = info.Value.Select(p => info.Key);
@@ -234,7 +235,8 @@ namespace Hermit.DataBindings
                 {
                     data.Add(propertyInfo.PropertyType);
                     lookup.Add($"{component.GetType()}.{propertyInfo.Name}");
-                    options.Add($"{component.GetType().Name}/{propertyInfo.Name} - [{propertyInfo.PropertyType.Name}]");
+                    options.Add(
+                        $"{component.GetType().PrettyName()}/{propertyInfo.Name} - [{propertyInfo.PropertyType.PrettyName()}]");
                 }
             }
 
@@ -277,7 +279,8 @@ namespace Hermit.DataBindings
                     var parameterType = parameter.Length == 1 ? parameter[0].ParameterType : typeof(void);
                     data.Add(parameterType);
                     lookup.Add($"{component.GetType()}.{methodInfo.Name}");
-                    options.Add($"{component.GetType().Name}/{methodInfo.Name} - [{parameterType.Name}]");
+                    options.Add(
+                        $"{component.GetType().PrettyName()}/{methodInfo.Name} - [{parameterType.PrettyName()}]");
                 }
             }
 
@@ -342,7 +345,7 @@ namespace Hermit.DataBindings
 
                     data.Add(memberInfo);
                     lookup.Add($"{component.GetType()}.{memberInfo.Name}");
-                    options.Add($"{component.GetType().Name}/{memberInfo.Name} - [{memberInfo.Name}]");
+                    options.Add($"{component.GetType().PrettyName()}/{memberInfo.Name} - [{memberInfo.Name}]");
                 }
             }
 
@@ -641,7 +644,7 @@ namespace Hermit.DataBindings
                 : new List<Type>();
 
             var options = data
-                .Select(a => $"[{AdapterFromName(a)}]->[{AdapterToName(a)}] : {a.Name}").ToList();
+                .Select(a => $"[{AdapterFromName(a)}]->[{AdapterToName(a)}] : {a.PrettyName()}").ToList();
 
             options.Insert(0, "None");
             var lookup = data.Select(a => a.FullName).ToList();
@@ -661,7 +664,7 @@ namespace Hermit.DataBindings
                 }
 
                 var adapter = data[selection];
-                
+
                 if (AdapterAttributeLookup.TryGetValue(adapter, out var adapterAttribute))
                 {
                     EditorGUILayout.PropertyField(adapterOptionSp);
@@ -681,7 +684,7 @@ namespace Hermit.DataBindings
 
         public string DrawCollectionHandlerPopup(string handlerTypeName)
         {
-            var options = ViewCollectionChangedHandlerTypes.Select(a => $"{a.FullName}").ToList();
+            var options = ViewCollectionChangedHandlerTypes.Select(a => $"{a.FullPrettyName()}").ToList();
 
             if (string.IsNullOrEmpty(handlerTypeName) && options.Count > 0) { handlerTypeName = options[0]; }
 
@@ -708,7 +711,7 @@ namespace Hermit.DataBindings
 
 
                 GUILayout.FlexibleSpace();
-                if (type != null) { EditorGUILayout.LabelField($"Type: {type.Name}", AlignToRightStyle); }
+                if (type != null) { EditorGUILayout.LabelField($"Type: {type.PrettyName()}", AlignToRightStyle); }
             }
         }
 
@@ -720,15 +723,15 @@ namespace Hermit.DataBindings
                 GUILayout.FlexibleSpace();
                 var viewModelText = ViewModelSource != null
                     ? ViewModelDest != null
-                        ? $"{ViewModelSource.Name}->{ViewModelDest.Name}"
-                        : ViewModelSource.Name
-                    : "Undefined";
+                        ? $"{ViewModelSource.PrettyName()}->{ViewModelDest.PrettyName()}"
+                        : ViewModelSource.PrettyName()
+                    : EditorUtil.Undefined;
 
                 var viewText = ViewSource != null
                     ? ViewDest != null
-                        ? $"{ViewSource.Name}->{ViewDest.Name}"
-                        : ViewSource.Name
-                    : "Undefined";
+                        ? $"{ViewSource.PrettyName()}->{ViewDest.PrettyName()}"
+                        : ViewSource.PrettyName()
+                    : EditorUtil.Undefined;
 
                 var connectionSign = oneWay ? "=>" : "<=>";
 
@@ -736,8 +739,8 @@ namespace Hermit.DataBindings
 
                 if (oneWay)
                 {
-                    content = ViewModelCurrentType == ViewCurrentType &&
-                              ViewModelCurrentType != null && ViewCurrentType != null
+                    content = ViewModelCurrentType != null && ViewCurrentType != null &&
+                              ViewModelCurrentType.IsAssignableFrom(ViewCurrentType)
                         ? $"<color=#006400>{viewModelText} {connectionSign} {viewText}</color>"
                         : $"<color=#640000>{viewModelText} {connectionSign} {viewText}</color>";
                 }

@@ -5,6 +5,8 @@ namespace Hermit
 {
     public class EditorUtil
     {
+        public const string Undefined = "Undefined";
+        
         public static GUIStyle GetStyle(string styleName)
         {
             var guiStyle = GUI.skin.FindStyle(styleName) ??
