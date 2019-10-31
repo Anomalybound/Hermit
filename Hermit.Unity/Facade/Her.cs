@@ -17,26 +17,25 @@ namespace Hermit
         {
             get
             {
-                if (current == null)
+                if (current != null) { return current; }
+
+                current = new Her();
+                var kernel = Object.FindObjectOfType<HermitKernel>();
+                if (kernel != null) { return current; }
+
+                Log("HermitKernel not found, add one to this scene.");
+                var kernelObj = new GameObject("Hermit Kernel");
+
+                var array = new MonoServiceProvider[]
                 {
-                    current = new Her();
-                    var kernel = Object.FindObjectOfType<HermitKernel>();
-                    if (kernel != null) { return current; }
+                    kernelObj.AddComponent<HermitKernelServiceProvider>(),
+                    kernelObj.AddComponent<HermitDataBindingServiceProvider>()
+                };
+                kernel = kernelObj.AddComponent<HermitKernel>();
 
-                    Log("HermitKernel not found, add one to this scene.");
-                    var kernelObj = new GameObject("Hermit Kernel");
-
-                    var array = new MonoServiceProvider[]
-                    {
-                        kernelObj.AddComponent<HermitKernelServiceProvider>(),
-                        kernelObj.AddComponent<HermitDataBindingServiceProvider>()
-                    };
-                    kernel = kernelObj.AddComponent<HermitKernel>();
-
-                    var fieldInfo = typeof(HermitKernel).GetField("ServiceProviders"
-                        , BindingFlags.NonPublic | BindingFlags.Instance);
-                    fieldInfo?.SetValue(kernel, array);
-                }
+                var fieldInfo = typeof(HermitKernel).GetField("ServiceProviders"
+                    , BindingFlags.NonPublic | BindingFlags.Instance);
+                fieldInfo?.SetValue(kernel, array);
 
                 return current;
             }

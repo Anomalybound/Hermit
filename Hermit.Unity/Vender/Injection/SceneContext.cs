@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using Debug = UnityEngine.Debug;
 
 namespace Hermit.Injection
@@ -9,6 +10,9 @@ namespace Hermit.Injection
     public class SceneContext : MonoBehaviour, IContext
     {
         public virtual IDependencyContainer Container { get; } = new DiContainer();
+
+        [SerializeField]
+        protected bool InjectSceneObjects;
 
         [SerializeField]
         protected MonoServiceProvider[] ServiceProviders = { };
@@ -55,12 +59,14 @@ namespace Hermit.Injection
                 provider.Initialization(Container);
             }
 
-            foreach (var go in (GameObject[]) Resources.FindObjectsOfTypeAll(typeof(GameObject)))
+            if (InjectSceneObjects)
             {
-                if (string.IsNullOrEmpty(go.scene.name) || go.hideFlags == HideFlags.NotEditable ||
-                    go.hideFlags == HideFlags.HideAndDontSave) { continue; }
-
-                InjectGameObject(go);
+                for (var i = 0; i < SceneManager.sceneCount; i++)
+                {
+                    var scene = SceneManager.GetSceneAt(i);
+                    var gos = scene.GetRootGameObjects();
+                    foreach (var go in gos) { InjectGameObject(go); }
+                }
             }
 
             sw.Stop();

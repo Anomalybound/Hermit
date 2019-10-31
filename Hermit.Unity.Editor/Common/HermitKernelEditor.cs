@@ -35,6 +35,8 @@ namespace Hermit
             var fieldInfo =
                 typeof(HermitKernel).GetField("ServiceProviders", BindingFlags.NonPublic | BindingFlags.Instance);
             fieldInfo?.SetValue(kernel, array);
+
+            EditorUtility.SetDirty(kernelObj);
         }
 
 #if HERMIT_DOTWEEN
@@ -70,6 +72,7 @@ namespace Hermit
             EditorGUILayout.LabelField($"Hermit Version: {Her.Version}", VersionDisplay);
             using (var check = new EditorGUI.ChangeCheckScope())
             {
+                EditorGUILayout.PropertyField(serializedObject.FindProperty("InjectSceneObjects"), true);
                 EditorGUILayout.PropertyField(serializedObject.FindProperty("ServiceProviders"), true);
                 if (check.changed) { serializedObject.ApplyModifiedProperties(); }
             }
