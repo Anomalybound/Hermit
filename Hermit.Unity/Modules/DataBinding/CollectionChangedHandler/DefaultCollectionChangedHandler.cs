@@ -16,7 +16,7 @@ namespace Hermit
 
         protected IViewManager ViewManager { get; }
 
-        protected Dictionary<object, GameObject> instantiatedGameObjects = new Dictionary<object, GameObject>();
+        protected Dictionary<object, GameObject> InstantiatedGameObjects = new Dictionary<object, GameObject>();
 
         public DefaultCollectionChangedHandler()
         {
@@ -40,7 +40,7 @@ namespace Hermit
                         var instance = Object.Instantiate(ViewTemplate, ViewContainer, false);
 
                         // Add to caches
-                        instantiatedGameObjects.Add(eNewItem, instance);
+                        InstantiatedGameObjects.Add(eNewItem, instance);
 
                         // View
                         var viewBase = instance.GetComponent<IView>();
@@ -60,12 +60,12 @@ namespace Hermit
                     for (var i = 0; i < e.OldItems.Count; i++)
                     {
                         var index = e.OldItems[i];
-                        if (!instantiatedGameObjects.TryGetValue(index, out var instance))
+                        if (!InstantiatedGameObjects.TryGetValue(index, out var instance))
                         {
                             throw new Exception($"Index: {index} has no founded instances.");
                         }
 
-                        instantiatedGameObjects.Remove(index);
+                        InstantiatedGameObjects.Remove(index);
 
                         // View
                         var viewBase = instance.GetComponent<IView>();
@@ -92,7 +92,7 @@ namespace Hermit
 
                     break;
                 case NotifyCollectionChangedAction.Reset:
-                    foreach (var generatedChild in instantiatedGameObjects.Values)
+                    foreach (var generatedChild in InstantiatedGameObjects.Values)
                     {
                         var viewBase = generatedChild.GetComponent<IView>();
                         viewBase?.CleanUpViewInfo();
@@ -100,7 +100,7 @@ namespace Hermit
                         Object.Destroy(generatedChild);
                     }
 
-                    instantiatedGameObjects.Clear();
+                    InstantiatedGameObjects.Clear();
 
                     break;
                 default:

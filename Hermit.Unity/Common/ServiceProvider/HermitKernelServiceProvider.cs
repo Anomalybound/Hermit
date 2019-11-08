@@ -11,22 +11,22 @@ namespace Hermit.Common
         [SerializeField]
         protected UIManagerSettings uiManagerSettings = new UIManagerSettings();
 
-        public override void RegisterBindings(IDependencyContainer Container)
+        public override void RegisterBindings(IDependencyContainer container)
         {
             // Built-in Services
-            Container.Bind<IEventBroker>().To<EventBroker>().FromInstance(Her.Current.EventBroker);
-            Container.Bind<ILog>().To<UnityLog>().FromInstance(Her.Current.Logger);
-            Container.Bind<ITime>().To<UnityTime>().FromInstance(UnityTime.Instance);
-            Container.Bind<IStore>().To<DictionaryStore>().FromInstance(DictionaryStore.Instance);
-            Container.Bind<IUIStack>().FromMethod(BuildUIStackInstance);
+            container.Bind<IEventBroker>().To<EventBroker>().FromInstance(Her.Current.EventBroker);
+            container.Bind<ILog>().To<UnityLog>().FromInstance(Her.Current.Logger);
+            container.Bind<ITime>().To<UnityTime>().FromInstance(UnityTime.Instance);
+            container.Bind<IStore>().To<DictionaryStore>().FromInstance(DictionaryStore.Instance);
+            container.Bind<IUIStack>().FromMethod(BuildUIStackInstance);
 
             // View
-            Container.Bind<IViewLoader>().To<ResourcesViewLoader>().FromInstance(ResourcesViewLoader.Instance);
-            Container.Bind<IViewManager>().To<ViewManager>().FromInstance(ViewManager.Instance);
+            container.Bind<IViewLoader>().To<ResourcesViewLoader>().FromInstance(ResourcesViewLoader.Instance);
+            container.Bind<IViewManager>().To<ViewManager>().FromInstance(ViewManager.Instance);
 
             // Essentials
-            Container.BindAll<Her>().FromInstance(Her.Current);
-            Container.BindInstance(Container);
+            container.BindAll<Her>().FromInstance(Her.Current);
+            container.BindInstance(container);
         }
 
         protected IUIStack BuildUIStackInstance(IDependencyContainer container)

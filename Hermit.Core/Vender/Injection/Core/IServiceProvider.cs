@@ -2,8 +2,8 @@
 {
     public interface IServiceProvider
     {
-        void RegisterBindings(IDependencyContainer Container);
+        void RegisterBindings(IDependencyContainer container);
 
-        void Initialization(IDependencyContainer Container);
+        void Initialization(IDependencyContainer container);
     }
 }

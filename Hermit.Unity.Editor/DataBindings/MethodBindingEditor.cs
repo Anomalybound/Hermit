@@ -2,24 +2,24 @@ using UnityEditor;
 
 namespace Hermit.DataBindings
 {
-    [CustomEditor(typeof(PropertyMethodBinding))]
-    public class PropertyMethodBindingEditor : DataBindingEditorBase
+    [CustomEditor(typeof(MethodBinding))]
+    public class MethodBindingEditor : DataBindingEditorBase
     {
         #region Runtime Variables
 
         protected SerializedProperty ViewAdapterOptions;
 
-        protected PropertyMethodBinding Target;
+        protected MethodBinding Target;
 
         #endregion
 
         protected override void OnEnable()
         {
-            Target = target as PropertyMethodBinding;
+            Target = target as MethodBinding;
 
             base.OnEnable();
 
-            ViewAdapterOptions = serializedObject.FindProperty("_viewAdapterOptions");
+            ViewAdapterOptions = serializedObject.FindProperty("viewAdapterOptions");
         }
 
         public override void OnInspectorGUI()
@@ -28,7 +28,7 @@ namespace Hermit.DataBindings
 
             using (var check = new EditorGUI.ChangeCheckScope())
             {
-                EditorGUILayout.PropertyField(serializedObject.FindProperty(nameof(Target.ShowDeclaredMethodsOnly)));
+                EditorGUILayout.PropertyField(serializedObject.FindProperty(nameof(Target.showDeclaredMethodsOnly)));
 
                 using (new EditorGUILayout.VerticalScope(EditorStyles.helpBox))
                 {
@@ -47,7 +47,7 @@ namespace Hermit.DataBindings
                     EditorGUI.BeginDisabledGroup(Target.ViewModelEntry == null);
 
                     // Draw View Popup
-                    Target.ViewEntry = DrawViewMethodPopup(Target.ViewEntry, Target.ShowDeclaredMethodsOnly);
+                    Target.ViewEntry = DrawViewMethodPopup(Target.ViewEntry, Target.showDeclaredMethodsOnly);
 
                     // Draw View adapter popup
                     Target.ViewAdapterType = DrawViewAdapterPopup(Target.ViewAdapterType, ViewAdapterOptions);

@@ -10,7 +10,7 @@ namespace Hermit
     [CustomEditor(typeof(HermitKernel))]
     public class HermitKernelEditor : Editor
     {
-        public const string HERMIT_DOTWEEN = "HERMIT_DOTWEEN";
+        public const string HermitDotween = "HERMIT_DOTWEEN";
 
         [MenuItem("Hermit/Quick Scene Setup %#k")]
         public static void Setup()
@@ -39,18 +39,18 @@ namespace Hermit
             EditorUtility.SetDirty(kernelObj);
         }
 
-        private GUIStyle VersionDisplay;
+        private GUIStyle _versionDisplay;
 
         public override void OnInspectorGUI()
         {
             serializedObject.Update();
 
-            if (VersionDisplay == null)
+            if (_versionDisplay == null)
             {
-                VersionDisplay = new GUIStyle(EditorStyles.helpBox) {alignment = TextAnchor.MiddleCenter};
+                _versionDisplay = new GUIStyle(EditorStyles.helpBox) {alignment = TextAnchor.MiddleCenter};
             }
 
-            EditorGUILayout.LabelField($"Hermit Version: {Her.Version}", VersionDisplay);
+            EditorGUILayout.LabelField($"Hermit Version: {Her.Version}", _versionDisplay);
             using (var check = new EditorGUI.ChangeCheckScope())
             {
                 EditorGUILayout.PropertyField(serializedObject.FindProperty("InjectSceneObjects"), true);

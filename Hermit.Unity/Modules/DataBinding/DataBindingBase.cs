@@ -8,7 +8,7 @@ namespace Hermit
     [ScriptOrder(-2000)]
     public abstract class DataBindingBase : MonoBehaviour
     {
-        public Component DataProviderComponent;
+        public Component dataProviderComponent;
 
         #region Runtime Variables
 
@@ -26,7 +26,7 @@ namespace Hermit
 
         protected virtual void Awake()
         {
-            if (DataProviderComponent != null && DataProviderComponent is IViewModelProvider provider)
+            if (dataProviderComponent != null && dataProviderComponent is IViewModelProvider provider)
             {
                 DataProvider = provider;
                 if (DataProvider.GetViewModel() != null)

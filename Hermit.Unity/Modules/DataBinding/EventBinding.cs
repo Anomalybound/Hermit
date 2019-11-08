@@ -6,37 +6,36 @@ using UnityEngine.Events;
 
 namespace Hermit
 {
+    [AddComponentMenu("Hermit/Data Binding/Event Binding")]
     public class EventBinding : DataBindingBase
     {
-        [SerializeField]
-        private string _viewEventEntry;
+        [SerializeField] private string viewEventEntry;
 
-        [SerializeField]
-        private string _viewModelActionEntry;
+        [SerializeField] private string viewModelActionEntry;
 
         #region Properties
 
         public string ViewEventEntry
         {
-            get => _viewEventEntry;
+            get => viewEventEntry;
             set
             {
 #if UNITY_EDITOR
                 UnityEditor.EditorUtility.SetDirty(this);
 #endif
-                _viewEventEntry = value;
+                viewEventEntry = value;
             }
         }
 
         public string ViewModelActionEntry
         {
-            get => _viewModelActionEntry;
+            get => viewModelActionEntry;
             set
             {
 #if UNITY_EDITOR
                 UnityEditor.EditorUtility.SetDirty(this);
 #endif
-                _viewModelActionEntry = value;
+                viewModelActionEntry = value;
             }
         }
 
@@ -48,7 +47,7 @@ namespace Hermit
 
         #endregion
 
-        protected virtual void BindViewAction2ViewModelFunction()
+        protected virtual void BindView2ViewModel()
         {
             #region ViewModel Actions
 
@@ -90,7 +89,7 @@ namespace Hermit
                     break;
                 default:
                     throw new Exception(
-                        $"MemberType: {memberInfo.MemberType} is not supported in two way property binding.");
+                        $"MemberType: {memberInfo.MemberType} is not supported in event binding.");
             }
 
             #endregion
@@ -100,7 +99,7 @@ namespace Hermit
         {
             base.SetupBinding();
 
-            BindViewAction2ViewModelFunction();
+            BindView2ViewModel();
         }
 
         public override void Connect()
@@ -113,7 +112,7 @@ namespace Hermit
         public override void Disconnect()
         {
             base.Disconnect();
-            
+
             ViewEventBinder?.Disconnect();
         }
 

@@ -10,17 +10,17 @@ namespace Hermit.UIStack
     [Serializable]
     public class UIManagerSettings
     {
-        public bool ScreenSpaceCameraMode = true;
+        public bool screenSpaceCameraMode = true;
 
         [Range(0, 1)]
-        public float MatchWidthOrHeight = 0.5f;
+        public float matchWidthOrHeight = 0.5f;
 
-        public Vector2 ReferenceResolution = new Vector2(1920, 1080);
+        public Vector2 referenceResolution = new Vector2(1920, 1080);
     }
 
     public enum UILayer
     {
-        UIHidden = -1,
+        Hidden = -1,
         Background = 0,
         Window = 1,
         Popup = 2
@@ -28,15 +28,15 @@ namespace Hermit.UIStack
 
     public class UIStackManager : MonoBehaviour, IUIStack
     {
-        private readonly Stack<Widget> StackedWindows = new Stack<Widget>();
-        private readonly List<ulong> WindowsInDisplay = new List<ulong>();
-        private readonly List<ulong> Popups = new List<ulong>();
+        private readonly Stack<Widget> _stackedWindows = new Stack<Widget>();
+        private readonly List<ulong> _windowsInDisplay = new List<ulong>();
+        private readonly List<ulong> _popups = new List<ulong>();
 
-        private readonly Dictionary<UILayer, GameObject> LayerLookup = new Dictionary<UILayer, GameObject>();
-        private IWidgetFactory DefaultFactory = new DefaultWidgetFactory();
-        private readonly Dictionary<ulong, IWidgetFactory> FactoryLookup = new Dictionary<ulong, IWidgetFactory>();
+        private readonly Dictionary<UILayer, GameObject> _layerLookup = new Dictionary<UILayer, GameObject>();
+        private IWidgetFactory _defaultFactory = new DefaultWidgetFactory();
+        private readonly Dictionary<ulong, IWidgetFactory> _factoryLookup = new Dictionary<ulong, IWidgetFactory>();
 
-        private readonly Dictionary<string, Stack<Widget>> PoolingWidgets =
+        private readonly Dictionary<string, Stack<Widget>> _poolingWidgets =
             new Dictionary<string, Stack<Widget>>();
 
         private IViewManager _viewManager;
@@ -56,7 +56,7 @@ namespace Hermit.UIStack
                     continue;
                 }
 
-                instance.LayerLookup.Add(layer, child.gameObject);
+                instance._layerLookup.Add(layer, child.gameObject);
             }
 
             return instance;
@@ -67,7 +67,7 @@ namespace Hermit.UIStack
             var manager = new GameObject("UI Stack Manager").AddComponent<UIStackManager>();
 
             var cam = Camera.main;
-            if (settings.ScreenSpaceCameraMode)
+            if (settings.screenSpaceCameraMode)
             {
                 cam = new GameObject("UI Camera").AddComponent<Camera>();
                 cam.orthographic = true;
@@ -79,10 +79,10 @@ namespace Hermit.UIStack
             foreach (UILayer layer in Enum.GetValues(typeof(UILayer)))
             {
                 var layerObj = new GameObject(layer.ToString());
-                manager.LayerLookup.Add(layer, layerObj);
+                manager._layerLookup.Add(layer, layerObj);
 
                 var layerCanvas = layerObj.AddComponent<Canvas>();
-                if (settings.ScreenSpaceCameraMode)
+                if (settings.screenSpaceCameraMode)
                 {
                     layerCanvas.renderMode = RenderMode.ScreenSpaceCamera;
                     layerCanvas.worldCamera = cam;
@@ -93,15 +93,15 @@ namespace Hermit.UIStack
 
                 var layerCanvasScaler = layerObj.AddComponent<CanvasScaler>();
                 layerCanvasScaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
-                layerCanvasScaler.referenceResolution = settings.ReferenceResolution;
-                layerCanvasScaler.matchWidthOrHeight = settings.MatchWidthOrHeight;
+                layerCanvasScaler.referenceResolution = settings.referenceResolution;
+                layerCanvasScaler.matchWidthOrHeight = settings.matchWidthOrHeight;
 
                 var layerRaycaster = layerObj.AddComponent<GraphicRaycaster>();
                 layerRaycaster.name = layer.ToString();
                 layerRaycaster.transform.SetParent(manager.transform);
                 layerRaycaster.transform.localPosition = Vector3.zero;
 
-                if (layer == UILayer.UIHidden)
+                if (layer == UILayer.Hidden)
                 {
                     layerObj.layer = LayerMask.NameToLayer("UIHidden");
                     layerRaycaster.enabled = false;
@@ -130,36 +130,36 @@ namespace Hermit.UIStack
             where TWidget : Widget
         {
             var instance = await GetInstance<TWidget>(widgetName, message, factory);
-            var parent = LayerLookup[instance.Layer];
+            var parent = _layerLookup[instance.Layer];
             instance.transform.SetParent(parent.transform, false);
 
             switch (instance.Layer)
             {
                 case UILayer.Popup:
-                    Popups.Add(instance.ViewId);
+                    _popups.Add(instance.ViewId);
                     break;
             }
 
-            if (StackedWindows.Count > 0)
+            if (_stackedWindows.Count > 0)
             {
-                var prevWidget = StackedWindows.Peek();
+                var prevWidget = _stackedWindows.Peek();
 
                 if (prevWidget != null)
                 {
                     await prevWidget.OnFreeze();
 
                     // Window will overlay previous windows.
-                    if (instance.Layer == UILayer.Window && WindowsInDisplay.Contains(prevWidget.ViewId))
+                    if (instance.Layer == UILayer.Window && _windowsInDisplay.Contains(prevWidget.ViewId))
                     {
-                        WindowsInDisplay.Remove(prevWidget.ViewId);
+                        _windowsInDisplay.Remove(prevWidget.ViewId);
                     }
                 }
             }
 
             await instance.OnShow();
 
-            StackedWindows.Push(instance);
-            WindowsInDisplay.Add(instance.ViewId);
+            _stackedWindows.Push(instance);
+            _windowsInDisplay.Add(instance.ViewId);
 
             return instance.ViewId;
         }
@@ -170,23 +170,23 @@ namespace Hermit.UIStack
 
         public async Task PopAsync(bool reuse = false)
         {
-            if (StackedWindows.Count < 0)
+            if (_stackedWindows.Count < 0)
             {
                 Debug.LogWarning("Nothing to pop.");
                 return;
             }
 
-            var current = StackedWindows.Pop();
+            var current = _stackedWindows.Pop();
 
             await current.OnHide();
 
             if (reuse) { MoveToHidden(current); }
             else { ReturnWidget(current); }
 
-            if (StackedWindows.Count > 0)
+            if (_stackedWindows.Count > 0)
             {
                 // resume previous window
-                var resumeWindow = StackedWindows.Peek();
+                var resumeWindow = _stackedWindows.Peek();
                 await resumeWindow.OnResume();
             }
         }
@@ -197,16 +197,16 @@ namespace Hermit.UIStack
 
         public async Task ClearPopupsAsync(bool reuse = false)
         {
-            foreach (var popup in Popups) { await CloseAsync(popup, reuse); }
+            foreach (var popup in _popups) { await CloseAsync(popup, reuse); }
 
-            Popups.Clear();
+            _popups.Clear();
         }
 
         public async Task ClearWindowsAsync(bool reuse = false)
         {
-            while (StackedWindows.Count > 0)
+            while (_stackedWindows.Count > 0)
             {
-                var window = StackedWindows.Pop();
+                var window = _stackedWindows.Pop();
                 await CloseAsync(window.ViewId, reuse);
             }
         }
@@ -222,14 +222,14 @@ namespace Hermit.UIStack
             var targetWidget = _viewManager.GetView<Widget>(widgetId);
             if (targetWidget == null) { return; }
 
-            if (targetWidget.Layer != UILayer.Window || WindowsInDisplay.Contains(widgetId))
+            if (targetWidget.Layer != UILayer.Window || _windowsInDisplay.Contains(widgetId))
             {
                 await targetWidget.OnHide();
 
                 if (reuse) { MoveToHidden(targetWidget); }
                 else { ReturnWidget(targetWidget); }
 
-                if (WindowsInDisplay.Contains(widgetId)) { WindowsInDisplay.Remove(widgetId); }
+                if (_windowsInDisplay.Contains(widgetId)) { _windowsInDisplay.Remove(widgetId); }
             }
         }
 
@@ -239,17 +239,17 @@ namespace Hermit.UIStack
 
         public void RegisterDefaultFactory(IWidgetFactory factory)
         {
-            DefaultFactory = factory ?? throw new ArgumentNullException();
+            _defaultFactory = factory ?? throw new ArgumentNullException();
         }
 
         private void ReturnWidget(Widget widget)
         {
-            if (FactoryLookup.TryGetValue(widget.ViewId, out var factory))
+            if (_factoryLookup.TryGetValue(widget.ViewId, out var factory))
             {
-                FactoryLookup.Remove(widget.ViewId);
+                _factoryLookup.Remove(widget.ViewId);
                 factory.ReturnInstance(widget);
             }
-            else { DefaultFactory.ReturnInstance(widget); }
+            else { _defaultFactory.ReturnInstance(widget); }
         }
 
         #endregion
@@ -260,9 +260,9 @@ namespace Hermit.UIStack
             IWidgetFactory factory = null)
             where TWidget : Widget
         {
-            if (PoolingWidgets.ContainsKey(widgetPath))
+            if (_poolingWidgets.ContainsKey(widgetPath))
             {
-                var pool = PoolingWidgets[widgetPath];
+                var pool = _poolingWidgets[widgetPath];
                 if (pool.Count > 0)
                 {
                     var instance = pool.Pop();
@@ -270,7 +270,7 @@ namespace Hermit.UIStack
                 }
             }
 
-            if (factory == null) { factory = DefaultFactory; }
+            if (factory == null) { factory = _defaultFactory; }
 
             TWidget widget;
             try { widget = (TWidget) await factory.CreateInstance(this, widgetPath, message); }
@@ -281,22 +281,22 @@ namespace Hermit.UIStack
             }
 
             // mark widget factory
-            FactoryLookup.Add(widget.ViewId, factory);
+            _factoryLookup.Add(widget.ViewId, factory);
 
             return widget;
         }
 
         private void MoveToHidden(Widget toHide)
         {
-            var hiddenLayer = LayerLookup[UILayer.UIHidden];
+            var hiddenLayer = _layerLookup[UILayer.Hidden];
             toHide.transform.SetParent(hiddenLayer.transform);
 
-            if (PoolingWidgets.ContainsKey(toHide.Path)) { PoolingWidgets[toHide.Path].Push(toHide); }
+            if (_poolingWidgets.ContainsKey(toHide.Path)) { _poolingWidgets[toHide.Path].Push(toHide); }
             else
             {
                 var newStack = new Stack<Widget>();
                 newStack.Push(toHide);
-                PoolingWidgets.Add(toHide.Path, newStack);
+                _poolingWidgets.Add(toHide.Path, newStack);
             }
         }
 

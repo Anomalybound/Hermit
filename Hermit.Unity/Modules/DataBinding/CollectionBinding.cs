@@ -8,53 +8,49 @@ namespace Hermit
 {
     public class CollectionBinding : DataBindingBase
     {
-        [SerializeField]
-        private string _viewModelCollectionEntry;
+        [SerializeField] private string viewModelCollectionEntry;
 
-        [SerializeField]
-        private string _collectionHandlerTypeName;
+        [SerializeField] private string collectionHandlerTypeName;
 
-        [SerializeField]
-        private GameObject _viewTemplate;
+        [SerializeField] private GameObject viewTemplate;
 
-        [SerializeField]
-        private Transform _viewContainer;
+        [SerializeField] private Transform viewContainer;
 
         #region Propertyies
 
         public string ViewModelCollectionEntry
         {
-            get => _viewModelCollectionEntry;
+            get => viewModelCollectionEntry;
             set
             {
 #if UNITY_EDITOR
                 if (_viewModelCollectionEntry != value) { UnityEditor.EditorUtility.SetDirty(this); }
 #endif
-                _viewModelCollectionEntry = value;
+                viewModelCollectionEntry = value;
             }
         }
 
         public string CollectionHandlerTypeName
         {
-            get => _collectionHandlerTypeName;
+            get => collectionHandlerTypeName;
             set
             {
 #if UNITY_EDITOR
                 if (_collectionHandlerTypeName != value) { UnityEditor.EditorUtility.SetDirty(this); }
 #endif
-                _collectionHandlerTypeName = value;
+                collectionHandlerTypeName = value;
             }
         }
 
         public GameObject ViewTemplate
         {
-            get => _viewTemplate;
+            get => viewTemplate;
             set
             {
 #if UNITY_EDITOR
                 if (_viewTemplate != value) { UnityEditor.EditorUtility.SetDirty(this); }
 #endif
-                _viewTemplate = value;
+                viewTemplate = value;
             }
         }
 
@@ -63,16 +59,16 @@ namespace Hermit
         {
             get
             {
-                if (_viewContainer == null) { return _viewTemplate != null ? _viewTemplate.transform.parent : null; }
+                if (viewContainer == null) { return viewTemplate != null ? viewTemplate.transform.parent : null; }
 
-                return _viewContainer;
+                return viewContainer;
             }
             set
             {
 #if UNITY_EDITOR
                 if (_viewContainer != value) { UnityEditor.EditorUtility.SetDirty(this); }
 #endif
-                _viewContainer = value;
+                viewContainer = value;
             }
         }
 
@@ -100,7 +96,7 @@ namespace Hermit
             if (string.IsNullOrEmpty(CollectionHandlerTypeName)) { return; }
 
             ChangedHandler = Her.Resolve<IViewCollectionChangedHandler>(CollectionHandlerTypeName);
-            ChangedHandler.SetUp(ViewTemplate, _viewContainer);
+            ChangedHandler.SetUp(ViewTemplate, viewContainer);
         }
 
         public override void Connect()
@@ -115,7 +111,7 @@ namespace Hermit
         public override void Disconnect()
         {
             base.Disconnect();
-            
+
             if (CollectionValue == null) { return; }
 
             CollectionValue.CollectionChanged -= ChangedHandler.OnCollectionChanged;

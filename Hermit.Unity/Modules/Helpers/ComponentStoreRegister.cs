@@ -6,20 +6,20 @@ namespace Hermit.Unity
     public sealed class ComponentStoreRegister : MonoBehaviour
     {
         [SerializeField]
-        private string _storeId = "Global";
+        private string storeId = "Global";
 
         [SerializeField]
-        private string _storeKey = "";
+        private string storeKey = "";
 
         [SerializeField]
-        private Component _storeValue = null;
+        private Component storeValue = null;
 
         private void Start()
         {
-            if (_storeValue == null || string.IsNullOrEmpty(_storeId) || string.IsNullOrEmpty(_storeKey)) { return; }
+            if (storeValue == null || string.IsNullOrEmpty(storeId) || string.IsNullOrEmpty(storeKey)) { return; }
 
-            var store = Her.GetStore(_storeId);
-            store.Set(_storeKey, _storeValue);
+            var store = Her.GetStore(storeId);
+            store.Set(storeKey, storeValue);
         }
     }
 }

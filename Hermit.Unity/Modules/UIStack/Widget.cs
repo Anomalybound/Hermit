@@ -7,11 +7,11 @@ namespace Hermit.UIStack
     public abstract class Widget : MonoBehaviour, IWidget
     {
         [SerializeField]
-        private UILayer _layer = UILayer.Window;
+        private UILayer layer = UILayer.Window;
 
         public string Path { get; private set; }
 
-        public virtual UILayer Layer => _layer;
+        public virtual UILayer Layer => layer;
 
         protected IUIStack IuiStack { get; private set; }
 

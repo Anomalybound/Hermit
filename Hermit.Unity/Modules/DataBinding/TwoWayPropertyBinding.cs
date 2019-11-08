@@ -6,28 +6,26 @@ using UnityEngine.Events;
 
 namespace Hermit
 {
+    [AddComponentMenu("Hermit/Data Binding/Two-way Binding")]
     public class TwoWayPropertyBinding : OneWayPropertyBinding
     {
-        [SerializeField]
-        private string _viewEventEntry;
+        [SerializeField] private string viewEventEntry;
 
-        [SerializeField]
-        private string viewModelAdapterType;
+        [SerializeField] private string viewModelAdapterType;
 
-        [SerializeField]
-        private AdapterOptions _viewModelAdapterOptions;
+        [SerializeField] private AdapterOptions viewModelAdapterOptions;
 
         #region Properties
 
         public string ViewEventEntry
         {
-            get => _viewEventEntry;
+            get => viewEventEntry;
             set
             {
 #if UNITY_EDITOR
                 if (_viewEventEntry != value) { UnityEditor.EditorUtility.SetDirty(this); }
 #endif
-                _viewEventEntry = value;
+                viewEventEntry = value;
             }
         }
 
@@ -45,13 +43,13 @@ namespace Hermit
 
         public AdapterOptions ViewModelAdapterOptions
         {
-            get => _viewModelAdapterOptions;
+            get => viewModelAdapterOptions;
             set
             {
 #if UNITY_EDITOR
                 if (_viewModelAdapterOptions != value) { UnityEditor.EditorUtility.SetDirty(this); }
 #endif
-                _viewModelAdapterOptions = value;
+                viewModelAdapterOptions = value;
             }
         }
 
@@ -156,7 +154,7 @@ namespace Hermit
             var convertedValue = ViewModelAdapterOptions != null
                 ? ViewAdapterInstance?.Convert(rawValue, ViewModelAdapterOptions)
                 : ViewAdapterInstance?.Convert(rawValue);
-            
+
             ViewModelSetter.Invoke(ViewModelAdapter != null ? convertedValue : rawValue);
 
             PropertyChanging = false;

@@ -6,18 +6,18 @@ namespace Hermit
 {
     public sealed class ViewManager : Singleton<ViewManager>, IViewManager
     {
-        private readonly Dictionary<ulong, IView> ViewCaches = new Dictionary<ulong, IView>();
+        private readonly Dictionary<ulong, IView> _viewCaches = new Dictionary<ulong, IView>();
 
         private ulong ViewIdCounter { get; set; }
 
         public IView GetView(ulong id)
         {
-            return ViewCaches.TryGetValue(id, out var view) ? view : default;
+            return _viewCaches.TryGetValue(id, out var view) ? view : default;
         }
 
         public TView GetView<TView>(ulong id) where TView : IView
         {
-            if (!ViewCaches.TryGetValue(id, out var view)) { return default; }
+            if (!_viewCaches.TryGetValue(id, out var view)) { return default; }
 
             if (view is TView targetView) { return targetView; }
 
@@ -27,7 +27,7 @@ namespace Hermit
         public ulong Register<TView>(TView view) where TView : IView
         {
             var viewId = ViewIdCounter;
-            ViewCaches.Add(viewId, view);
+            _viewCaches.Add(viewId, view);
 
             ViewIdCounter++;
             return viewId;
@@ -35,13 +35,13 @@ namespace Hermit
 
         public void UnRegister(ulong id)
         {
-            if (!ViewCaches.ContainsKey(id))
+            if (!_viewCaches.ContainsKey(id))
             {
                 throw new IndexOutOfRangeException(
-                    $"Failed to unregister view of id: {id}, view caches contains: {string.Join("-", ViewCaches.Select(v => v.Key.ToString()))}.");
+                    $"Failed to unregister view of id: {id}, view caches contains: {string.Join("-", _viewCaches.Select(v => v.Key.ToString()))}.");
             }
 
-            ViewCaches.Remove(id);
+            _viewCaches.Remove(id);
         }
     }
 }

@@ -14,8 +14,8 @@ namespace Hermit
 
         public static async Task<IView> PushUIAsync(string widgetName, UIMessage message)
         {
-            var id = await Current.UiStack.PushAsync(widgetName, message);
-            return Current._viewManager.GetView(id);
+            var id = await Current.UIStack.PushAsync(widgetName, message);
+            return Current.ViewManager.GetView(id);
         }
 
         public static async Task<IView> PushUIAsync<TWidget>(string widgetName) where TWidget : Widget
@@ -26,33 +26,33 @@ namespace Hermit
         public static async Task<IView> PushUIAsync<TWidget>(string widgetName, UIMessage message)
             where TWidget : Widget
         {
-            var id = await Current.UiStack.PushAsync<TWidget>(widgetName, message);
-            return Current._viewManager.GetView(id);
+            var id = await Current.UIStack.PushAsync<TWidget>(widgetName, message);
+            return Current.ViewManager.GetView(id);
         }
 
         public static async void PopUIAsync(bool reuse = false)
         {
-            await Current.UiStack.PopAsync(reuse);
+            await Current.UIStack.PopAsync(reuse);
         }
 
         public static async void ClearUIPopupsAsync(bool reuse = false)
         {
-            await Current.UiStack.ClearPopupsAsync(reuse);
+            await Current.UIStack.ClearPopupsAsync(reuse);
         }
 
         public static async void ClearUIWindowsAsync(bool reuse = false)
         {
-            await Current.UiStack.ClearWindowsAsync(reuse);
+            await Current.UIStack.ClearWindowsAsync(reuse);
         }
 
         public static async void ClearAllUIAsync(bool reuse = false)
         {
-            await Current.UiStack.ClearAllAsync(reuse);
+            await Current.UIStack.ClearAllAsync(reuse);
         }
 
         public static async void CloseUIAsync(ulong widgetId, bool reuse = false)
         {
-            await Current.UiStack.CloseAsync(widgetId, reuse);
+            await Current.UIStack.CloseAsync(widgetId, reuse);
         }
 
         #endregion

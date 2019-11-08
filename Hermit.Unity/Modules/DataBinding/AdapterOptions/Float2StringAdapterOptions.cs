@@ -6,11 +6,11 @@ namespace Hermit.DataBinding
     public class Float2StringAdapterOptions : AdapterOptions
     {
         [Header("Options")]
-        public string Format = "{0}";
+        public string format = "{0}";
 
         public override object Convert(object fromObj)
         {
-            return string.Format(Format, fromObj);
+            return string.Format(format, fromObj);
         }
     }
 }

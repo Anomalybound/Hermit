@@ -13,17 +13,17 @@ namespace Hermit.Procedure
         where TProcedureController : GameProcedureController<TProcedureController, TProcedureIndex>
         where TProcedureIndex : struct, IConvertible
     {
-        private readonly Dictionary<TProcedureIndex, GameProcedure<TProcedureController, TProcedureIndex>> Indices =
+        private readonly Dictionary<TProcedureIndex, GameProcedure<TProcedureController, TProcedureIndex>> _indices =
             new Dictionary<TProcedureIndex, GameProcedure<TProcedureController, TProcedureIndex>>();
 
-        private readonly Dictionary<IState, TProcedureIndex> IndexLookup = new Dictionary<IState, TProcedureIndex>();
+        private readonly Dictionary<IState, TProcedureIndex> _indexLookup = new Dictionary<IState, TProcedureIndex>();
 
         [SerializeField, HideInInspector]
-        private TProcedureIndex _initState = default(TProcedureIndex);
+        private TProcedureIndex initState = default(TProcedureIndex);
 
-        public TProcedureIndex InitState => _initState;
+        public TProcedureIndex InitState => initState;
 
-        public TProcedureIndex Current => IndexLookup[Root.ActiveStates.Peek()];
+        public TProcedureIndex Current => _indexLookup[Root.ActiveStates.Peek()];
 
         public event Action<IState, IState> OnStateChanged;
 
@@ -55,14 +55,14 @@ namespace Hermit.Procedure
             {
                 var id = procedure.Index;
 
-                if (Indices.ContainsKey(id))
+                if (_indices.ContainsKey(id))
                 {
                     Debug.LogErrorFormat("{0}[{1}] already added.", id, procedure.GetType().Name);
                     continue;
                 }
 
-                Indices.Add(id, procedure);
-                IndexLookup.Add(procedure, id);
+                _indices.Add(id, procedure);
+                _indexLookup.Add(procedure, id);
                 root.AddChild(id.ToString(CultureInfo.InvariantCulture), procedure);
             }
 

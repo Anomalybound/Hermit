@@ -13,12 +13,12 @@ namespace Hermit.DataBinding
             Round
         }
 
-        public ParseType FloatParseType = ParseType.Round;
+        public ParseType floatParseType = ParseType.Round;
 
 
         public override object Convert(object fromObj)
         {
-            switch (FloatParseType)
+            switch (floatParseType)
             {
                 case ParseType.Ceil:
                     return Mathf.CeilToInt((float) fromObj);

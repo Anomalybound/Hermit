@@ -7,21 +7,18 @@ using Component = UnityEngine.Component;
 
 namespace Hermit
 {
-    public class PropertyMethodBinding : DataBindingBase
+    [AddComponentMenu("Hermit/Data Binding/Method Binding")]
+    public class MethodBinding : DataBindingBase
     {
-        public bool ShowDeclaredMethodsOnly = true;
+        public bool showDeclaredMethodsOnly = true;
 
-        [SerializeField]
-        private string _viewModelEntry;
+        [SerializeField] private string viewModelEntry;
 
-        [SerializeField]
-        private string _viewEntry;
+        [SerializeField] private string viewEntry;
 
-        [SerializeField]
-        private string viewAdapterType;
+        [SerializeField] private string viewAdapterType;
 
-        [SerializeField]
-        private AdapterOptions _viewAdapterOptions;
+        [SerializeField] private AdapterOptions viewAdapterOptions;
 
         #region Properties
 
@@ -39,31 +36,31 @@ namespace Hermit
 
         public AdapterOptions AdapterOptions
         {
-            get => _viewAdapterOptions;
-            set => _viewAdapterOptions = value;
+            get => viewAdapterOptions;
+            set => viewAdapterOptions = value;
         }
 
         public string ViewModelEntry
         {
-            get => _viewModelEntry;
+            get => viewModelEntry;
             set
             {
 #if UNITY_EDITOR
                 if (_viewModelEntry != value) { UnityEditor.EditorUtility.SetDirty(this); }
 #endif
-                _viewModelEntry = value;
+                viewModelEntry = value;
             }
         }
 
         public string ViewEntry
         {
-            get => _viewEntry;
+            get => viewEntry;
             set
             {
 #if UNITY_EDITOR
                 if (_viewEntry != value) { UnityEditor.EditorUtility.SetDirty(this); }
 #endif
-                _viewEntry = value;
+                viewEntry = value;
             }
         }
 
@@ -125,8 +122,8 @@ namespace Hermit
         protected void UpdateProperty()
         {
             var rawValue = ViewModelGetter.Invoke();
-            var convertedValue = _viewAdapterOptions != null
-                ? ViewAdapterInstance?.Convert(rawValue, _viewAdapterOptions)
+            var convertedValue = viewAdapterOptions != null
+                ? ViewAdapterInstance?.Convert(rawValue, viewAdapterOptions)
                 : ViewAdapterInstance?.Convert(rawValue);
 
             var parameter = new[] {ViewAdapterInstance != null ? convertedValue : rawValue};
@@ -156,8 +153,7 @@ namespace Hermit
                     break;
 
                 default:
-                    throw new Exception(
-                        $"MemberType: {memberInfo.MemberType} is not supported in property method binding.");
+                    throw new Exception($"MemberType: {memberInfo.MemberType} is not supported in method binding.");
             }
 
             #endregion
@@ -179,8 +175,7 @@ namespace Hermit
                     ViewModelGetter = () => propertyInfo?.GetValue(ViewModel);
                     break;
                 default:
-                    throw new Exception(
-                        $"MemberType: {memberInfo.MemberType} is not supported in one way property binding.");
+                    throw new Exception($"MemberType: {memberInfo.MemberType} is not supported in method binding.");
             }
 
             #endregion

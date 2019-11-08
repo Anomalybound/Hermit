@@ -2,8 +2,8 @@
 {
     public abstract class ServiceProviderBase : IServiceProvider
     {
-        public abstract void RegisterBindings(IDependencyContainer Container);
+        public abstract void RegisterBindings(IDependencyContainer container);
 
-        public virtual void Initialization(IDependencyContainer Container) { }
+        public virtual void Initialization(IDependencyContainer container) { }
     }
 }

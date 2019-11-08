@@ -5,9 +5,9 @@ namespace Hermit
 {
     public partial class Her
     {
-        private readonly Dictionary<string, IStore> stores = new Dictionary<string, IStore>();
+        private readonly Dictionary<string, IStore> _stores = new Dictionary<string, IStore>();
 
-        private IStore GlobalStore => stores["Global"];
+        private IStore GlobalStore => _stores["Global"];
 
         #region Glaobal Store
 
@@ -54,12 +54,12 @@ namespace Hermit
 
         public static IStore GetStore(string storeId)
         {
-            if (Current.stores.TryGetValue(storeId, out var store)) { return store; }
+            if (Current._stores.TryGetValue(storeId, out var store)) { return store; }
 
             store = Create<IStore>();
             store.SetStoreId(storeId);
 
-            Current.stores.Add(storeId, store);
+            Current._stores.Add(storeId, store);
 
             return store;
         }

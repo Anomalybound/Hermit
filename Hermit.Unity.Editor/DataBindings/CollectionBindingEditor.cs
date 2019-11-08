@@ -33,7 +33,7 @@ namespace Hermit.DataBindings
                 {
                     DrawBindingLabel("View");
 
-                    EditorGUILayout.PropertyField(serializedObject.FindProperty("_viewTemplate"));
+                    EditorGUILayout.PropertyField(serializedObject.FindProperty("viewTemplate"));
 
                     if (Target.ViewTemplate != null &&
                         Target.ViewTemplate.GetComponent<IViewModelProvider>() == null)
@@ -41,7 +41,7 @@ namespace Hermit.DataBindings
                         EditorGUILayout.HelpBox("View Template must be a IViewModelProvider.", MessageType.Error);
                     }
 
-                    EditorGUILayout.PropertyField(serializedObject.FindProperty("_viewContainer"));
+                    EditorGUILayout.PropertyField(serializedObject.FindProperty("viewContainer"));
                 }
 
                 if (check.changed)

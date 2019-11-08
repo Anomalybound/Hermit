@@ -64,7 +64,7 @@ namespace Hermit.DataBindings
 
             using (new EditorGUI.DisabledScope(true))
             {
-                var providerProperty = nameof(BindingBase.DataProviderComponent);
+                var providerProperty = nameof(BindingBase.dataProviderComponent);
                 EditorGUILayout.PropertyField(serializedObject.FindProperty(providerProperty));
             }
         }
@@ -199,7 +199,7 @@ namespace Hermit.DataBindings
                 if (check.changed)
                 {
                     viewModelEntry = lookup[selection];
-                    BindingBase.DataProviderComponent = providerLookup[viewModelTypeLookup[selection]] as Component;
+                    BindingBase.dataProviderComponent = providerLookup[viewModelTypeLookup[selection]] as Component;
 
                     ViewModelSource = propertyTypeLookup[selection];
                     ViewModelDest = null;
@@ -506,14 +506,14 @@ namespace Hermit.DataBindings
             {
                 selection = EditorGUILayout.Popup("Actions", selection, options.ToArray());
 
-                if (BindingBase.DataProviderComponent == null && selection >= 0)
+                if (BindingBase.dataProviderComponent == null && selection >= 0)
                 {
-                    BindingBase.DataProviderComponent = providerLookup[arguments.Count][selection];
+                    BindingBase.dataProviderComponent = providerLookup[arguments.Count][selection];
                 }
 
                 if (!check.changed) { return viewModelActionEntry; }
 
-                BindingBase.DataProviderComponent = providerLookup[arguments.Count][selection];
+                BindingBase.dataProviderComponent = providerLookup[arguments.Count][selection];
                 serializedObject.ApplyModifiedProperties();
                 return lookup[selection];
             }
@@ -607,11 +607,11 @@ namespace Hermit.DataBindings
 
                 if (selection < 0) { return viewModelCollectionEntry; }
 
-                if (BindingBase.DataProviderComponent == null) { BindingBase.DataProviderComponent = data[selection]; }
+                if (BindingBase.dataProviderComponent == null) { BindingBase.dataProviderComponent = data[selection]; }
 
                 if (!check.changed) { return viewModelCollectionEntry; }
 
-                BindingBase.DataProviderComponent = data[selection];
+                BindingBase.dataProviderComponent = data[selection];
                 serializedObject.ApplyModifiedProperties();
                 return lookup[selection];
             }

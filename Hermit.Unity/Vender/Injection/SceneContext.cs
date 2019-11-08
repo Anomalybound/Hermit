@@ -12,10 +12,10 @@ namespace Hermit.Injection
         public virtual IDependencyContainer Container { get; } = new DiContainer();
 
         [SerializeField]
-        protected bool InjectSceneObjects;
+        protected bool injectSceneObjects;
 
         [SerializeField]
-        protected MonoServiceProvider[] ServiceProviders = { };
+        protected MonoServiceProvider[] serviceProviders = { };
 
         protected virtual void Awake()
         {
@@ -27,15 +27,15 @@ namespace Hermit.Injection
         {
             if (Context.GlobalContext == null) { Context.SetCurrentContext(this); }
 
-            if (ServiceProviders == null || ServiceProviders.Length == 0)
+            if (serviceProviders == null || serviceProviders.Length == 0)
             {
-                ServiceProviders = GetComponentsInChildren<MonoServiceProvider>();
+                serviceProviders = GetComponentsInChildren<MonoServiceProvider>();
             }
 
             var sw = Stopwatch.StartNew();
             sw.Start();
 
-            foreach (var provider in ServiceProviders)
+            foreach (var provider in serviceProviders)
             {
                 if (provider == null) { continue; }
 
@@ -52,14 +52,14 @@ namespace Hermit.Injection
         {
             var sw = Stopwatch.StartNew();
             sw.Start();
-            foreach (var provider in ServiceProviders)
+            foreach (var provider in serviceProviders)
             {
                 if (provider == null) { continue; }
 
                 provider.Initialization(Container);
             }
 
-            if (InjectSceneObjects)
+            if (injectSceneObjects)
             {
                 for (var i = 0; i < SceneManager.sceneCount; i++)
                 {

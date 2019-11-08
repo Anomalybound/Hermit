@@ -14,38 +14,38 @@ namespace Hermit.Unity
     public sealed class ComponentBindingRegister : MonoBehaviour
     {
         [SerializeField]
-        private Component _target = null;
+        private Component target = null;
 
         [SerializeField]
-        private AsType _asScope = AsType.Singleton;
+        private AsType asScope = AsType.Singleton;
 
         [SerializeField]
-        private BindingRegisterType _bindingType = BindingRegisterType.BindSelf;
+        private BindingRegisterType bindingType = BindingRegisterType.BindSelf;
 
         [SerializeField]
-        private string _bindingId = null;
+        private string bindingId = null;
 
         private void Awake()
         {
             var container = Context.GlobalContext.Container;
 
-            if (_target == null) { return; }
+            if (target == null) { return; }
 
             IBindingInfo bindingInfo;
 
-            switch (_bindingType)
+            switch (bindingType)
             {
                 case BindingRegisterType.BindSelf:
-                    bindingInfo = container.Bind(_target.GetType()).FromInstance(_target);
+                    bindingInfo = container.Bind(target.GetType()).FromInstance(target);
                     break;
                 case BindingRegisterType.BindAll:
-                    bindingInfo = container.BindAll(_target.GetType()).FromInstance(_target);
+                    bindingInfo = container.BindAll(target.GetType()).FromInstance(target);
                     break;
                 default:
                     throw new ArgumentOutOfRangeException();
             }
 
-            switch (_asScope)
+            switch (asScope)
             {
                 case AsType.Singleton:
                     bindingInfo.AsSingleton();
@@ -57,7 +57,7 @@ namespace Hermit.Unity
                     throw new ArgumentOutOfRangeException();
             }
 
-            bindingInfo.WithId(_bindingId.Trim());
+            bindingInfo.WithId(bindingId.Trim());
 
             (container as DiContainer)?.Build(bindingInfo);
         }

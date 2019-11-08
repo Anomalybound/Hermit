@@ -41,6 +41,7 @@
     <Compile Include="Common\ServiceProvider\HermitDataBindingServiceProvider.cs" />
     <Compile Include="Common\ServiceProvider\HermitKernelServiceProvider.cs" />
     <Compile Include="Facade\HerStore.cs" />
+    <Compile Include="Modules\DataBinding\ActionBinding.cs" />
     <Compile Include="Modules\DataBinding\AdapterOptions\Int2StringAdapterOptions.cs" />
     <Compile Include="Modules\DataBinding\Core\Abstractions\AdapterBase.cs" />
     <Compile Include="Modules\UIStack\Abstractions\IUIController.cs" />
@@ -72,7 +73,7 @@
     <Compile Include="Modules\DataBinding\DataBindingBase.cs" />
     <Compile Include="Modules\DataBinding\EventBinding.cs" />
     <Compile Include="Modules\DataBinding\OneWayPropertyBinding.cs" />
-    <Compile Include="Modules\DataBinding\PropertyMethodBinding.cs" />
+    <Compile Include="Modules\DataBinding\MethodBinding.cs" />
     <Compile Include="Modules\DataBinding\TwoWayPropertyBinding.cs" />
     <Compile Include="Modules\DataBinding\AdapterOptions\Float2StringAdapterOptions.cs" />
     <Compile Include="Modules\DataBinding\Adapters\Float2StringAdapter.cs" />

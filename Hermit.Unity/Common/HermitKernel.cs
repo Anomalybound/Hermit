@@ -5,13 +5,13 @@ namespace Hermit.Common
     [ScriptOrder(-10000)]
     public sealed class HermitKernel : SceneContext
     {
-        private static HermitKernel _instance;
+        private static HermitKernel instance;
 
         protected override void Awake()
         {
-            if (_instance == null)
+            if (instance == null)
             {
-                _instance = this;
+                instance = this;
 
                 RegisterServices();
                 InitServices();

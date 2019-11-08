@@ -6,19 +6,16 @@ using UnityEngine;
 
 namespace Hermit
 {
+    [AddComponentMenu("Hermit/Data Binding/One-way Binding")]
     public class OneWayPropertyBinding : DataBindingBase
     {
-        [SerializeField]
-        private string _viewModelEntry;
+        [SerializeField] private string viewModelEntry;
 
-        [SerializeField]
-        private string _viewEntry;
+        [SerializeField] private string viewEntry;
 
-        [SerializeField]
-        private string viewAdapterType;
+        [SerializeField] private string viewAdapterType;
 
-        [SerializeField]
-        private AdapterOptions _viewAdapterOptions;
+        [SerializeField] private AdapterOptions viewAdapterOptions;
 
         #region Properties
 
@@ -36,31 +33,31 @@ namespace Hermit
 
         public AdapterOptions AdapterOptions
         {
-            get => _viewAdapterOptions;
-            set => _viewAdapterOptions = value;
+            get => viewAdapterOptions;
+            set => viewAdapterOptions = value;
         }
 
         public string ViewModelEntry
         {
-            get => _viewModelEntry;
+            get => viewModelEntry;
             set
             {
 #if UNITY_EDITOR
                 if (_viewModelEntry != value) { UnityEditor.EditorUtility.SetDirty(this); }
 #endif
-                _viewModelEntry = value;
+                viewModelEntry = value;
             }
         }
 
         public string ViewEntry
         {
-            get => _viewEntry;
+            get => viewEntry;
             set
             {
 #if UNITY_EDITOR
                 if (_viewEntry != value) { UnityEditor.EditorUtility.SetDirty(this); }
 #endif
-                _viewEntry = value;
+                viewEntry = value;
             }
         }
 
@@ -124,8 +121,8 @@ namespace Hermit
         protected void UpdateProperty()
         {
             var rawValue = ViewModelGetter.Invoke();
-            var convertedValue = _viewAdapterOptions != null
-                ? ViewAdapterInstance?.Convert(rawValue, _viewAdapterOptions)
+            var convertedValue = viewAdapterOptions != null
+                ? ViewAdapterInstance?.Convert(rawValue, viewAdapterOptions)
                 : ViewAdapterInstance?.Convert(rawValue);
 
             ViewSetter.Invoke(ViewAdapterInstance != null ? convertedValue : rawValue);

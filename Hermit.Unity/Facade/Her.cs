@@ -47,13 +47,13 @@ namespace Hermit
 
         public ILog Logger { get; }
 
-        public IUIStack UiStack => _uiStack ?? (_uiStack = _container.Resolve<IUIStack>());
+        public IUIStack UIStack => _uiStack ?? (_uiStack = Container.Resolve<IUIStack>());
 
-        private IUIStack _uiStack { get; set; }
+        private IUIStack _uiStack;
 
-        private IDependencyContainer _container { get; set; }
+        private IDependencyContainer Container { get; set; }
 
-        private IViewManager _viewManager { get; set; }
+        private IViewManager ViewManager { get; set; }
 
         public Her()
         {
@@ -64,13 +64,13 @@ namespace Hermit
         [Inject]
         public void Injection(IDependencyContainer container, IViewManager viewManager)
         {
-            _container = container;
-            _viewManager = viewManager;
+            Container = container;
+            ViewManager = viewManager;
 
             // Setup stores
             var store = container.Resolve<IStore>();
             store.SetStoreId("Global");
-            stores.Add("Global", store);
+            _stores.Add("Global", store);
         }
     }
 }

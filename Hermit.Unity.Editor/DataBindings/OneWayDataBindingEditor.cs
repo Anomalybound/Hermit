@@ -19,7 +19,7 @@ namespace Hermit.DataBindings
 
             base.OnEnable();
 
-            ViewAdapterOptions = serializedObject.FindProperty("_viewAdapterOptions");
+            ViewAdapterOptions = serializedObject.FindProperty("viewAdapterOptions");
         }
 
         public override void OnInspectorGUI()
