@@ -1,0 +1,82 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{BDF88F73-E9FD-4381-9474-9A4CAB9B8145}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <RootNamespace>Hermit.Core</RootNamespace>
+    <AssemblyName>Hermit.Core</AssemblyName>
+    <TargetFrameworkVersion>v4.7</TargetFrameworkVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>..\bin\Debug</OutputPath>
+    <DefineConstants>DEBUG;</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <ConsolePause>false</ConsolePause>
+    <LangVersion>7.1</LangVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <Optimize>true</Optimize>
+    <OutputPath>..\bin\Release</OutputPath>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <ConsolePause>false</ConsolePause>
+    <LangVersion>7.1</LangVersion>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Modules\Misc\Singleton.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Common\Contexts\ContextBase.cs" />
+    <Compile Include="Services\Event\EventBroker.cs" />
+    <Compile Include="Services\Event\IEventBroker.cs" />
+    <Compile Include="Services\Store\DictionaryStore.cs" />
+    <Compile Include="Services\Store\IStore.cs" />
+    <Compile Include="Services\Time\ITime.cs" />
+    <Compile Include="Modules\Attributes\ScriptOrderAttribute.cs" />
+    <Compile Include="Modules\Extensions\IListExtensions.cs" />
+    <Compile Include="Modules\Misc\AssemblyHelper.cs" />
+    <Compile Include="Modules\Misc\DelegateHelper.cs" />
+    <Compile Include="Modules\Misc\DictionaryExtensions.cs" />
+    <Compile Include="Modules\Misc\TypeExtensions.cs" />
+    <Compile Include="Modules\ObjectPool\DefaultPooledObjectPolicy.cs" />
+    <Compile Include="Modules\ObjectPool\IPooledObjectPolicy.cs" />
+    <Compile Include="Modules\ObjectPool\ObjectPool.cs" />
+    <Compile Include="Vender\Fsm\Builder\StateBuilder.cs" />
+    <Compile Include="Vender\Fsm\Builder\StateMachineBuilder.cs" />
+    <Compile Include="Vender\Fsm\Core\ContextState.cs" />
+    <Compile Include="Vender\Fsm\Core\IBuildableState.cs" />
+    <Compile Include="Vender\Fsm\Core\IPureState.cs" />
+    <Compile Include="Vender\Fsm\Core\IState.cs" />
+    <Compile Include="Vender\Fsm\Core\State.cs" />
+    <Compile Include="Vender\Injection\Attribute\Inject.cs" />
+    <Compile Include="Vender\Injection\Builder\BindingInfo.cs" />
+    <Compile Include="Vender\Injection\Builder\IBindingInfo.cs" />
+    <Compile Include="Vender\Injection\Core\Context.cs" />
+    <Compile Include="Vender\Injection\Core\DiContainer.cs" />
+    <Compile Include="Vender\Injection\Core\IContext.cs" />
+    <Compile Include="Vender\Injection\Core\IDependencyBinder.cs" />
+    <Compile Include="Vender\Injection\Core\IDependencyContainer.cs" />
+    <Compile Include="Vender\Injection\Core\IDependencyResolver.cs" />
+    <Compile Include="Vender\Injection\Core\IServiceProvider.cs" />
+    <Compile Include="Vender\Injection\Core\ServiceProviderBase.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Vender\Fsm\LICENSE" />
+    <None Include="Vender\Fsm\README.md" />
+    <None Include="Vender\Fsm\Docs\inspector.png" />
+    <None Include="Vender\Injection\LICENSE" />
+    <None Include="Vender\Injection\README.md" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Vender\Injection\Unity\" />
+  </ItemGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+</Project>
