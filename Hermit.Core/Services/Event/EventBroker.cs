@@ -105,19 +105,13 @@ namespace Hermit.Services
 
             var eventType = typeof(Action);
 
-            if (!_genericEvents.TryGetValue(channel, out var delegates)) { return; }
-
-            if (!delegates.TryGetValue(eventType, out var del)) { return; }
+            if (!_nonGenericEvents.TryGetValue(channel, out var del)) { return; }
 
             if (del == null) { return; }
 
-            var ret = (Action) del - eventAction;
-            if (ret == null && !keepEvent)
-            {
-                delegates.Remove(eventType);
-                if (delegates.Count <= 0) { _genericEvents.Remove(channel); }
-            }
-            else { delegates[eventType] = ret; }
+            var ret = (del as Action) - eventAction;
+            if (ret == null && !keepEvent) { _nonGenericEvents.Remove(channel); }
+            else { _nonGenericEvents[channel] = ret; }
         }
 
         public void UnsubscribeAll(string channel, bool keepEvent = false)
