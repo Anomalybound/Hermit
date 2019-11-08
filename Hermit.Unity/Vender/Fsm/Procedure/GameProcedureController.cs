@@ -34,7 +34,7 @@ namespace Hermit.Procedure
             var context = Context.GlobalContext;
 
             var types = GetType().Assembly.GetTypes()
-                .Where(x => typeof(GameProcedure<TProcedureController, TProcedureIndex>).IsAssignableFrom(x));
+                .Where(x => !x.IsAbstract && typeof(GameProcedure<TProcedureController, TProcedureIndex>).IsAssignableFrom(x));
 
             var procedures = new List<GameProcedure<TProcedureController, TProcedureIndex>>();
 
