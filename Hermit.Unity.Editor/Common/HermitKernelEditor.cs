@@ -53,8 +53,8 @@ namespace Hermit
             EditorGUILayout.LabelField($"Hermit Version: {Her.Version}", _versionDisplay);
             using (var check = new EditorGUI.ChangeCheckScope())
             {
-                EditorGUILayout.PropertyField(serializedObject.FindProperty("InjectSceneObjects"), true);
-                EditorGUILayout.PropertyField(serializedObject.FindProperty("ServiceProviders"), true);
+                EditorGUILayout.PropertyField(serializedObject.FindProperty("injectSceneObjects"), true);
+                EditorGUILayout.PropertyField(serializedObject.FindProperty("serviceProviders"), true);
                 if (check.changed) { serializedObject.ApplyModifiedProperties(); }
             }
         }
