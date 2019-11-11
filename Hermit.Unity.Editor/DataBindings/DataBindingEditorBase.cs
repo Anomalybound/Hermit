@@ -174,7 +174,8 @@ namespace Hermit.DataBindings
                 var properties = info.Value.Select(p =>
                 {
                     var provider = (Component) providerLookup[info.Key];
-                    var property = $"{provider.name}/{info.Key.PrettyName()}/{p.Name} - [{p.PropertyType.PrettyName()}]";
+                    var property =
+                        $"{provider.name}/{info.Key.PrettyName()}/{p.Name} - [{p.PropertyType.PrettyName()}]";
                     return property;
                 });
                 var items = info.Value.Select(p => $"{info.Key.FullName}.{p.Name}");
@@ -223,7 +224,7 @@ namespace Hermit.DataBindings
             // Fill data
             foreach (var component in components)
             {
-                if (component == BindingBase) { continue; }
+                if (component == BindingBase || component == null) { continue; }
 
                 // TODO: configs for static properties
                 // Get properties with public setter and getter
@@ -266,11 +267,24 @@ namespace Hermit.DataBindings
             {
                 if (component == BindingBase) { continue; }
 
+                var type = component.GetType();
+                var propertyAccessors = type.GetProperties(BindingFlags.Static | BindingFlags.Public)
+                    .SelectMany(p => p.GetAccessors());
+
+                var eventAccessors = type.GetEvents(BindingFlags.Static | BindingFlags.Public)
+                    .SelectMany(e => new[]
+                    {
+                        e.GetAddMethod(true),
+                        e.GetRemoveMethod(true)
+                    });
+
+                var accessors = propertyAccessors.Concat(eventAccessors);
+
                 var filter = BindingFlags.Instance | BindingFlags.Public;
                 if (declaredMethodsOnly) { filter |= BindingFlags.DeclaredOnly; }
 
-                var methodInfos = component.GetType()
-                    .GetMethods(filter)
+                var methodInfos = type
+                    .GetMethods(filter).Except(accessors)
                     .Where(m => !m.IsSpecialName && m.GetParameters().Length <= 1);
 
                 foreach (var methodInfo in methodInfos)
@@ -300,7 +314,65 @@ namespace Hermit.DataBindings
 
         #endregion
 
-        #region Events
+        #region View Action        
+
+        protected virtual (string eventEntry, MemberInfo memberInfo) DrawViewMethodsPopup(string viewMethodEntry,
+            bool declaredMethodsOnly)
+        {
+            var components = BindingBase.gameObject.GetComponents<Component>().ToList();
+            var data = new List<MemberInfo>();
+            var options = new List<string>();
+            var lookup = new List<string>();
+
+            // Fill data
+            foreach (var component in components)
+            {
+                if (component == BindingBase) { continue; }
+
+                var type = component.GetType();
+                var propertyAccessors = type.GetProperties(BindingFlags.Static | BindingFlags.Public)
+                    .SelectMany(p => p.GetAccessors());
+
+                var eventAccessors = type.GetEvents(BindingFlags.Static | BindingFlags.Public)
+                    .SelectMany(e => new[]
+                    {
+                        e.GetAddMethod(true),
+                        e.GetRemoveMethod(true)
+                    });
+
+                var accessors = propertyAccessors.Concat(eventAccessors);
+
+                var filter = BindingFlags.Instance | BindingFlags.Public;
+                if (declaredMethodsOnly) { filter |= BindingFlags.DeclaredOnly; }
+
+                var methodInfos = component.GetType().GetMethods(filter).Except(accessors);
+
+                foreach (var memberInfo in methodInfos)
+                {
+                    data.Add(memberInfo);
+                    lookup.Add($"{component.GetType()}.{memberInfo.Name}");
+                    options.Add($"{component.GetType().PrettyName()}/{memberInfo.Name} - [{memberInfo.Name}]");
+                }
+            }
+
+            var selection = lookup.IndexOf(viewMethodEntry);
+
+            using (var check = new EditorGUI.ChangeCheckScope())
+            {
+                selection = EditorGUILayout.Popup("Methods", selection, options.ToArray());
+
+                if (BindingEvent == null && selection >= 0) { BindingEvent = data[selection]; }
+
+                if (!check.changed) { return (viewMethodEntry, BindingEvent); }
+
+                BindingEvent = data[selection];
+                return (lookup[selection], BindingEvent);
+            }
+        }
+
+        #endregion
+
+        #region View Event
 
         protected virtual (string eventEntry, MemberInfo memberInfo) DrawViewEventPopup(string viewEventEntry)
         {
@@ -320,12 +392,7 @@ namespace Hermit.DataBindings
                 {
                     switch (memberInfo.MemberType)
                     {
-                        case MemberTypes.All:
-                        case MemberTypes.Constructor:
-                        case MemberTypes.Custom:
-                        case MemberTypes.Method:
-                        case MemberTypes.NestedType:
-                        case MemberTypes.TypeInfo:
+                        default:
                             continue;
                         case MemberTypes.Event:
                             break;
@@ -339,8 +406,6 @@ namespace Hermit.DataBindings
                             if (!typeof(UnityEventBase).IsAssignableFrom(propertyInfo?.PropertyType)) { continue; }
 
                             break;
-                        default:
-                            throw new ArgumentOutOfRangeException();
                     }
 
                     data.Add(memberInfo);
@@ -366,11 +431,92 @@ namespace Hermit.DataBindings
 
         #endregion
 
+        #region ViewModel Event
+
+        protected string DrawViewModelEventsPopup(string viewModelActionEntry, MemberInfo viewMethodInfo)
+        {
+            var data = new List<Component>();
+            var options = new List<string>();
+            var lookup = new List<string>();
+
+            var assemblies = AppDomain.CurrentDomain.GetAssemblies();
+            var viewModelTypes = new List<Type>();
+            var providerTypeLookup = new Dictionary<Type, IViewModelProvider>();
+            var memberInfoLookup = new Dictionary<MemberInfo, IViewModelProvider>();
+
+            var dataProviders = BindingBase.transform.GetComponentsInParent<IViewModelProvider>(true);
+
+            if (dataProviders.Length <= 0)
+            {
+                var oriCol = EditorStyles.label.normal.textColor;
+                EditorStyles.label.normal.textColor = Color.red;
+
+                EditorGUILayout.LabelField("View Model not found in context.");
+
+                EditorStyles.label.normal.textColor = oriCol;
+                return null;
+            }
+
+            foreach (var dataProvider in dataProviders)
+            {
+                foreach (var assembly in assemblies)
+                {
+                    var viewModelType = assembly.GetType(dataProvider.GetViewModelTypeName);
+                    if (viewModelType == null) { continue; }
+
+                    if (!viewModelTypes.Contains(viewModelType)) { viewModelTypes.Add(viewModelType); }
+
+                    providerTypeLookup[viewModelType] = dataProvider;
+                }
+            }
+
+            foreach (var viewModelType in viewModelTypes)
+            {
+                var members = viewModelType.GetMembers(BindingFlags.Instance | BindingFlags.Public);
+
+                foreach (var memberInfo in members)
+                {
+                    var valueName = "";
+                    var viewModelProvider = providerTypeLookup[viewModelType];
+                    switch (memberInfo.MemberType)
+                    {
+                        case MemberTypes.Event:
+                            valueName = memberInfo.Name;
+                            break;
+                        default:
+                            continue;
+                    }
+
+                    data.Add(viewModelProvider as Component);
+                    options.Add($"{viewModelProvider.GetViewModelTypeName}/{valueName}");
+                    lookup.Add($"{viewModelProvider.GetViewModelTypeName}.{valueName}");
+                }
+            }
+
+            var selection = lookup.IndexOf(viewModelActionEntry);
+
+            using (var check = new EditorGUI.ChangeCheckScope())
+            {
+                selection = EditorGUILayout.Popup("Events", selection, options.ToArray());
+
+                if (selection < 0) { return viewModelActionEntry; }
+
+                if (BindingBase.dataProviderComponent == null) { BindingBase.dataProviderComponent = data[selection]; }
+
+                if (!check.changed) { return viewModelActionEntry; }
+
+                BindingBase.dataProviderComponent = data[selection];
+                serializedObject.ApplyModifiedProperties();
+                return lookup[selection];
+            }
+        }
+
+        #endregion
+
         #region ViewModel Action
 
-        protected string DrawViewModelActionPopup(string viewModelActionEntry, MemberInfo eventMemberInfo)
+        protected string DrawViewModelActionPopup(string viewModelEventEntry, MemberInfo eventMemberInfo)
         {
-//            var extra = "";
             var arguments = new List<Type>();
             var options = new List<string>();
             var lookup = new List<string>();
@@ -401,20 +547,13 @@ namespace Hermit.DataBindings
 
             if (eventMemberInfo == null)
             {
-                using (new EditorGUI.DisabledScope(true)) { EditorGUILayout.Popup("Actions", -1, options.ToArray()); }
+                using (new EditorGUI.DisabledScope(true)) { EditorGUILayout.Popup("Events", -1, options.ToArray()); }
 
-                return viewModelActionEntry;
+                return viewModelEventEntry;
             }
 
             switch (eventMemberInfo.MemberType)
             {
-                case MemberTypes.All:
-                case MemberTypes.Constructor:
-                case MemberTypes.Custom:
-                case MemberTypes.Method:
-                case MemberTypes.NestedType:
-                case MemberTypes.TypeInfo:
-                    return null;
                 case MemberTypes.Event:
                     var eventInfo = eventMemberInfo as EventInfo;
                     var handlerType = eventInfo.EventHandlerType;
@@ -437,7 +576,7 @@ namespace Hermit.DataBindings
 
                     break;
                 default:
-                    throw new ArgumentOutOfRangeException();
+                    return null;
             }
 
             var dataProviders = BindingBase.transform.GetComponentsInParent<IViewModelProvider>(true);
@@ -497,21 +636,18 @@ namespace Hermit.DataBindings
                 lookup.Add($"{methodInfoTypeLookup[actionMethod].GetViewModelTypeName}.{actionMethod.Name}");
             }
 
-            var selection = lookup.IndexOf(viewModelActionEntry);
-
-//            EditorGUILayout.LabelField($"{eventMemberInfo.Name}/{eventMemberInfo.MemberType}/{extra}");
-//            EditorGUILayout.LabelField($"ArgumentsCount:{arguments.Count}/Arguments:{string.Join("-", arguments)}");
+            var selection = lookup.IndexOf(viewModelEventEntry);
 
             using (var check = new EditorGUI.ChangeCheckScope())
             {
-                selection = EditorGUILayout.Popup("Actions", selection, options.ToArray());
+                selection = EditorGUILayout.Popup("Events", selection, options.ToArray());
 
                 if (BindingBase.dataProviderComponent == null && selection >= 0)
                 {
                     BindingBase.dataProviderComponent = providerLookup[arguments.Count][selection];
                 }
 
-                if (!check.changed) { return viewModelActionEntry; }
+                if (!check.changed) { return viewModelEventEntry; }
 
                 BindingBase.dataProviderComponent = providerLookup[arguments.Count][selection];
                 serializedObject.ApplyModifiedProperties();
@@ -590,7 +726,7 @@ namespace Hermit.DataBindings
 
                             break;
                         default:
-                            throw new ArgumentOutOfRangeException();
+                            continue;
                     }
 
                     data.Add(viewModelProvider as Component);

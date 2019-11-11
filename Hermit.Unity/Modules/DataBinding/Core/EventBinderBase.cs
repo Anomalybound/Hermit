@@ -12,7 +12,7 @@ namespace Hermit.DataBinding
 
         public abstract void Disconnect();
 
-        public static IEventBinder CreateEventBinder(Component target, EventInfo eventInfo, Delegate action)
+        public static IEventBinder CreateEventBinder(object target, EventInfo eventInfo, Delegate action)
         {
             var handlerType = eventInfo.EventHandlerType;
             var invokeMethod = handlerType.GetMethod("Invoke");

@@ -38,6 +38,7 @@
   <ItemGroup>
     <Compile Include="Common\HermitKernelEditor.cs" />
     <Compile Include="Common\MonoServiceProviderEditor.cs" />
+    <Compile Include="DataBindings\ActionBindingEditor.cs" />
     <Compile Include="DataBindings\MethodBindingEditor.cs" />
     <Compile Include="Helpers\LayerUtility.cs" />
     <Compile Include="Helpers\TypeExtensions.cs" />
