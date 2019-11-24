@@ -1,4 +1,4 @@
-using System;
+using System.Threading.Tasks;
 
 namespace Hermit
 {
@@ -7,70 +7,55 @@ namespace Hermit
     /// </summary>
     public partial class Her
     {
-        #region Events
+        #region Registeration
 
-        #region No channel
-
-        public static void Subscribe<T>(Action<T> action)
+        public static void Listen(object obj)
         {
-            Current.EventBroker.Subscribe(action);
+            Current.EventBroker.Register(obj);
         }
 
-        public static void UnSubscribe<T>(Action<T> action, bool keepEvent = false)
+        public static void UnListen(object obj)
         {
-            Current.EventBroker.Unsubscribe(action, keepEvent);
-        }
-
-        public static void UnSubscribeAll(bool keepEvent = false)
-        {
-            Current.EventBroker.UnsubscribeAll(keepEvent);
-        }
-
-        public static void Publish<T>(T message)
-        {
-            Current.EventBroker.Publish(message);
+            Current.EventBroker.Unregister(obj);
         }
 
         #endregion
 
-        #region With Channel
+        #region Trigger
 
-        public static void Subscribe(string channel, Action action)
+        public static void Trigger(string endpoint, bool sticky = false)
         {
-            Current.EventBroker.Subscribe(channel, action);
+            Current.EventBroker.Trigger(endpoint, sticky);
         }
 
-        public static void Subscribe<T>(string channel, Action<T> action)
+        public static void Trigger<TEventData>(TEventData payloads, bool sticky = false)
+            where TEventData : EventData
         {
-            Current.EventBroker.Subscribe(channel, action);
+            Current.EventBroker.Trigger(payloads, sticky);
         }
 
-        public static void UnSubscribe(string channel, Action action, bool keepEvent = false)
+        public static void Trigger<TEventData>(string endpoint, TEventData payloads, bool sticky = false)
+            where TEventData : EventData
         {
-            Current.EventBroker.Unsubscribe(channel, action, keepEvent);
+            Current.EventBroker.Trigger(endpoint, payloads, sticky);
         }
 
-        public static void UnSubscribe<T>(string channel, Action<T> action, bool keepEvent = false)
+        public static Task TriggerAsync(string endpoint)
         {
-            Current.EventBroker.Unsubscribe(channel, action, keepEvent);
+            return Current.EventBroker.TriggerAsync(endpoint);
         }
 
-        public static void Publish(string channel)
+        public static Task TriggerAsync<TEventData>(TEventData payloads)
+            where TEventData : EventData
         {
-            Current.EventBroker.Publish(channel);
+            return Current.EventBroker.TriggerAsync(payloads);
         }
 
-        public static void Publish<T>(string channel, T message)
+        public static Task TriggerAsync<TEventData>(string endpoint, TEventData payloads)
+            where TEventData : EventData
         {
-            Current.EventBroker.Publish(channel, message);
+            return Current.EventBroker.TriggerAsync(endpoint, payloads);
         }
-
-        public static void UnSubscribeAll(string channel, bool keepEvent = false)
-        {
-            Current.EventBroker.UnsubscribeAll(channel, keepEvent);
-        }
-
-        #endregion
 
         #endregion
     }

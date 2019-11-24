@@ -1,5 +1,4 @@
-﻿using System.Linq;
-using System.Reflection;
+﻿using System.Reflection;
 using Hermit.Common;
 using Hermit.Injection;
 using UnityEditor;
@@ -33,7 +32,7 @@ namespace Hermit
                 kernelObj.GetComponent<HermitDataBindingServiceProvider>()
             };
             var fieldInfo =
-                typeof(HermitKernel).GetField("ServiceProviders", BindingFlags.NonPublic | BindingFlags.Instance);
+                typeof(HermitKernel).GetField("serviceProviders", BindingFlags.NonPublic | BindingFlags.Instance);
             fieldInfo?.SetValue(kernel, array);
 
             EditorUtility.SetDirty(kernelObj);

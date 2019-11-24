@@ -35,7 +35,7 @@
     <Compile Include="Modules\Misc\Singleton.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Common\Contexts\ContextBase.cs" />
-    <Compile Include="Services\Event\EventBroker.cs" />
+    <Compile Include="Services\Event\EventData.cs" />
     <Compile Include="Services\Event\IEventBroker.cs" />
     <Compile Include="Services\Store\DictionaryStore.cs" />
     <Compile Include="Services\Store\IStore.cs" />
@@ -49,6 +49,7 @@
     <Compile Include="Modules\ObjectPool\DefaultPooledObjectPolicy.cs" />
     <Compile Include="Modules\ObjectPool\IPooledObjectPolicy.cs" />
     <Compile Include="Modules\ObjectPool\ObjectPool.cs" />
+    <Compile Include="Vender\Extensions\DelegateExtensions.cs" />
     <Compile Include="Vender\Fsm\Builder\StateBuilder.cs" />
     <Compile Include="Vender\Fsm\Builder\StateMachineBuilder.cs" />
     <Compile Include="Vender\Fsm\Core\ContextState.cs" />

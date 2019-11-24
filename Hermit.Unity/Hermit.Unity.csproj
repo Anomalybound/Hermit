@@ -59,6 +59,15 @@
     <Compile Include="Facade\HerInjection.cs" />
     <Compile Include="Facade\HerLog.cs" />
     <Compile Include="Facade\HerUI.cs" />
+    <Compile Include="Services\Event\EventBroker.cs" />
+    <Compile Include="Services\Event\EventConstants.cs" />
+    <Compile Include="Services\Event\EventNode.cs" />
+    <Compile Include="Services\Event\EventNodeHelper.cs" />
+    <Compile Include="Services\Event\MainThreadDispatcher.cs" />
+    <Compile Include="Services\Event\SubscribeAttribute.cs" />
+    <Compile Include="Services\Event\Subscription.cs" />
+    <Compile Include="Services\Event\SubscriptionHelper.cs" />
+    <Compile Include="Services\Event\ThreadMode.cs" />
     <Compile Include="Services\Log\UnityLog.cs" />
     <Compile Include="Services\Time\UnityTime.cs" />
     <Compile Include="Services\View\Abstractions\IViewManager.cs" />

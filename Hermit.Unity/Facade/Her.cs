@@ -11,7 +11,7 @@ namespace Hermit
 {
     public sealed partial class Her
     {
-        public static readonly Version Version = new Version("0.3.1");
+        public static readonly Version Version = new Version("0.4.0");
 
         public static Her Current
         {
@@ -58,7 +58,7 @@ namespace Hermit
         public Her()
         {
             Logger = UnityLog.Instance;
-            EventBroker = Services.EventBroker.Instance;
+            EventBroker = Hermit.EventBroker.Default;
         }
 
         [Inject]

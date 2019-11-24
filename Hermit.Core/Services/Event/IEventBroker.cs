@@ -1,97 +1,35 @@
 ﻿using System;
+using System.Threading.Tasks;
 
 namespace Hermit
 {
     public interface IEventBroker
     {
-        #region No channel specified
+        #region Register
 
-        /// <summary>
-        /// Subscribe callback to be raised on specific event.
-        /// </summary>
-        /// <param name="eventAction"></param>
-        /// <typeparam name="T"></typeparam>
-        void Subscribe<T>(Action<T> eventAction);
+        void Register(object obj);
 
-        /// <summary>
-        /// Unsubscribe callback.
-        /// </summary>
-        /// <param name="eventAction"></param>
-        /// <typeparam name="T"></typeparam>
-        void UnSubscribe<T>(Action<T> eventAction);
-
-        /// <summary>
-        /// Unsubscribe callback.
-        /// </summary>
-        /// <param name="eventAction">Event action.</param>
-        /// <param name="keepEvent">GC optimization - clear only callback list and keep event for future use.</param>
-        void Unsubscribe<T>(Action<T> eventAction, bool keepEvent = false);
-
-        /// <summary>
-        /// Unsubscribe all callbacks from event.
-        /// </summary>
-        /// <param name="keepEvent"></param>
-        void UnsubscribeAll(bool keepEvent = false);
-
-        /// <summary>
-        /// Publish event.
-        /// </summary>
-        /// <param name="eventMessage">Event message.</param>
-        void Publish<T>(T eventMessage);
+        void Unregister(object obj);
 
         #endregion
 
-        #region Channel specified
+        #region Trigger
 
-        /// <summary>
-        /// Subscribe callback to be raised on specific event.
-        /// </summary>
-        /// <param name="channel"></param>
-        /// <param name="eventAction">Callback.</param>
-        void Subscribe<T>(string channel, Action<T> eventAction);
+        void Trigger(string endpoint, bool sticky = false);
 
-        /// <summary>
-        /// Subscribe callback to be raised on specific event.
-        /// </summary>
-        /// <param name="channel"></param>
-        /// <param name="eventAction"></param>
-        void Subscribe(string channel, Action eventAction);
+        void Trigger<TEventData>(TEventData payloads, bool sticky = false)
+            where TEventData : EventData;
 
-        /// <summary>
-        /// Unsubscribe callback.
-        /// </summary>
-        /// <param name="channel"></param>
-        /// <param name="eventAction">Event action.</param>
-        /// <param name="keepEvent">GC optimization - clear only callback list and keep event for future use.</param>
-        void Unsubscribe<T>(string channel, Action<T> eventAction, bool keepEvent = false);
+        void Trigger<TEventData>(string endpoint, TEventData payloads, bool sticky = false)
+            where TEventData : EventData;
 
-        /// <summary>
-        /// Unsubscribe callback.
-        /// </summary>
-        /// <param name="channel"></param>
-        /// <param name="eventAction">Event action.</param>
-        /// <param name="keepEvent">GC optimization - clear only callback list and keep event for future use.</param>
-        void Unsubscribe(string channel, Action eventAction, bool keepEvent = false);
+        Task TriggerAsync(string endpoint);
 
-        /// <summary>
-        /// Unsubscribe all callbacks from event.
-        /// </summary>
-        /// <param name="channel"></param>
-        /// <param name="keepEvent">GC optimization - clear only callback list and keep event for future use.</param>
-        void UnsubscribeAll(string channel, bool keepEvent = false);
+        Task TriggerAsync<TEventData>(TEventData payloads)
+            where TEventData : EventData;
 
-        /// <summary>
-        /// Publish event.
-        /// </summary>
-        /// <param name="channel"></param>
-        /// <param name="eventMessage">Event message.</param>
-        void Publish<T>(string channel, T eventMessage);
-
-        /// <summary>
-        /// Publish event.
-        /// </summary>
-        /// <param name="channel"></param>
-        void Publish(string channel);
+        Task TriggerAsync<TEventData>(string endpoint, TEventData payloads)
+            where TEventData : EventData;
 
         #endregion
     }
