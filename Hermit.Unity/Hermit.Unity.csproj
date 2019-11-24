@@ -38,6 +38,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Common\HermitGeneralSettings.cs" />
     <Compile Include="Common\ServiceProvider\HermitDataBindingServiceProvider.cs" />
     <Compile Include="Common\ServiceProvider\HermitKernelServiceProvider.cs" />
     <Compile Include="Facade\HerStore.cs" />

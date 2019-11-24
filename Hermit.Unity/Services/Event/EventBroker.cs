@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -15,10 +17,14 @@ namespace Hermit
 
         #region Runtime variables
 
+        private object _locker = new object();
+
         private readonly EventNode _rootNode = new EventNode("Root");
 
         public readonly ConcurrentDictionary<string, EventData> StickyEvents =
             new ConcurrentDictionary<string, EventData>();
+
+        private readonly List<object> _registeredObjects = new List<object>();
 
         #endregion
 
@@ -26,6 +32,13 @@ namespace Hermit
 
         public void Register(object obj)
         {
+            lock (_locker)
+            {
+                if (_registeredObjects.Contains(obj)) { return; }
+
+                _registeredObjects.Add(obj);
+            }
+
             var subscriptions = SubscriptionHelper.FindSubscriber(obj);
             foreach (var subscription in subscriptions)
             {
@@ -41,6 +54,13 @@ namespace Hermit
 
         public void Unregister(object obj)
         {
+            lock (_locker)
+            {
+                if (!_registeredObjects.Contains(obj)) { return; }
+
+                _registeredObjects.Remove(obj);
+            }
+
             var subscriptions = SubscriptionHelper.FindSubscriber(obj);
             foreach (var subscription in subscriptions) { EventNode.RemoveSubscription(_rootNode, subscription); }
         }

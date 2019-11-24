@@ -54,6 +54,8 @@ namespace Hermit
         private IDependencyContainer Container { get; set; }
 
         private IViewManager ViewManager { get; set; }
+        
+        private HermitGeneralSettings GeneralSettings { get; set; }
 
         public Her()
         {
@@ -62,11 +64,12 @@ namespace Hermit
         }
 
         [Inject]
-        public void Injection(IDependencyContainer container, IViewManager viewManager)
+        public void Injection(IDependencyContainer container, IViewManager viewManager, HermitGeneralSettings generalSettings)
         {
             Container = container;
             ViewManager = viewManager;
-
+            GeneralSettings = generalSettings;
+            
             // Setup stores
             var store = container.Resolve<IStore>();
             store.SetStoreId("Global");
