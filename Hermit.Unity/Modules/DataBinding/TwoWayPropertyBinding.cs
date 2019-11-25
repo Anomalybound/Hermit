@@ -150,12 +150,12 @@ namespace Hermit
         {
             PropertyChanging = true;
 
-            var rawValue = ViewGetter.Invoke();
+            var rawValue = ViewGetter.Invoke(ComponentInstance);
             var convertedValue = ViewModelAdapterOptions != null
                 ? ViewAdapterInstance?.Convert(rawValue, ViewModelAdapterOptions)
                 : ViewAdapterInstance?.Convert(rawValue);
 
-            ViewModelSetter.Invoke(ViewModelAdapter != null ? convertedValue : rawValue);
+            ViewModelSetter.Invoke(ViewModelInstance, ViewModelAdapter != null ? convertedValue : rawValue);
 
             PropertyChanging = false;
         }

@@ -67,17 +67,20 @@ namespace Hermit
 
         protected string ViewModelMemberName;
 
-        protected Action<object> ViewSetter;
+        protected Action<object, object> ViewSetter;
 
-        protected Func<object> ViewGetter;
+        protected Func<object, object> ViewGetter;
 
-        protected Action<object> ViewModelSetter;
+        protected Action<object, object> ViewModelSetter;
 
-        protected Func<object> ViewModelGetter;
+        protected Func<object, object> ViewModelGetter;
 
         protected IAdapter ViewAdapterInstance;
 
         protected bool PropertyChanging;
+
+        protected UnityEngine.Component ComponentInstance;
+        protected ViewModel ViewModelInstance;
 
         #endregion
 
@@ -120,12 +123,12 @@ namespace Hermit
 
         protected void UpdateProperty()
         {
-            var rawValue = ViewModelGetter.Invoke();
+            var rawValue = ViewModelGetter.Invoke(ComponentInstance);
             var convertedValue = viewAdapterOptions != null
                 ? ViewAdapterInstance?.Convert(rawValue, viewAdapterOptions)
                 : ViewAdapterInstance?.Convert(rawValue);
 
-            ViewSetter.Invoke(ViewAdapterInstance != null ? convertedValue : rawValue);
+            ViewSetter.Invoke(ComponentInstance, ViewAdapterInstance != null ? convertedValue : rawValue);
         }
 
         protected void GetViewAdapterInstance()
@@ -140,18 +143,25 @@ namespace Hermit
             #region View 
 
             var (component, memberInfo) = ParseViewEntry(this, ViewEntry);
-
+            ComponentInstance = component;
+            
             switch (memberInfo.MemberType)
             {
                 case MemberTypes.Field:
                     var fieldInfo = memberInfo as FieldInfo;
-                    ViewSetter = value => fieldInfo?.SetValue(component, value);
-                    ViewGetter = () => fieldInfo?.GetValue(component);
+//                    ViewSetter = value => fieldInfo?.SetValue(component, value);
+//                    ViewGetter = () => fieldInfo?.GetValue(component);
+
+                    ViewSetter = fieldInfo.CreateSetter();
+                    ViewGetter = fieldInfo.CreateGetter();
                     break;
                 case MemberTypes.Property:
                     var propertyInfo = memberInfo as PropertyInfo;
-                    ViewSetter = value => propertyInfo?.SetValue(component, value);
-                    ViewGetter = () => propertyInfo?.GetValue(component);
+//                    ViewSetter = value => propertyInfo?.SetValue(component, value);
+//                    ViewGetter = () => propertyInfo?.GetValue(component);
+
+                    ViewSetter = propertyInfo.CreateSetter();
+                    ViewGetter = propertyInfo.CreateGetter();
                     break;
                 default:
                     throw new Exception(
@@ -163,20 +173,25 @@ namespace Hermit
             #region View Model
 
             memberInfo = ParseViewModelEntry(ViewModel, ViewModelEntry);
-
+            ViewModelInstance = ViewModel;
             ViewModelMemberName = memberInfo.Name;
 
             switch (memberInfo.MemberType)
             {
                 case MemberTypes.Field:
                     var fieldInfo = memberInfo as FieldInfo;
-                    ViewModelGetter = () => fieldInfo?.GetValue(ViewModel);
-                    ViewModelSetter = value => fieldInfo?.SetValue(ViewModel, value);
+//                    ViewModelGetter = () => fieldInfo?.GetValue(ViewModel);
+//                    ViewModelSetter = value => fieldInfo?.SetValue(ViewModel, value);
+                    ViewModelGetter = fieldInfo.CreateGetter();
+                    ViewModelSetter = fieldInfo.CreateSetter();
                     break;
                 case MemberTypes.Property:
                     var propertyInfo = memberInfo as PropertyInfo;
-                    ViewModelGetter = () => propertyInfo?.GetValue(ViewModel);
-                    ViewModelSetter = value => propertyInfo?.SetValue(ViewModel, value);
+//                    ViewModelGetter = () => propertyInfo?.GetValue(ViewModel);
+//                    ViewModelSetter = value => propertyInfo?.SetValue(ViewModel, value);
+                    ViewModelGetter = propertyInfo.CreateGetter();
+                    ViewModelSetter = propertyInfo.CreateSetter();
+                    
                     break;
                 default:
                     throw new Exception(
