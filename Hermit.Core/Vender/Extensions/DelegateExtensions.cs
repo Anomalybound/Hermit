@@ -122,11 +122,9 @@ namespace Hermit
         public static Func<object, object> CreateGetter(this PropertyInfo propertyInfo)
         {
             var type = propertyInfo.DeclaringType;
-            var propGetMethod = propertyInfo.GetGetMethod(nonPublic: true);
+            var propGetMethod = propertyInfo.GetGetMethod();
             var propType = propertyInfo.PropertyType;
-
-            var dynamicMethod = new DynamicMethod("m", typeof(object), new[] {typeof(object)}, type.Module);
-
+            var dynamicMethod = new DynamicMethod("Getter", typeof(object), new[] {typeof(object)}, type.Module);
             var iLGenerator = dynamicMethod.GetILGenerator();
 
             iLGenerator.Emit(OpCodes.Ldarg_0);
@@ -140,24 +138,35 @@ namespace Hermit
 
         public static Action<object, object> CreateSetter(this PropertyInfo propertyInfo)
         {
-            var type = propertyInfo.DeclaringType;
-            var propSetMethod = propertyInfo.GetSetMethod(nonPublic: true);
-            var propType = propertyInfo.PropertyType;
+//            var type = propertyInfo.DeclaringType;
+//            var propertyType = propertyInfo.PropertyType;
+//            var propSetMethod = propertyInfo.GetSetMethod();
+//            var dynamicMethod = new DynamicMethod("Setter", typeof(void),
+//                new[] {typeof(object), typeof(object)}, type.Module);
+//            var iLGenerator = dynamicMethod.GetILGenerator();
+//
+//            iLGenerator.Emit(OpCodes.Ldarg_0);
+//            iLGenerator.Emit(OpCodes.Castclass, type);
+//            iLGenerator.Emit(propertyType.IsValueType ? OpCodes.Unbox_Any : OpCodes.Castclass, propertyType);
+//            iLGenerator.Emit(OpCodes.Ldarg_1);
+//            iLGenerator.Emit(OpCodes.Call, propSetMethod);
+//            iLGenerator.Emit(OpCodes.Ret);
+//
+//            return (Action<object, object>) dynamicMethod.CreateDelegate(typeof(Action<object, object>));
+            var expParamPo = Expression.Parameter(typeof(object), "p");
+            var expParamPc = Expression.Convert(expParamPo, propertyInfo.DeclaringType);
 
-            var dynamicMethod =
-                new DynamicMethod("m", typeof(object), new[] {typeof(object), typeof(object)}, type.Module);
+            var expParamV = Expression.Parameter(typeof(object), "v");
+            var expParamVc = Expression.Convert(expParamV, propertyInfo.PropertyType);
 
-            var iLGenerator = dynamicMethod.GetILGenerator();
-            var local0 = iLGenerator.DeclareLocal(propType);
+            var expMma = Expression.Call(
+                expParamPc
+                , propertyInfo.GetSetMethod()
+                , expParamVc
+            );
 
-            iLGenerator.Emit(OpCodes.Ldarg_0);
-            iLGenerator.Emit(OpCodes.Ldarg_1);
-            iLGenerator.Emit(OpCodes.Castclass, type);
-            iLGenerator.Emit(OpCodes.Call, propSetMethod);
-            iLGenerator.Emit(OpCodes.Box, propType);
-            iLGenerator.Emit(OpCodes.Ret );
-
-            return (Action<object, object>) dynamicMethod.CreateDelegate(typeof(Action<object, object>));
+            var exp = Expression.Lambda<Action<object, object>>(expMma, expParamPo, expParamV);
+            return exp.Compile();
         }
 
         public static Func<S, T> CreateGetter<S, T>(this PropertyInfo propertyInfo)

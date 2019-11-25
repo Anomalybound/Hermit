@@ -156,7 +156,6 @@ namespace Hermit
                 : ViewAdapterInstance?.Convert(rawValue);
 
             ViewModelSetter.Invoke(ViewModelInstance, ViewModelAdapter != null ? convertedValue : rawValue);
-
             PropertyChanging = false;
         }
     }

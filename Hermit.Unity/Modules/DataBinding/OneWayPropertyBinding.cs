@@ -123,7 +123,7 @@ namespace Hermit
 
         protected void UpdateProperty()
         {
-            var rawValue = ViewModelGetter.Invoke(ComponentInstance);
+            var rawValue = ViewModelGetter.Invoke(ViewModelInstance);
             var convertedValue = viewAdapterOptions != null
                 ? ViewAdapterInstance?.Convert(rawValue, viewAdapterOptions)
                 : ViewAdapterInstance?.Convert(rawValue);
