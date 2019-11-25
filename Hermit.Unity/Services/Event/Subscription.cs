@@ -41,7 +41,7 @@ namespace Hermit
         public int CompareTo(Subscription other)
         {
             if (ReferenceEquals(this, other)) return 0;
-            return ReferenceEquals(null, other) ? 1 : Priority.CompareTo(other.Priority);
+            return other?.Priority.CompareTo(Priority) ?? 1;
         }
     }
 }

@@ -26,7 +26,15 @@ namespace Hermit
                 var endpoint = endpoints[i];
                 var lastElement = i == endpoints.Length - 1;
                 var wildcard = endpoint.Equals("*");
-                if (lastElement && wildcard) { ret = cursor.Children.Values.ToArray(); }
+
+                if (wildcard && !lastElement) { throw new Exception($"Endpoint is not valid: {targetEndpoint}"); }
+
+                if (lastElement && wildcard)
+                {
+                    var list = new List<EventNode>();
+                    AddChildren(cursor, list);
+                    ret = list.ToArray();
+                }
                 else
                 {
                     if (!cursor.Children.TryGetValue(endpoint, out var child))
@@ -45,6 +53,15 @@ namespace Hermit
 
             Mapping.TryAdd(targetEndpoint, ret);
             return ret;
+        }
+
+        private static void AddChildren(EventNode node, ICollection<EventNode> list)
+        {
+            foreach (var nodeChild in node.Children.Values)
+            {
+                list.Add(nodeChild);
+                AddChildren(nodeChild, list);
+            }
         }
     }
 }

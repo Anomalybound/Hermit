@@ -32,10 +32,12 @@
     <Reference Include="System" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Modules\Pool\EventPool.cs" />
     <Compile Include="Modules\Misc\Singleton.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Common\Contexts\ContextBase.cs" />
     <Compile Include="Services\Event\EventData.cs" />
+    <Compile Include="Services\Event\HermitEventData.cs" />
     <Compile Include="Services\Event\IEventBroker.cs" />
     <Compile Include="Services\Store\DictionaryStore.cs" />
     <Compile Include="Services\Store\IStore.cs" />

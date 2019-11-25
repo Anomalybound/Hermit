@@ -29,8 +29,9 @@ namespace Hermit.Procedure
 
         protected override IState BuildState()
         {
+            HermitEvent.Send(HermitEvent.ProcedureBuildStateStarted);
+            
             var root = new State();
-
             var context = Context.GlobalContext;
 
             var types = GetType().Assembly.GetTypes()
@@ -76,7 +77,8 @@ namespace Hermit.Procedure
                 Her.Warn($"Procedure of [{InitState}] is no available, change to {first} instead.");
                 ChangeState(first);
             }
-
+            
+            HermitEvent.Send(HermitEvent.ProcedureBuildStateFinished);
             return Root;
         }
 

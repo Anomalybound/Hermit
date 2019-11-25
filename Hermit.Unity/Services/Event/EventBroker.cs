@@ -17,7 +17,7 @@ namespace Hermit
 
         #region Runtime variables
 
-        private object _locker = new object();
+        private readonly object _locker = new object();
 
         private readonly EventNode _rootNode = new EventNode("Root");
 
@@ -77,7 +77,7 @@ namespace Hermit
         public void Trigger<TEventData>(TEventData payloads, bool sticky = false)
             where TEventData : EventData
         {
-            Trigger(EventConstants.DefaultEndpoint, payloads, sticky);
+            Trigger(HermitEvent.DefaultEndpoint, payloads, sticky);
         }
 
         public void Trigger<TEventData>(string endpoint, TEventData payloads, bool sticky = false)
@@ -89,11 +89,7 @@ namespace Hermit
             var subscriptions = eventNodes.SelectMany(e => e.GetSubscriptions()).ToList();
             subscriptions.Sort();
 
-            foreach (var subscription in subscriptions)
-            {
-                TriggerEvent(subscription, payloads);
-                if (!payloads.Propagation) { return; }
-            }
+            foreach (var subscription in subscriptions) { TriggerEvent(subscription, payloads); }
         }
 
         public async Task TriggerAsync(string endpoint)
@@ -104,7 +100,7 @@ namespace Hermit
         public async Task TriggerAsync<TEventData>(TEventData payloads)
             where TEventData : EventData
         {
-            await TriggerAsync(EventConstants.DefaultEndpoint, payloads);
+            await TriggerAsync(HermitEvent.DefaultEndpoint, payloads);
         }
 
         public async Task TriggerAsync<TEventData>(string endpoint, TEventData payloads)
@@ -114,11 +110,7 @@ namespace Hermit
             var subscriptions = eventNodes.SelectMany(e => e.GetSubscriptions()).ToList();
             subscriptions.Sort();
 
-            foreach (var subscription in subscriptions)
-            {
-                await TriggerEventAsync(subscription, payloads);
-                if (!payloads.Propagation) { return; }
-            }
+            foreach (var subscription in subscriptions) { await TriggerEventAsync(subscription, payloads); }
         }
 
         #endregion
@@ -135,8 +127,6 @@ namespace Hermit
         private static void TriggerEvent<TEventData>(Subscription subscription, TEventData data)
             where TEventData : EventData
         {
-            if (data == null || !data.Propagation) { return; }
-
             var eventDataType = typeof(TEventData);
             var methodName = subscription.MethodName;
             var subEventType = subscription.EventDataType;
@@ -164,8 +154,6 @@ namespace Hermit
         private static async Task TriggerEventAsync<TEventData>(Subscription subscription, TEventData data)
             where TEventData : EventData
         {
-            if (!data.Propagation) { return; }
-
             var eventDataType = typeof(TEventData);
             var methodName = subscription.MethodName;
             var subEventType = subscription.EventDataType;

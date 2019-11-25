@@ -25,15 +25,14 @@ namespace Hermit.Injection
 
         protected virtual void RegisterServices()
         {
+            HermitEvent.Send(HermitEvent.ServiceRegisterStarted);
+
             if (Context.GlobalContext == null) { Context.SetCurrentContext(this); }
 
             if (serviceProviders == null || serviceProviders.Length == 0)
             {
                 serviceProviders = GetComponentsInChildren<MonoServiceProvider>();
             }
-
-            var sw = Stopwatch.StartNew();
-            sw.Start();
 
             foreach (var provider in serviceProviders)
             {
@@ -43,15 +42,13 @@ namespace Hermit.Injection
             }
 
             Container.Build();
-            sw.Stop();
 
-            Debug.LogFormat($"Services registration finished, cost : {sw.ElapsedMilliseconds}ms. ");
+            HermitEvent.Send(HermitEvent.ServiceRegisterFinished);
         }
 
         protected virtual void InitServices()
         {
-            var sw = Stopwatch.StartNew();
-            sw.Start();
+            HermitEvent.Send(HermitEvent.ServiceInjectionStarted);
             foreach (var provider in serviceProviders)
             {
                 if (provider == null) { continue; }
@@ -69,8 +66,7 @@ namespace Hermit.Injection
                 }
             }
 
-            sw.Stop();
-            Debug.LogFormat($"Services initialization finished, cost : {sw.ElapsedMilliseconds}ms. ");
+            HermitEvent.Send(HermitEvent.ServiceInjectionFinished);
         }
 
         #region Imeplementation of IContext

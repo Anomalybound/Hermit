@@ -1,14 +1,16 @@
+using System;
+
 namespace Hermit
 {
     public class EventData
     {
         public static readonly EventData Empty = new EventData();
-        
-        public bool Propagation { get; private set; } = true;
 
-        public void StopPropagation()
+        public DateTime SentTime { get; set; }
+
+        protected EventData()
         {
-            Propagation = false;
+            SentTime = DateTime.Now;
         }
     }
 }

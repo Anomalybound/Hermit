@@ -1,0 +1,26 @@
+namespace Hermit
+{
+    public class HermitEvent
+    {
+        public const string DefaultEndpoint = "Default";
+
+        // Register services
+        public const string ServiceInjectionStarted = "Hermit.Service.RegisterStarted";
+        public const string ServiceInjectionFinished = "Hermit.Service.InjectionFinished";
+
+        // Inject services
+        public const string ServiceRegisterStarted = "Hermit.Service.RegisterStarted";
+        public const string ServiceRegisterFinished = "Hermit.Service.RegisterFinished";
+        
+        // Procedure
+        public const string ProcedureBuildStateStarted = "Hermit.Procedure.BuildStateStarted";
+        public const string ProcedureBuildStateFinished = "Hermit.Procedure.BuildStateFinished";
+        
+        internal static void Send(string endpoint, string msg = null)
+        {
+            var eventData = EventPool<HermitEventData>.Rent();
+            eventData.Message = msg;
+            Her.Trigger(endpoint, eventData);
+        }
+    }
+}

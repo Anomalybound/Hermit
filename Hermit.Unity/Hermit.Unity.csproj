@@ -61,9 +61,9 @@
     <Compile Include="Facade\HerLog.cs" />
     <Compile Include="Facade\HerUI.cs" />
     <Compile Include="Services\Event\EventBroker.cs" />
-    <Compile Include="Services\Event\EventConstants.cs" />
     <Compile Include="Services\Event\EventNode.cs" />
     <Compile Include="Services\Event\EventNodeHelper.cs" />
+    <Compile Include="Services\Event\HermitEvent.cs" />
     <Compile Include="Services\Event\MainThreadDispatcher.cs" />
     <Compile Include="Services\Event\SubscribeAttribute.cs" />
     <Compile Include="Services\Event\Subscription.cs" />

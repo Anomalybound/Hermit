@@ -5,7 +5,7 @@ namespace Hermit
     [AttributeUsage(AttributeTargets.Method)]
     public sealed class SubscribeAttribute : Attribute
     {
-        public string Endpoint { get; set; } = EventConstants.DefaultEndpoint;
+        public string Endpoint { get; set; } = HermitEvent.DefaultEndpoint;
 
         public ThreadMode Mode { get; set; } = ThreadMode.Main;
 
