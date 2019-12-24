@@ -1,4 +1,4 @@
-﻿using System;
+﻿﻿using System;
 using System.Threading.Tasks;
 using UnityEngine;
 
@@ -7,7 +7,7 @@ namespace Hermit.UIStack
     public abstract class Widget : MonoBehaviour, IWidget
     {
         [SerializeField]
-        private UILayer layer = UILayer.Window;
+        private UILayer layer = UILayer.Background;
 
         public string Path { get; private set; }
 
@@ -15,13 +15,10 @@ namespace Hermit.UIStack
 
         protected IUIStack IuiStack { get; private set; }
 
-        protected UIMessage Message { get; private set; } = UIMessage.Empty;
-
-        public virtual void SetManagerInfo(string path, IUIStack manager, UIMessage message)
+        public virtual void SetUpWidgetInfo(string path, IUIStack manager)
         {
             Path = path;
             IuiStack = manager;
-            Message = message;
         }
 
         public virtual void SetUpViewInfo()

@@ -1,4 +1,4 @@
-﻿using System.Threading.Tasks;
+﻿﻿using System.Threading.Tasks;
 
 namespace Hermit.UIStack
 {
@@ -14,6 +14,6 @@ namespace Hermit.UIStack
 
         void DestroyWidget();
 
-        void SetManagerInfo(string path, IUIStack manager, UIMessage message);
+        void SetUpWidgetInfo(string path, IUIStack manager);
     }
 }

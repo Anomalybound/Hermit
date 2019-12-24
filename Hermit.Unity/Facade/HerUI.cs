@@ -9,24 +9,14 @@ namespace Hermit
 
         public static async Task<IView> PushUIAsync(string widgetName)
         {
-            return await PushUIAsync(widgetName, UIMessage.Empty);
-        }
-
-        public static async Task<IView> PushUIAsync(string widgetName, UIMessage message)
-        {
-            var id = await Current.UIStack.PushAsync(widgetName, message);
+            var id = await Current.UIStack.PushAsync(widgetName);
             return Current.ViewManager.GetView(id);
         }
 
-        public static async Task<IView> PushUIAsync<TWidget>(string widgetName) where TWidget : Widget
-        {
-            return await PushUIAsync<TWidget>(widgetName, UIMessage.Empty);
-        }
-
-        public static async Task<IView> PushUIAsync<TWidget>(string widgetName, UIMessage message)
+        public static async Task<IView> PushUIAsync<TWidget>(string widgetName)
             where TWidget : Widget
         {
-            var id = await Current.UIStack.PushAsync<TWidget>(widgetName, message);
+            var id = await Current.UIStack.PushAsync<TWidget>(widgetName);
             return Current.ViewManager.GetView(id);
         }
 

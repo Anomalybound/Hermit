@@ -50,7 +50,6 @@
     <Compile Include="Modules\UIStack\Abstractions\IWidget.cs" />
     <Compile Include="Modules\UIStack\Abstractions\IWidgetFactory.cs" />
     <Compile Include="Modules\UIStack\DefaultWidgetFactory.cs" />
-    <Compile Include="Modules\UIStack\UIMessage.cs" />
     <Compile Include="Modules\UIStack\UIStackManager.cs" />
     <Compile Include="Modules\UIStack\Widget.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

@@ -1,4 +1,4 @@
-﻿using System;
+﻿﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using UnityEngine;
@@ -23,7 +23,8 @@ namespace Hermit.UIStack
         Hidden = -1,
         Background = 0,
         Window = 1,
-        Popup = 2
+        Popup = 2,
+        Item = 10,
     }
 
     public class UIStackManager : MonoBehaviour, IUIStack
@@ -119,17 +120,15 @@ namespace Hermit.UIStack
 
         #region Push
 
-        public async Task<ulong> PushAsync(string widgetName, UIMessage message,
-            IWidgetFactory factory = null)
+        public async Task<ulong> PushAsync(string widgetName, IWidgetFactory factory = null)
         {
-            return await PushAsync<Widget>(widgetName, message, factory);
+            return await PushAsync<Widget>(widgetName, factory);
         }
 
-        public async Task<ulong> PushAsync<TWidget>(string widgetName, UIMessage message,
-            IWidgetFactory factory = null)
+        public async Task<ulong> PushAsync<TWidget>(string widgetName, IWidgetFactory factory = null)
             where TWidget : Widget
         {
-            var instance = await GetInstance<TWidget>(widgetName, message, factory);
+            var instance = await GetInstance<TWidget>(widgetName, factory);
             var parent = _layerLookup[instance.Layer];
             instance.transform.SetParent(parent.transform, false);
 
@@ -256,7 +255,7 @@ namespace Hermit.UIStack
 
         #region Internal Funtions
 
-        private async Task<TWidget> GetInstance<TWidget>(string widgetPath, UIMessage message,
+        private async Task<TWidget> GetInstance<TWidget>(string widgetPath,
             IWidgetFactory factory = null)
             where TWidget : Widget
         {
@@ -273,7 +272,7 @@ namespace Hermit.UIStack
             if (factory == null) { factory = _defaultFactory; }
 
             TWidget widget;
-            try { widget = (TWidget) await factory.CreateInstance(this, widgetPath, message); }
+            try { widget = (TWidget) await factory.CreateInstance(this, widgetPath); }
             catch (Exception e)
             {
                 Her.Error(e);

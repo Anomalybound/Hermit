@@ -16,7 +16,7 @@ namespace Hermit
 
         protected IViewManager ViewManager { get; }
 
-        protected Dictionary<object, GameObject> InstantiatedGameObjects = new Dictionary<object, GameObject>();
+        protected readonly Dictionary<object, GameObject> InstantiatedGameObjects = new Dictionary<object, GameObject>();
 
         public DefaultCollectionChangedHandler()
         {
