@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Hermit
+namespace Hermit.View
 {
     public sealed class ViewManager : Singleton<ViewManager>, IViewManager
     {

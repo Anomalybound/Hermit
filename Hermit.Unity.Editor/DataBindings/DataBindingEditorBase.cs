@@ -4,6 +4,7 @@ using System.Collections.Specialized;
 using System.Linq;
 using System.Reflection;
 using Hermit.DataBinding;
+using Hermit.View;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.Events;

@@ -1,4 +1,5 @@
-﻿using System.Reflection;
+﻿using System;
+using System.Reflection;
 using Hermit.Common;
 using Hermit.Injection;
 using UnityEditor;
@@ -22,14 +23,16 @@ namespace Hermit
             }
 
             var kernelObj = new GameObject("Hermit Kernel",
-                typeof(HermitKernel), typeof(HermitKernelServiceProvider), typeof(HermitDataBindingServiceProvider)
+                typeof(HermitKernel), typeof(HermitKernelServiceProvider), typeof(HermitDataBindingServiceProvider),
+                typeof(HermitUIServiceProvider)
             );
             kernel = kernelObj.GetComponent<HermitKernel>();
 
             var array = new MonoServiceProvider[]
             {
                 kernelObj.GetComponent<HermitKernelServiceProvider>(),
-                kernelObj.GetComponent<HermitDataBindingServiceProvider>()
+                kernelObj.GetComponent<HermitDataBindingServiceProvider>(),
+                kernelObj.GetComponent<HermitUIServiceProvider>()
             };
             var fieldInfo =
                 typeof(HermitKernel).GetField("serviceProviders", BindingFlags.NonPublic | BindingFlags.Instance);

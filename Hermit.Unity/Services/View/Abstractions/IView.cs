@@ -1,14 +1,16 @@
 using UnityEngine;
 
-namespace Hermit
+namespace Hermit.View
 {
     public interface IView
     {
         ulong ViewId { get; }
 
-        GameObject ViewObject { get; }
+        // ReSharper disable once InconsistentNaming
+        GameObject gameObject { get; }
 
-        Component ViewComponent { get; }
+        // ReSharper disable once InconsistentNaming
+        Component component { get; }
 
         void SetUpViewInfo();
 

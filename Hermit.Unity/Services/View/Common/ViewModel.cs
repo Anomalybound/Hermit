@@ -1,13 +1,17 @@
-﻿using System.Collections.Concurrent;
+﻿using System;
+using System.Collections.Concurrent;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using JetBrains.Annotations;
 
-namespace Hermit
+namespace Hermit.View
 {
-    public sealed class EmptyViewModel : ViewModel { }
+    public sealed class EmptyViewModel : ViewModel
+    {
+        public override void Dispose() { }
+    }
 
-    public abstract class ViewModel : INotifyPropertyChanged, INotifyPropertyChanging
+    public abstract class ViewModel : INotifyPropertyChanged, INotifyPropertyChanging, IDisposable
     {
         public virtual bool Reusable { get; } = false;
 
@@ -56,5 +60,7 @@ namespace Hermit
 
             return true;
         }
+
+        public abstract void Dispose();
     }
 }

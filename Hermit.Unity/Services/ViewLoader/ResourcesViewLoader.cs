@@ -1,37 +1,26 @@
 using System;
 using System.Threading.Tasks;
+using Hermit.View;
 using UnityEngine;
 
 namespace Hermit.Services
 {
     public class ResourcesViewLoader : Singleton<ResourcesViewLoader>, IViewLoader
     {
-        public async Task<GameObject> LoadView(string key)
+        public async Task<TView> LoadView<TView>() where TView : IView
         {
-            var request = Resources.LoadAsync<GameObject>(key);
+            var viewInfo = ViewAttribute.Find<TView>();
+            var request = Resources.LoadAsync<GameObject>(viewInfo.Path);
 
-            while (!request.isDone) { await Task.Delay(10); }
+            while (!request.isDone) { await Task.Yield(); }
 
             var go = request.asset as GameObject;
-            if (go != null) { return go; }
+            if (go == null) { throw new Exception($"Can't load view at path:{viewInfo.Path}"); }
 
-            throw new Exception($"Can't load view at key:{key}");
-        }
+            var view = go.GetComponent<TView>();
+            if (view != null) { return view; }
 
-        public async Task<TView> LoadView<TView>(string key) where TView : IView
-        {
-            var request = Resources.LoadAsync<GameObject>(key);
-
-            while (!request.isDone) { await Task.Delay(10); }
-
-            var go = request.asset as GameObject;
-            if (go != null)
-            {
-                var view = go.GetComponent<TView>();
-                if (view != null) { return view; }
-            }
-
-            throw new Exception($"Can't load view at key:{key}");
+            throw new Exception($"Can't found {nameof(TView)} on {go.name}");
         }
     }
 }
