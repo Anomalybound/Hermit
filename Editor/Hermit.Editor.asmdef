@@ -1,0 +1,16 @@
+{
+    "name": "Hermit.Editor",
+    "references": [
+        "GUID:05db3c3727f094711869959e2ca97546",
+        "GUID:59813c7b596ae4648b210edfc164ffb6"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

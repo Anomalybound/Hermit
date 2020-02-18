@@ -1,0 +1,15 @@
+{
+    "name": "Hermit.Unity",
+    "references": [
+        "GUID:05db3c3727f094711869959e2ca97546"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
