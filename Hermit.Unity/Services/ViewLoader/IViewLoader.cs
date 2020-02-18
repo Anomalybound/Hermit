@@ -1,12 +1,9 @@
 using System.Threading.Tasks;
-using UnityEngine;
 
-namespace Hermit
+namespace Hermit.View
 {
     public interface IViewLoader
     {
-        Task<GameObject> LoadView(string key);
-
-        Task<TView> LoadView<TView>(string key) where TView : IView;
+        Task<TView> LoadView<TView>() where TView : IView;
     }
 }

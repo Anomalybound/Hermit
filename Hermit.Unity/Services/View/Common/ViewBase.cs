@@ -1,19 +1,39 @@
 using System;
 using UnityEngine;
 
-namespace Hermit
+namespace Hermit.View
 {
     public abstract class ViewBase<TViewModel> : MonoBehaviour, IViewModelProvider, IView where TViewModel : ViewModel
     {
         protected IViewManager ViewManager { get; private set; }
 
+        protected DataBindingBase[] DataBindings;
+
         #region IView
 
         public ulong ViewId { get; private set; }
 
-        public GameObject ViewObject => gameObject;
+        public Component component => this;
 
-        public Component ViewComponent => this;
+        /// <summary>
+        /// Should be call manually.
+        /// </summary>
+        public virtual void SetUpViewInfo()
+        {
+            ViewManager = Her.Resolve<IViewManager>();
+            ViewId = ViewManager.Register(this);
+
+            DataBindings = GetComponentsInChildren<DataBindingBase>();
+        }
+
+        /// <summary>
+        /// Should be call manually.
+        /// </summary>
+        public virtual void CleanUpViewInfo()
+        {
+            ViewManager.UnRegister(ViewId);
+            if (!DataContext.Reusable) { DataContext?.Dispose(); }
+        }
 
         #endregion
 
@@ -24,7 +44,7 @@ namespace Hermit
         public void SetViewModel(TViewModel dataContext)
         {
             DataContext = dataContext;
-            DataReadyEvent?.Invoke();
+            OnDataReady?.Invoke();
         }
 
         public void SetViewModel(object context)
@@ -32,13 +52,11 @@ namespace Hermit
             if (context is TViewModel viewModel) { DataContext = viewModel; }
             else { Her.Warn($"{context} is not matching {typeof(TViewModel)}"); }
 
-            DataReadyEvent?.Invoke();
+            OnDataReady?.Invoke();
+            ReBindAll();
         }
 
-        public virtual TViewModel GetViewModel()
-        {
-            return DataContext;
-        }
+        public virtual TViewModel GetViewModel() => DataContext;
 
         public string GetViewModelTypeName => typeof(TViewModel).FullName;
 
@@ -55,7 +73,7 @@ namespace Hermit
             }
         }
 
-        public event Action DataReadyEvent;
+        public event Action OnDataReady;
 
         ViewModel IViewModelProvider.GetViewModel()
         {
@@ -63,27 +81,6 @@ namespace Hermit
         }
 
         #endregion
-
-        protected DataBindingBase[] DataBindings;
-
-        /// <summary>
-        /// Should be call manually.
-        /// </summary>
-        public virtual void SetUpViewInfo()
-        {
-            ViewManager = Her.Resolve<IViewManager>();
-
-            DataBindings = GetComponentsInChildren<DataBindingBase>();
-            ViewId = ViewManager.Register(this);
-        }
-
-        /// <summary>
-        /// Should be call manually.
-        /// </summary>
-        public virtual void CleanUpViewInfo()
-        {
-            ViewManager.UnRegister(ViewId);
-        }
     }
 
     public abstract class ViewBase : ViewBase<ViewModel> { }

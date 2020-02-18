@@ -3,7 +3,7 @@ using System.Reflection;
 using Hermit.Common;
 using Hermit.Injection;
 using Hermit.Services;
-using Hermit.UIStack;
+using Hermit.View;
 using UnityEngine;
 using Object = UnityEngine.Object;
 

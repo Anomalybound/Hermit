@@ -2,6 +2,7 @@
 using System.ComponentModel;
 using System.Reflection;
 using Hermit.DataBinding;
+using Hermit.View;
 using UnityEngine;
 
 namespace Hermit

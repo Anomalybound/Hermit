@@ -1,73 +1,45 @@
-using System;
-using Hermit.UIStack;
+using System.Threading.Tasks;
 
 namespace Hermit.View
 {
-    public abstract class UIViewBase<TViewModel> : Widget, IViewModelProvider where TViewModel : ViewModel
+    public abstract class UIViewBase<TViewModel> : ViewBase<TViewModel> where TViewModel : ViewModel
     {
-        public TViewModel DataContext { get; protected set; }
+        protected IUIController UIController { get; private set; }
 
-        public void SetViewModel(TViewModel dataContext)
+        #region IUIView
+
+        public virtual async Task OnShow()
         {
-            DataContext = dataContext;
-            DataReadyEvent?.Invoke();
+            await Task.CompletedTask;
         }
 
-        public void SetViewModel(object context)
+        public virtual async Task OnHide()
         {
-            if (context is TViewModel viewModel) { DataContext = viewModel; }
-            else { Her.Warn($"{context} is not matching {typeof(TViewModel)}"); }
-
-            DataReadyEvent?.Invoke();
+            await Task.CompletedTask;
         }
 
-        public TViewModel GetViewModel()
+        public virtual async Task OnResume()
         {
-            return DataContext;
+            await Task.CompletedTask;
         }
 
-        public string GetViewModelTypeName => typeof(TViewModel).FullName;
-
-        public void ReBindAll()
+        public virtual async Task OnFreeze()
         {
-            if (DataBindings != null)
-            {
-                foreach (var db in DataBindings)
-                {
-                    db.Disconnect();
-                    db.SetupBinding();
-                    db.Connect();
-                }
-            }
+            await Task.CompletedTask;
         }
 
-        public event Action DataReadyEvent;
-
-        ViewModel IViewModelProvider.GetViewModel()
+        public async void Close()
         {
-            return GetViewModel();
+            await UIController.CloseAsync(ViewId);
         }
 
-        protected DataBindingBase[] DataBindings;
-
-        protected virtual void Awake()
-        {
-            SetUpViewInfo();
-        }
-
-        public override void CleanUpViewInfo()
-        {
-            base.CleanUpViewInfo();
-
-            if (!DataContext.Reusable && DataContext is IDisposable disposable) { disposable.Dispose(); }
-        }
+        #endregion
 
         public override void SetUpViewInfo()
         {
             base.SetUpViewInfo();
-            DataBindings = GetComponentsInChildren<DataBindingBase>();
+
+            UIController = Her.Resolve<IUIController>();
         }
     }
-
-    public abstract class UIViewBase : UIViewBase<ViewModel> { }
 }

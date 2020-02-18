@@ -1,5 +1,6 @@
 using System;
 using System.Reflection;
+using Hermit.View;
 using UnityEngine;
 using Component = UnityEngine.Component;
 
@@ -34,7 +35,7 @@ namespace Hermit
                     IsDataReady = true;
                     SetupBinding();
                 }
-                else { DataProvider.DataReadyEvent += OnDataReady; }
+                else { DataProvider.OnDataReady += OnDataReady; }
             }
             else
             {
@@ -45,13 +46,13 @@ namespace Hermit
                     IsDataReady = true;
                     SetupBinding();
                 }
-                else { DataProvider.DataReadyEvent += OnDataReady; }
+                else { DataProvider.OnDataReady += OnDataReady; }
             }
         }
 
         protected virtual void OnDestroy()
         {
-            if (DataProvider != null) { DataProvider.DataReadyEvent -= OnDataReady; }
+            if (DataProvider != null) { DataProvider.OnDataReady -= OnDataReady; }
         }
 
         protected virtual void OnEnable()

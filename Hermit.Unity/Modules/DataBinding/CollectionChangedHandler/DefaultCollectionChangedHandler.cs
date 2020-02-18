@@ -87,7 +87,6 @@ namespace Hermit
                         var newItem = e.NewItems[i];
 
                         dataProvider.SetViewModel(newItem);
-                        dataProvider.ReBindAll();
                     }
 
                     break;

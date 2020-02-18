@@ -1,4 +1,4 @@
-namespace Hermit
+namespace Hermit.View
 {
     public interface IViewManager
     {
