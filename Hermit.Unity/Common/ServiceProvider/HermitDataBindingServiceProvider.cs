@@ -3,7 +3,7 @@ using Hermit.Injection;
 
 namespace Hermit.Common
 {
-    public class HermitDataBindingServiceProvider : MonoServiceProvider
+    public class HermitDataBindingServiceProvider : ServiceProviderBase
     {
         public override void RegisterBindings(IDependencyContainer container)
         {

@@ -11,7 +11,7 @@ namespace Hermit
 {
     public sealed partial class Her
     {
-        public static readonly Version Version = new Version("0.4.0");
+        public static readonly Version Version = new Version("0.4.1");
 
         public static Her Current
         {
@@ -29,7 +29,6 @@ namespace Hermit
                 var array = new MonoServiceProvider[]
                 {
                     kernelObj.AddComponent<HermitKernelServiceProvider>(),
-                    kernelObj.AddComponent<HermitDataBindingServiceProvider>()
                 };
                 kernel = kernelObj.AddComponent<HermitKernel>();
 
@@ -54,7 +53,7 @@ namespace Hermit
         private IDependencyContainer Container { get; set; }
 
         private IViewManager ViewManager { get; set; }
-        
+
         private HermitGeneralSettings GeneralSettings { get; set; }
 
         public Her()
@@ -64,12 +63,13 @@ namespace Hermit
         }
 
         [Inject]
-        public void Injection(IDependencyContainer container, IViewManager viewManager, HermitGeneralSettings generalSettings)
+        public void Injection(IDependencyContainer container, IViewManager viewManager,
+            HermitGeneralSettings generalSettings)
         {
             Container = container;
             ViewManager = viewManager;
             GeneralSettings = generalSettings;
-            
+
             // Setup stores
             var store = container.Resolve<IStore>();
             store.SetStoreId("Global");

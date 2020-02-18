@@ -78,8 +78,5 @@
     <None Include="Vender\Injection\LICENSE" />
     <None Include="Vender\Injection\README.md" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Vender\Injection\Unity\" />
-  </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
 </Project>

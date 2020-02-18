@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
+using Hermit.Common;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using Debug = UnityEngine.Debug;
@@ -17,6 +19,8 @@ namespace Hermit.Injection
         [SerializeField]
         protected MonoServiceProvider[] serviceProviders = { };
 
+        protected List<ServiceProviderBase> serviceProviderBases = new List<ServiceProviderBase>();
+
         protected virtual void Awake()
         {
             RegisterServices();
@@ -29,17 +33,8 @@ namespace Hermit.Injection
 
             if (Context.GlobalContext == null) { Context.SetCurrentContext(this); }
 
-            if (serviceProviders == null || serviceProviders.Length == 0)
-            {
-                serviceProviders = GetComponentsInChildren<MonoServiceProvider>();
-            }
-
-            foreach (var provider in serviceProviders)
-            {
-                if (provider == null) { continue; }
-
-                provider.RegisterBindings(Container);
-            }
+            RegisterInternalServiceProviders();
+            RegisterMonoServiceProviders();
 
             Container.Build();
 
@@ -49,12 +44,8 @@ namespace Hermit.Injection
         protected virtual void InitServices()
         {
             HermitEvent.Send(HermitEvent.ServiceInjectionStarted);
-            foreach (var provider in serviceProviders)
-            {
-                if (provider == null) { continue; }
 
-                provider.Initialization(Container);
-            }
+            InitializeServiceProviders();
 
             if (injectSceneObjects)
             {
@@ -68,6 +59,53 @@ namespace Hermit.Injection
 
             HermitEvent.Send(HermitEvent.ServiceInjectionFinished);
         }
+
+        protected virtual void RegisterServiceProviderBases() { }
+
+        private void RegisterMonoServiceProviders()
+        {
+            if (serviceProviders == null || serviceProviders.Length == 0)
+            {
+                serviceProviders = GetComponentsInChildren<MonoServiceProvider>();
+            }
+
+            foreach (var provider in serviceProviders)
+            {
+                if (provider == null) { continue; }
+
+                provider.RegisterBindings(Container);
+            }
+        }
+
+        private void InitializeServiceProviders()
+        {
+            foreach (var provider in serviceProviders)
+            {
+                if (provider == null) { continue; }
+
+                provider.Initialization(Container);
+            }
+
+            foreach (var serviceProviderBase in serviceProviderBases)
+            {
+                if (serviceProviderBase == null) { return; }
+
+                serviceProviderBase.Initialization(Container);
+            }
+        }
+
+        private void RegisterInternalServiceProviders()
+        {
+            // internal
+            serviceProviderBases.Add(new HermitDataBindingServiceProvider());
+
+            // custom service providers
+            RegisterServiceProviderBases();
+
+            // register
+            foreach (var serviceProvider in serviceProviderBases) { serviceProvider.RegisterBindings(Container); }
+        }
+
 
         #region Imeplementation of IContext
 

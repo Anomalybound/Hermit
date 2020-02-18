@@ -9,8 +9,6 @@ namespace Hermit
     [CustomEditor(typeof(HermitKernel))]
     public class HermitKernelEditor : Editor
     {
-        public const string HermitDotween = "HERMIT_DOTWEEN";
-
         [MenuItem("Hermit/Quick Scene Setup %#k")]
         public static void Setup()
         {
@@ -29,7 +27,6 @@ namespace Hermit
             var array = new MonoServiceProvider[]
             {
                 kernelObj.GetComponent<HermitKernelServiceProvider>(),
-                kernelObj.GetComponent<HermitDataBindingServiceProvider>()
             };
             var fieldInfo =
                 typeof(HermitKernel).GetField("serviceProviders", BindingFlags.NonPublic | BindingFlags.Instance);
