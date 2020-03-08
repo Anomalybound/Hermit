@@ -24,7 +24,7 @@ namespace Hermit
 
             using (var check = new EditorGUI.ChangeCheckScope())
             {
-                EditorGUILayout.PropertyField(serializedObject.FindProperty("_useFixedUpdate"));
+                EditorGUILayout.PropertyField(serializedObject.FindProperty("useFixedUpdate"));
                 if (check.changed) { serializedObject.ApplyModifiedProperties(); }
             }
 
