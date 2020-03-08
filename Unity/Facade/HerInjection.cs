@@ -6,7 +6,7 @@ namespace Hermit
 {
     public partial class Her
     {
-        public static bool AutoRegister => Current.GeneralSettings.RegisterEventWhileInjection;
+        public static bool AutoRegister => Current.GeneralSettings.AutoRegisterEvents;
 
         #region Static Facade Methods
 

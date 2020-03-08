@@ -8,7 +8,7 @@ namespace Hermit.Common
     public class HermitKernelServiceProvider : MonoServiceProvider
     {
         [Header("General")]
-        [SerializeField] protected HermitGeneralSettings generalSettings;
+        [SerializeField] protected HermitGeneralSettings settings;
 
         public override void RegisterBindings(IDependencyContainer container)
         {
@@ -21,10 +21,11 @@ namespace Hermit.Common
             // View
             container.Bind<IViewLoader>().To<ResourcesViewLoader>().FromInstance(ResourcesViewLoader.Instance);
             container.Bind<IViewManager>().To<ViewManager>().FromInstance(ViewManager.Instance);
+            container.Bind<IViewFactory>().To<DefaultViewFactory>();
 
             // Essentials
             container.BindAll<Her>().FromInstance(Her.Current);
-            container.Bind<HermitGeneralSettings>().FromInstance(generalSettings);
+            container.Bind<HermitGeneralSettings>().FromInstance(settings);
             container.BindInstance(container);
         }
     }

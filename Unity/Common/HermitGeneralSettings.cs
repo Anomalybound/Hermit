@@ -7,8 +7,8 @@ namespace Hermit.Common
     public class HermitGeneralSettings
     {
         [SerializeField]
-        protected bool registerEventWhileInjection = true;
+        protected bool autoRegisterEvents = true;
 
-        public bool RegisterEventWhileInjection => registerEventWhileInjection;
+        public bool AutoRegisterEvents => autoRegisterEvents;
     }
 }
