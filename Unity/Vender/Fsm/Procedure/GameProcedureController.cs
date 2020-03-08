@@ -31,7 +31,6 @@ namespace Hermit.Procedure
             HermitEvent.Send(HermitEvent.ProcedureBuildStateStarted);
 
             var root = new State();
-            var context = Context.GlobalContext;
 
             var types = GetType().Assembly.GetTypes()
                 .Where(x => !x.IsAbstract &&
@@ -41,7 +40,7 @@ namespace Hermit.Procedure
 
             foreach (var type in types)
             {
-                if (!(context.Create(type) is GameProcedure<TProcedureController, TProcedureIndex> instance))
+                if (!(Her.Create(type) is GameProcedure<TProcedureController, TProcedureIndex> instance))
                 {
                     continue;
                 }
