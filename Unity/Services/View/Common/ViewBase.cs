@@ -32,7 +32,7 @@ namespace Hermit.View
         public virtual void CleanUpViewInfo()
         {
             ViewManager.UnRegister(ViewId);
-            if (!DataContext.Reusable) { DataContext?.Dispose(); }
+            if (DataContext != null && !DataContext.Reusable) { DataContext?.Dispose(); }
         }
 
         #endregion

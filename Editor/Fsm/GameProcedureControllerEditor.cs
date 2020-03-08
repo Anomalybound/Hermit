@@ -12,7 +12,7 @@ namespace Hermit
             
             using (var check = new EditorGUI.ChangeCheckScope())
             {
-                EditorGUILayout.PropertyField(serializedObject.FindProperty("_initState"));
+                EditorGUILayout.PropertyField(serializedObject.FindProperty("initState"));
                 if (check.changed) { serializedObject.ApplyModifiedProperties(); }
             }
         }
