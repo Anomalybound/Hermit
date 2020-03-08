@@ -3,16 +3,13 @@ using System.Collections.Generic;
 
 namespace Hermit.View
 {
-    [AttributeUsage(AttributeTargets.Class, AllowMultiple = false, Inherited = false)]
+    [AttributeUsage(AttributeTargets.Class, Inherited = false)]
     public class ViewAttribute : Attribute
     {
-        public int Tag { get; }
-
         public string Path { get; }
 
-        public ViewAttribute(int tag, string path)
+        public ViewAttribute(string path)
         {
-            Tag = tag;
             Path = path;
         }
 
