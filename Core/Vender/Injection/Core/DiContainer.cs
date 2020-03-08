@@ -67,8 +67,7 @@ namespace Hermit.Injection
                     var resultList = ContractTypeLookup[(info.BindingId, contractType)];
                     resultList.Clear();
                     resultList.Add(info);
-                }
-                else { ContractTypeLookup.Add((info.BindingId, contractType), new List<BindingInfo> {info}); }
+                } else { ContractTypeLookup.Add((info.BindingId, contractType), new List<BindingInfo> {info}); }
             }
 
             if (info.BuildImmediately) { Resolve(info); }
@@ -198,21 +197,11 @@ namespace Hermit.Injection
 
         #endregion
 
-        public object Instance(Type contract, string id = null)
-        {
-            return OperationHelper(Instance, contract, id);
-        }
+        public object Instance(Type contract, string id = null) => OperationHelper(Instance, contract, id);
 
-        public object Resolve(Type contract, string id = null)
-        {
-            return OperationHelper(Resolve, contract, id);
-        }
+        public object Resolve(Type contract, string id = null) => OperationHelper(Resolve, contract, id);
 
-        public object Singleton(Type contract, string id = null)
-        {
-            // add default injection key if null
-            return OperationHelper(Singleton, contract, id);
-        }
+        public object Singleton(Type contract, string id = null) => OperationHelper(Singleton, contract, id);
 
         public object Create(Type type, string id = null)
         {
@@ -221,6 +210,13 @@ namespace Hermit.Injection
             return ContractTypeLookup.ContainsKey((id, type))
                 ? Instance(type, id)
                 : CreateInstanceFromNew(type);
+        }
+
+        public bool Has(Type contract, string id = null)
+        {
+            if (string.IsNullOrEmpty(id)) { id = DefaultInjectionKey; }
+
+            return ContractTypeLookup.ContainsKey((id, contract));
         }
 
         public T Inject<T>(T target)
@@ -290,25 +286,15 @@ namespace Hermit.Injection
             return target;
         }
 
-        public T Create<T>(string id = null) where T : class
-        {
-            return Create(typeof(T), id) as T;
-        }
+        public T Create<T>(string id = null) where T : class => Create(typeof(T), id) as T;
 
-        public T Instance<T>(string id = null) where T : class
-        {
-            return Instance(typeof(T), id) as T;
-        }
+        public T Instance<T>(string id = null) where T : class => Instance(typeof(T), id) as T;
 
-        public T Singleton<T>(string id = null) where T : class
-        {
-            return Singleton(typeof(T), id) as T;
-        }
+        public T Singleton<T>(string id = null) where T : class => Singleton(typeof(T), id) as T;
 
-        public T Resolve<T>(string id = null) where T : class
-        {
-            return Resolve(typeof(T), id) as T;
-        }
+        public T Resolve<T>(string id = null) where T : class => Resolve(typeof(T), id) as T;
+
+        public bool Has<T>(string id = null) where T : class => Has(typeof(T), id);
 
         protected virtual void Dispose(bool disposing)
         {

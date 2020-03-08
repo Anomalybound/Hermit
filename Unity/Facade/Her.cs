@@ -11,7 +11,7 @@ namespace Hermit
 {
     public sealed partial class Her
     {
-        public static readonly Version Version = new Version("0.4.3");
+        public static readonly Version Version = new Version("0.4.5");
 
         public static Her Current
         {
@@ -27,7 +27,7 @@ namespace Hermit
                 var kernelObj = new GameObject("Hermit Kernel");
                 var kernelServiceProvider = kernelObj.AddComponent<HermitKernelServiceProvider>();
                 var uiServiceProvider = kernelObj.AddComponent<HermitUIServiceProvider>();
-                
+
                 // TODO: Temporary workaround
                 uiServiceProvider.uiRootPrefab = Resources.Load<UIRoot>("UI Root");
 
@@ -51,15 +51,15 @@ namespace Hermit
 
         public ILog Logger { get; }
 
-        public IUIStack UIStack => _uiStack ?? (_uiStack = Container.Resolve<IUIStack>());
+        public IUIStack UIStack => _uiStack ?? (_uiStack = Context.Container.Resolve<IUIStack>());
 
         private IUIStack _uiStack;
-
-        private IDependencyContainer Container { get; set; }
 
         private IViewManager ViewManager { get; set; }
 
         private HermitGeneralSettings GeneralSettings { get; set; }
+
+        private IContext Context { get; set; }
 
         public Her()
         {
@@ -68,15 +68,15 @@ namespace Hermit
         }
 
         [Inject]
-        public void Injection(IDependencyContainer container, IViewManager viewManager,
-            HermitGeneralSettings generalSettings)
+        public void Injection(IViewManager viewManager, HermitGeneralSettings generalSettings)
         {
-            Container = container;
             ViewManager = viewManager;
             GeneralSettings = generalSettings;
+            
+            Context = Contexts.GlobalContext;
 
             // Setup stores
-            var store = container.Resolve<IStore>();
+            var store = Context.Container.Resolve<IStore>();
             store.SetStoreId("Global");
             _stores.Add("Global", store);
         }

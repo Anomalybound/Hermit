@@ -2,7 +2,7 @@ using System;
 
 namespace Hermit.Injection
 {
-    public class Context
+    public static class Contexts
     {
         public static IContext GlobalContext { get; private set; }
 

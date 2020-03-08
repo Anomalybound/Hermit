@@ -1,28 +1,29 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using Hermit.Common;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using Debug = UnityEngine.Debug;
 
 namespace Hermit.Injection
 {
     [ScriptOrder(-10000)]
     public class SceneContext : MonoBehaviour, IContext
     {
-        public virtual IDependencyContainer Container { get; } = new DiContainer();
+        [SerializeField] protected bool injectSceneObjects;
 
-        [SerializeField]
-        protected bool injectSceneObjects;
+        [SerializeField] protected MonoServiceProvider[] serviceProviders = { };
 
-        [SerializeField]
-        protected MonoServiceProvider[] serviceProviders = { };
+        protected IContext Context { get; private set; }
 
-        protected List<ServiceProviderBase> serviceProviderBases = new List<ServiceProviderBase>();
+        public IDependencyContainer Container { get; private set; }
+
+        protected readonly List<ServiceProviderBase> serviceProviderBases = new List<ServiceProviderBase>();
 
         protected virtual void Awake()
         {
+            Context = new ContextBase();
+            Container = Context.Container;
+            
             RegisterServices();
             InitServices();
         }
@@ -30,8 +31,6 @@ namespace Hermit.Injection
         protected virtual void RegisterServices()
         {
             HermitEvent.Send(HermitEvent.ServiceRegisterStarted);
-
-            if (Context.GlobalContext == null) { Context.SetCurrentContext(this); }
 
             RegisterInternalServiceProviders();
             RegisterMonoServiceProviders();
@@ -106,7 +105,6 @@ namespace Hermit.Injection
             foreach (var serviceProvider in serviceProviderBases) { serviceProvider.RegisterBindings(Container); }
         }
 
-
         #region Imeplementation of IContext
 
         public void InjectGameObject(GameObject targetGo)
@@ -116,54 +114,31 @@ namespace Hermit.Injection
             {
                 if (monoBehaviour == null) { continue; }
 
-                Inject(monoBehaviour);
+                Context.Inject(monoBehaviour);
             }
         }
 
-        public object Create(Type type, string id = null)
-        {
-            return Container.Create(type, id);
-        }
+        public object Create(Type type, string id = null) => Context.Create(type, id);
 
-        public T Create<T>(string id = null) where T : class
-        {
-            return Container.Create<T>(id);
-        }
+        public T Create<T>(string id = null) where T : class => Context.Create<T>(id);
 
-        public object Instance(Type type, string id = null)
-        {
-            return Container.Instance(type, id);
-        }
+        public object Instance(Type type, string id = null) => Context.Instance(type, id);
 
-        public T Instance<T>(string id = null) where T : class
-        {
-            return Container.Instance<T>(id);
-        }
+        public T Instance<T>(string id = null) where T : class => Context.Instance<T>(id);
 
-        public object Singleton(Type contract, string id = null)
-        {
-            return Container.Singleton(contract, id);
-        }
+        public object Singleton(Type contract, string id = null) => Context.Singleton(contract, id);
 
-        public T Singleton<T>(string id = null) where T : class
-        {
-            return Container.Singleton<T>(id);
-        }
+        public T Singleton<T>(string id = null) where T : class => Context.Singleton<T>(id);
 
-        public object Resolve(Type contract, string id = null)
-        {
-            return Container.Resolve(contract, id);
-        }
+        public object Resolve(Type contract, string id = null) => Context.Resolve(contract, id);
 
-        public T Resolve<T>(string id = null) where T : class
-        {
-            return Container.Resolve<T>(id);
-        }
+        public T Resolve<T>(string id = null) where T : class => Context.Resolve<T>(id);
 
-        public T Inject<T>(T target)
-        {
-            return Container.Inject(target);
-        }
+        public bool Has(Type contract, string id = null) => Context.Has(contract, id);
+
+        public bool Has<T>(string id = null) where T : class => Context.Has<T>(id);
+
+        public T Inject<T>(T target) => Context.Inject(target);
 
         #endregion
     }

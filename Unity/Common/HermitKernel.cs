@@ -12,9 +12,7 @@ namespace Hermit.Common
             if (instance == null)
             {
                 instance = this;
-
-                RegisterServices();
-                InitServices();
+                base.Awake();
                 Inject(Her.Current);
             }
             else

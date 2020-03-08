@@ -20,6 +20,10 @@ namespace Hermit.Injection
 
         T Resolve<T>(string id = null) where T : class;
 
+        bool Has(Type contract, string id = null);
+
+        bool Has<T>(string id = null) where T : class;
+
         T Inject<T>(T target);
     }
 }

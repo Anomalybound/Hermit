@@ -27,7 +27,7 @@ namespace Hermit.Unity
 
         private void Awake()
         {
-            var container = Context.GlobalContext.Container;
+            var container = Contexts.GlobalContext.Container;
 
             if (target == null) { return; }
 
