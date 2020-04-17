@@ -13,7 +13,7 @@ namespace Hermit
         public static object Create(Type type, string id = null)
         {
             var instance = Current.Context.Create(type, id);
-            if (AutoRegister) { Current.EventBroker.Register(instance); }
+            if (instance != null && AutoRegister) { Current.EventBroker.Register(instance); }
 
             return instance;
         }
@@ -21,7 +21,7 @@ namespace Hermit
         public static object Instance(Type type, string id = null)
         {
             var instance = Current.Context.Instance(type, id);
-            if (AutoRegister) { Current.EventBroker.Register(instance); }
+            if (instance != null && AutoRegister) { Current.EventBroker.Register(instance); }
 
             return instance;
         }
@@ -29,7 +29,7 @@ namespace Hermit
         public static object Singleton(Type type, string id = null)
         {
             var instance = Current.Context.Singleton(type, id);
-            if (AutoRegister) { Current.EventBroker.Register(instance); }
+            if (instance != null && AutoRegister) { Current.EventBroker.Register(instance); }
 
             return instance;
         }
@@ -37,7 +37,7 @@ namespace Hermit
         public static object Resolve(Type type, string id = null)
         {
             var instance = Current.Context.Resolve(type, id);
-            if (AutoRegister) { Current.EventBroker.Register(instance); }
+            if (instance != null && AutoRegister) { Current.EventBroker.Register(instance); }
 
             return instance;
         }
@@ -45,7 +45,7 @@ namespace Hermit
         public static T Create<T>(string id = null) where T : class
         {
             var instance = Current.Context.Create<T>(id);
-            if (AutoRegister) { Current.EventBroker.Register(instance); }
+            if (instance != null && AutoRegister) { Current.EventBroker.Register(instance); }
 
             return instance;
         }
@@ -53,7 +53,7 @@ namespace Hermit
         public static T Singleton<T>(string id = null) where T : class
         {
             var instance = Current.Context.Singleton<T>(id);
-            if (AutoRegister) { Current.EventBroker.Register(instance); }
+            if (instance != null && AutoRegister) { Current.EventBroker.Register(instance); }
 
             return instance;
         }
@@ -61,7 +61,7 @@ namespace Hermit
         public static T Instance<T>(string id = null) where T : class
         {
             var instance = Current.Context.Instance<T>(id);
-            if (AutoRegister) { Current.EventBroker.Register(instance); }
+            if (instance != null && AutoRegister) { Current.EventBroker.Register(instance); }
 
             return instance;
         }
@@ -69,7 +69,8 @@ namespace Hermit
         public static T Resolve<T>(string id = null) where T : class
         {
             var instance = Current.Context.Resolve<T>(id);
-            if (AutoRegister) { Current.EventBroker.Register(instance); }
+
+            if (instance != null && AutoRegister) { Current.EventBroker.Register(instance); }
 
             return instance;
         }
@@ -77,7 +78,7 @@ namespace Hermit
         public static T Inject<T>(T target)
         {
             var instance = Current.Context.Inject(target);
-            if (AutoRegister) { Current.EventBroker.Register(instance); }
+            if (instance != null && AutoRegister) { Current.EventBroker.Register(instance); }
 
             return instance;
         }
@@ -89,7 +90,7 @@ namespace Hermit
             foreach (var monoBehaviour in behaviours)
             {
                 var instance = context.Inject(monoBehaviour);
-                if (AutoRegister) { Current.EventBroker.Register(instance); }
+                if (instance != null && AutoRegister) { Current.EventBroker.Register(instance); }
             }
         }
 

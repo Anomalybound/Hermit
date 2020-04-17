@@ -107,7 +107,7 @@ namespace Hermit.DataBindings
 
         private static void CollectAdapters()
         {
-            var adapters = AssemblyHelper.GetInheritancesInParentAssembly(typeof(IAdapter)).ToList();
+            var adapters = AssemblyHelper.GetInheritancesInAppDomain(typeof(IAdapter)).ToList();
             foreach (var adapter in adapters)
             {
                 var adapterAttribute = adapter.GetCustomAttribute<AdapterAttribute>();
@@ -125,7 +125,7 @@ namespace Hermit.DataBindings
         protected void CollectViewHandlers()
         {
             ViewCollectionChangedHandlerTypes = AssemblyHelper
-                .GetInheritancesInParentAssembly(typeof(IViewCollectionChangedHandler)).ToList();
+                .GetInheritancesInAppDomain(typeof(IViewCollectionChangedHandler)).ToList();
         }
 
         #region View Model

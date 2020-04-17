@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
@@ -32,6 +31,8 @@ namespace Hermit
 
         public void Register(object obj)
         {
+            if (obj == null) { return; }
+
             lock (_locker)
             {
                 if (_registeredObjects.Contains(obj)) { return; }
@@ -57,6 +58,8 @@ namespace Hermit
 
         public void Unregister(object obj)
         {
+            if (obj == null) { return; }
+
             lock (_locker)
             {
                 if (!_registeredObjects.Contains(obj)) { return; }
@@ -136,10 +139,8 @@ namespace Hermit
         {
             var nodes = endPoint.Split('.');
             var lastElement = nodes[nodes.Length - 1];
-            if (lastElement.Equals("*")) { Her.Error($"Trigger sticky with wildcard endpoint is not supported."); } else
-            {
-                StickyEvents.TryAdd(endPoint, payload);
-            }
+            if (lastElement.Equals("*")) { Her.Error($"Trigger sticky with wildcard endpoint is not supported."); }
+            else { StickyEvents.TryAdd(endPoint, payload); }
         }
 
         private static bool IsMainThread()
@@ -167,17 +168,13 @@ namespace Hermit
             {
                 MainThreadDispatcher.Instance.Enqueue(() =>
                 {
-                    if (noParameters) { ((Action) subscription.MethodInvoker).Invoke(); } else
-                    {
-                        ((Action<TEventData>) subscription.MethodInvoker).Invoke(data);
-                    }
+                    if (noParameters) { ((Action) subscription.MethodInvoker).Invoke(); }
+                    else { ((Action<TEventData>) subscription.MethodInvoker).Invoke(data); }
                 });
             }
 
-            if (noParameters) { ((Action) subscription.MethodInvoker).Invoke(); } else
-            {
-                ((Action<TEventData>) subscription.MethodInvoker).Invoke(data);
-            }
+            if (noParameters) { ((Action) subscription.MethodInvoker).Invoke(); }
+            else { ((Action<TEventData>) subscription.MethodInvoker).Invoke(data); }
         }
 
         private static async Task TriggerEventAsync<TEventData>(Subscription subscription, TEventData data)
@@ -199,10 +196,8 @@ namespace Hermit
             //     Debug.LogWarning($"ThreadMode must be ThreadMode.Current while using async calls.");
             // }
 
-            if (noParameters) { await ((Func<Task>) subscription.MethodInvoker).Invoke(); } else
-            {
-                await ((Func<TEventData, Task>) subscription.MethodInvoker).Invoke(data);
-            }
+            if (noParameters) { await ((Func<Task>) subscription.MethodInvoker).Invoke(); }
+            else { await ((Func<TEventData, Task>) subscription.MethodInvoker).Invoke(data); }
         }
 
         #endregion

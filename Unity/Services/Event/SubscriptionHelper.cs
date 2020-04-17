@@ -12,6 +12,8 @@ namespace Hermit
 
         public static IEnumerable<Subscription> FindSubscriber(object obj)
         {
+            if (obj == null) { throw new ArgumentNullException(); }
+
             var type = obj.GetType();
             if (MethodCaches.TryGetValue(type, out var subscriptions)) { return subscriptions; }
 

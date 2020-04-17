@@ -7,13 +7,13 @@ namespace Hermit.Common
     {
         public override void RegisterBindings(IDependencyContainer container)
         {
-            var adapterTypes = AssemblyHelper.GetInheritancesInParentAssembly(typeof(IAdapter));
+            var adapterTypes = AssemblyHelper.GetInheritancesInAppDomain(typeof(IAdapter));
             foreach (var adapterType in adapterTypes)
             {
                 container.Bind<IAdapter>().To(adapterType).WithId(adapterType.FullName);
             }
 
-            var viewHandlers = AssemblyHelper.GetInheritancesInParentAssembly(typeof(IViewCollectionChangedHandler));
+            var viewHandlers = AssemblyHelper.GetInheritancesInAppDomain(typeof(IViewCollectionChangedHandler));
             foreach (var viewHandler in viewHandlers)
             {
                 container.Bind<IViewCollectionChangedHandler>().To(viewHandler)

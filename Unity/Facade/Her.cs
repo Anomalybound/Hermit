@@ -11,7 +11,7 @@ namespace Hermit
 {
     public sealed partial class Her
     {
-        public static readonly Version Version = new Version("0.4.5");
+        public static readonly Version Version = new Version("0.4.6");
 
         public static Her Current
         {
@@ -67,15 +67,19 @@ namespace Hermit
             EventBroker = Hermit.EventBroker.Default;
         }
 
+        ~Her() { }
+
         [Inject]
         public void Injection(IViewManager viewManager, HermitGeneralSettings generalSettings)
         {
             ViewManager = viewManager;
             GeneralSettings = generalSettings;
-            
+
             Context = Contexts.GlobalContext;
 
             // Setup stores
+            if (_stores.ContainsKey("Global")) { return; }
+
             var store = Context.Container.Resolve<IStore>();
             store.SetStoreId("Global");
             _stores.Add("Global", store);
