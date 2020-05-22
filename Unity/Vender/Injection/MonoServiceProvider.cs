@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using Hermit.Injection.Core;
+using UnityEngine;
 
 namespace Hermit.Injection
 {

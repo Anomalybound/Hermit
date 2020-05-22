@@ -1,6 +1,7 @@
 ﻿using System;
+using Hermit.Fsm.Core;
 
-namespace Hermit.Fsm
+namespace Hermit.Fsm.Builder
 {
     public class StateBuilder<TState, TParentBuilder> where TState : IBuildableState, new()
     {

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Globalization;
 
-namespace Hermit.Procedure
+namespace Hermit.Fsm.Procedure
 {
     public abstract class
         GameProcedure<TProcedureController, TProcedureIndex> : ProcedureBase<TProcedureController>

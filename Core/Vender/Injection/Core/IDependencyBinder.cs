@@ -1,6 +1,7 @@
 using System;
+using Hermit.Injection.Binder;
 
-namespace Hermit.Injection
+namespace Hermit.Injection.Core
 {
     public interface IDependencyBinder
     {

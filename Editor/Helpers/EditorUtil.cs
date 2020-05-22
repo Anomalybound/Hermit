@@ -1,9 +1,9 @@
 using UnityEditor;
 using UnityEngine;
 
-namespace Hermit
+namespace Hermit.Helpers
 {
-    public class EditorUtil
+    public static class EditorUtil
     {
         public const string Undefined = "Undefined";
         

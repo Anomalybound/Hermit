@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Hermit.Common;
+using Hermit.Injection.Core;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 

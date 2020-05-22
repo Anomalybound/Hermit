@@ -3,7 +3,7 @@ using System.Reflection;
 using Hermit.Injection;
 using UnityEditor;
 
-namespace Hermit
+namespace Hermit.Common
 {
     [CustomEditor(typeof(MonoServiceProvider), true)]
     public class MonoServiceProviderEditor : Editor

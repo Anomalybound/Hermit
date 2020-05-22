@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Hermit.Fsm
+namespace Hermit.Fsm.Core
 {
     public class State : IBuildableState
     {

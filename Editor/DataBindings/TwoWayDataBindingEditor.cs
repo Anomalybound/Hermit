@@ -1,3 +1,4 @@
+using Hermit.Common.DataBinding;
 using UnityEditor;
 
 namespace Hermit.DataBindings

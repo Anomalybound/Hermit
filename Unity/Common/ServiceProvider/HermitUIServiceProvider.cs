@@ -1,6 +1,7 @@
 using System;
 using Hermit.Injection;
-using Hermit.View;
+using Hermit.Injection.Core;
+using Hermit.Service.Views.UI;
 using UnityEngine;
 
 namespace Hermit.Common

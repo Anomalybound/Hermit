@@ -1,4 +1,5 @@
 using System.Threading.Tasks;
+using Hermit.Common;
 
 namespace Hermit
 {
@@ -28,12 +29,12 @@ namespace Hermit
             Current.EventBroker.Trigger(endpoint);
         }
 
-        public static void Trigger<TEventData>(TEventData payloads) where TEventData : EventData
+        public static void Trigger<TEventData>(TEventData payloads) where TEventData : Payloads
         {
             Current.EventBroker.Trigger(payloads);
         }
 
-        public static void TriggerSticky<TEventData>(string endpoint, TEventData payloads) where TEventData : EventData
+        public static void TriggerSticky<TEventData>(string endpoint, TEventData payloads) where TEventData : Payloads
         {
             Current.EventBroker.TriggerSticky(endpoint, payloads);
         }
@@ -43,12 +44,12 @@ namespace Hermit
             Current.EventBroker.TriggerSticky(endpoint);
         }
 
-        public static void TriggerSticky<TEventData>(TEventData payloads) where TEventData : EventData
+        public static void TriggerSticky<TEventData>(TEventData payloads) where TEventData : Payloads
         {
             Current.EventBroker.TriggerSticky(payloads);
         }
 
-        public static void Trigger<TEventData>(string endpoint, TEventData payloads) where TEventData : EventData
+        public static void Trigger<TEventData>(string endpoint, TEventData payloads) where TEventData : Payloads
         {
             Current.EventBroker.Trigger(endpoint, payloads);
         }
@@ -59,13 +60,13 @@ namespace Hermit
         }
 
         public static Task TriggerAsync<TEventData>(TEventData payloads)
-            where TEventData : EventData
+            where TEventData : Payloads
         {
             return Current.EventBroker.TriggerAsync(payloads);
         }
 
         public static Task TriggerAsync<TEventData>(string endpoint, TEventData payloads)
-            where TEventData : EventData
+            where TEventData : Payloads
         {
             return Current.EventBroker.TriggerAsync(endpoint, payloads);
         }

@@ -2,53 +2,56 @@
 using UnityEditor;
 using UnityEngine;
 
-public class LayerUtility
+namespace Hermit.Helpers
 {
-    [InitializeOnLoadMethod]
-    public static void CheckUIStackLayer()
+    public static class LayerUtility
     {
-        CheckLayers(new[] {"UI", "UIHidden"});
-    }
-
-    public static void CheckLayers(IEnumerable<string> layerNames)
-    {
-        var manager = new SerializedObject(AssetDatabase.LoadAllAssetsAtPath("ProjectSettings/TagManager.asset")[0]);
-        var layersProp = manager.FindProperty("layers");
-
-        foreach (var name in layerNames)
+        [InitializeOnLoadMethod]
+        public static void CheckUIStackLayer()
         {
-            // check if layer is present
-            var found = false;
-            for (var i = 0; i <= 31; i++)
-            {
-                var sp = layersProp.GetArrayElementAtIndex(i);
-                if (sp != null && name.Equals(sp.stringValue))
-                {
-                    found = true;
-                    break;
-                }
-            }
+            CheckLayers(new[] {"UI", "UIHidden"});
+        }
 
-            // not found, add into 1st open slot
-            if (!found)
+        public static void CheckLayers(IEnumerable<string> layerNames)
+        {
+            var manager = new SerializedObject(AssetDatabase.LoadAllAssetsAtPath("ProjectSettings/TagManager.asset")[0]);
+            var layersProp = manager.FindProperty("layers");
+
+            foreach (var name in layerNames)
             {
-                SerializedProperty slot = null;
-                for (int i = 8; i <= 31; i++)
+                // check if layer is present
+                var found = false;
+                for (var i = 0; i <= 31; i++)
                 {
-                    SerializedProperty sp = layersProp.GetArrayElementAtIndex(i);
-                    if (sp != null && string.IsNullOrEmpty(sp.stringValue))
+                    var sp = layersProp.GetArrayElementAtIndex(i);
+                    if (sp != null && name.Equals(sp.stringValue))
                     {
-                        slot = sp;
+                        found = true;
                         break;
                     }
                 }
 
-                if (slot != null) { slot.stringValue = name; }
-                else { Debug.LogError("Could not find an open Layer Slot for: " + name); }
-            }
-        }
+                // not found, add into 1st open slot
+                if (!found)
+                {
+                    SerializedProperty slot = null;
+                    for (int i = 8; i <= 31; i++)
+                    {
+                        SerializedProperty sp = layersProp.GetArrayElementAtIndex(i);
+                        if (sp != null && string.IsNullOrEmpty(sp.stringValue))
+                        {
+                            slot = sp;
+                            break;
+                        }
+                    }
 
-        // save
-        manager.ApplyModifiedProperties();
+                    if (slot != null) { slot.stringValue = name; }
+                    else { Debug.LogError("Could not find an open Layer Slot for: " + name); }
+                }
+            }
+
+            // save
+            manager.ApplyModifiedProperties();
+        }
     }
 }

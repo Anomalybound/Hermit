@@ -1,6 +1,6 @@
 using System;
 
-namespace Hermit.Injection
+namespace Hermit.Injection.Core
 {
     public interface IDependencyContainer : IDisposable, IDependencyBinder, IDependencyResolver
     {

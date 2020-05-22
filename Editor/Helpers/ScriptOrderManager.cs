@@ -1,7 +1,8 @@
 ﻿using System;
+using Hermit.Common;
 using UnityEditor;
 
-namespace Hermit
+namespace Hermit.Helpers
 {
     [InitializeOnLoad]
     public class ScriptOrderManager

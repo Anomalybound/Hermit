@@ -2,11 +2,12 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using Hermit.Fsm;
+using Hermit.Common;
+using Hermit.Fsm.Common;
+using Hermit.Fsm.Core;
 using UnityEngine;
-using Hermit.Injection;
 
-namespace Hermit.Procedure
+namespace Hermit.Fsm.Procedure
 {
     public abstract class GameProcedureController<TProcedureController, TProcedureIndex> : FsmContainer
         where TProcedureController : GameProcedureController<TProcedureController, TProcedureIndex>

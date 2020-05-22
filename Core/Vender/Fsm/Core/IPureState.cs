@@ -1,4 +1,4 @@
-﻿namespace Hermit.Fsm
+﻿namespace Hermit.Fsm.Core
 {
     public interface IPureState
     {

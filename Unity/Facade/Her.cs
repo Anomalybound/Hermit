@@ -2,8 +2,14 @@
 using System.Reflection;
 using Hermit.Common;
 using Hermit.Injection;
-using Hermit.Services;
-using Hermit.View;
+using Hermit.Injection.Attributes;
+using Hermit.Injection.Core;
+using Hermit.Service.Events;
+using Hermit.Service.Log;
+using Hermit.Service.Messages;
+using Hermit.Service.Stores;
+using Hermit.Service.Views;
+using Hermit.Service.Views.UI;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
@@ -11,9 +17,9 @@ namespace Hermit
 {
     public sealed partial class Her
     {
-        public static readonly Version Version = new Version("0.4.6");
+        public static readonly Version Version = new Version("0.5.0");
 
-        public static Her Current
+        internal static Her Current
         {
             get
             {
@@ -49,6 +55,8 @@ namespace Hermit
 
         public IEventBroker EventBroker { get; }
 
+        public IMessageHub MessageHub { get; }
+
         public ILog Logger { get; }
 
         public IUIStack UIStack => _uiStack ?? (_uiStack = Context.Container.Resolve<IUIStack>());
@@ -61,21 +69,28 @@ namespace Hermit
 
         private IContext Context { get; set; }
 
-        public Her()
+        private Her()
         {
             Logger = UnityLog.Instance;
-            EventBroker = Hermit.EventBroker.Default;
+            EventBroker = new EventBroker(MainThreadDispatcher.Instance);
+            MessageHub = new MessageHub();
         }
 
         ~Her() { }
 
         [Inject]
-        public void Injection(IViewManager viewManager, HermitGeneralSettings generalSettings)
+        internal void Injection(IViewManager viewManager, HermitGeneralSettings generalSettings)
         {
             ViewManager = viewManager;
             GeneralSettings = generalSettings;
 
             Context = Contexts.GlobalContext;
+
+            // Add default error handler
+            if (GeneralSettings.RegisterGlobalMessageHandler)
+            {
+                MessageHub.RegisterGlobalErrorHandler(DefaultErrorMessagesHandler);
+            }
 
             // Setup stores
             if (_stores.ContainsKey("Global")) { return; }
@@ -83,6 +98,11 @@ namespace Hermit
             var store = Context.Container.Resolve<IStore>();
             store.SetStoreId("Global");
             _stores.Add("Global", store);
+        }
+
+        private void DefaultErrorMessagesHandler(Guid token, Exception exception)
+        {
+            Error(exception);
         }
     }
 }

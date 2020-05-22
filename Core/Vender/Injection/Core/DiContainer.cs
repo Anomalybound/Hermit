@@ -3,8 +3,10 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using Hermit.Injection.Attributes;
+using Hermit.Injection.Binder;
 
-namespace Hermit.Injection
+namespace Hermit.Injection.Core
 {
     public class DiContainer : IDependencyContainer
     {

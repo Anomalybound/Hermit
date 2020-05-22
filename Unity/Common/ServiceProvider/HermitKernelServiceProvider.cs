@@ -1,7 +1,12 @@
 using Hermit.Injection;
-using Hermit.Services;
+using Hermit.Injection.Core;
+using Hermit.Service.Events;
+using Hermit.Service.Log;
+using Hermit.Service.Stores;
+using Hermit.Service.Time;
+using Hermit.Service.ViewLoader;
+using Hermit.Service.Views;
 using UnityEngine;
-using Hermit.View;
 
 namespace Hermit.Common
 {

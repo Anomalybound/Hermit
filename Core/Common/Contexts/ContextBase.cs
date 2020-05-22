@@ -1,5 +1,6 @@
 ﻿using System;
 using Hermit.Injection;
+using Hermit.Injection.Core;
 
 namespace Hermit.Common
 {

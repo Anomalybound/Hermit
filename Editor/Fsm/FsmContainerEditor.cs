@@ -1,8 +1,9 @@
-﻿using Hermit.Fsm;
+﻿using Hermit.Fsm.Common;
+using Hermit.Fsm.Core;
 using UnityEditor;
 using UnityEngine;
 
-namespace Hermit
+namespace Hermit.Fsm
 {
     [CustomEditor(typeof(FsmContainer), true)]
     public class FsmContainerEditor : Editor

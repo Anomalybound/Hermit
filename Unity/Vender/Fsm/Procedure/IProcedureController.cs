@@ -1,4 +1,4 @@
-﻿namespace Hermit.Procedure
+﻿namespace Hermit.Fsm.Procedure
 {
     public interface IProcedureController { }
 }

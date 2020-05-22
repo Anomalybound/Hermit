@@ -1,4 +1,4 @@
-﻿namespace Hermit.Injection
+﻿namespace Hermit.Injection.Core
 {
     public interface IServiceProvider
     {

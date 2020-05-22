@@ -1,7 +1,7 @@
+using Hermit.Fsm.Procedure;
 using UnityEditor;
-using Hermit.Procedure;
 
-namespace Hermit
+namespace Hermit.Fsm
 {
     [CustomEditor(typeof(GameProcedureController<,>), true)]
     public class GameProcedureControllerEditor : FsmContainerEditor

@@ -1,14 +1,13 @@
 ﻿using System.Reflection;
-using Hermit.Common;
 using Hermit.Injection;
-using Hermit.View;
+using Hermit.Service.Views.UI;
 using UnityEditor;
 using UnityEngine;
 
-namespace Hermit
+namespace Hermit.Common
 {
     [CustomEditor(typeof(HermitKernel))]
-    public class HermitKernelEditor : Editor
+    public class HermitKernelEditor : UnityEditor.Editor
     {
         [MenuItem("Hermit/Quick Scene Setup %#k")]
         public static void Setup()

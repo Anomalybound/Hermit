@@ -1,7 +1,7 @@
-﻿using Hermit.Fsm;
+﻿using Hermit.Fsm.Core;
 using UnityEngine;
 
-namespace Hermit
+namespace Hermit.Fsm.Common
 {
     public abstract class FsmContainer : MonoBehaviour
     {

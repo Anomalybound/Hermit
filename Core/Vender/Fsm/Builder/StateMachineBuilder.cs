@@ -1,4 +1,6 @@
-﻿namespace Hermit.Fsm
+﻿using Hermit.Fsm.Core;
+
+namespace Hermit.Fsm.Builder
 {
     public class StateMachineBuilder<TState> where TState : IBuildableState, new()
     {

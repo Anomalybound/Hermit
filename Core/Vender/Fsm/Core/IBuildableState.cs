@@ -1,6 +1,6 @@
 using System;
 
-namespace Hermit.Fsm
+namespace Hermit.Fsm.Core
 {
     public interface IBuildableState : IState
     {

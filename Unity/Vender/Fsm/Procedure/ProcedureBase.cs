@@ -1,6 +1,6 @@
-﻿using Hermit.Fsm;
+﻿using Hermit.Fsm.Core;
 
-namespace Hermit.Procedure
+namespace Hermit.Fsm.Procedure
 {
     public abstract class ProcedureBase<TProcedureController> : ContextState<TProcedureController>
     {
