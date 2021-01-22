@@ -1,5 +1,5 @@
-using Hermit.Common.DataBinding;
-using Hermit.Service.Views;
+using Hermit.DataBinding;
+using Hermit.Views;
 using UnityEditor;
 
 namespace Hermit.DataBindings
@@ -20,37 +20,35 @@ namespace Hermit.DataBindings
         {
             base.OnInspectorGUI();
 
-            using (var check = new EditorGUI.ChangeCheckScope())
+            using var check = new EditorGUI.ChangeCheckScope();
+            Target.CollectionHandlerTypeName = DrawCollectionHandlerPopup(Target.CollectionHandlerTypeName);
+
+            using (new EditorGUILayout.VerticalScope(EditorStyles.helpBox))
             {
-                Target.CollectionHandlerTypeName = DrawCollectionHandlerPopup(Target.CollectionHandlerTypeName);
+                DrawBindingLabel("View Model");
 
-                using (new EditorGUILayout.VerticalScope(EditorStyles.helpBox))
+                Target.ViewModelCollectionEntry = DrawViewModelCollectionPopup(Target.ViewModelCollectionEntry);
+            }
+
+            using (new EditorGUILayout.VerticalScope(EditorStyles.helpBox))
+            {
+                DrawBindingLabel("View");
+
+                EditorGUILayout.PropertyField(serializedObject.FindProperty("viewTemplate"));
+
+                if (Target.ViewTemplate != null &&
+                    Target.ViewTemplate.GetComponent<IViewModelProvider>() == null)
                 {
-                    DrawBindingLabel("View Model");
-
-                    Target.ViewModelCollectionEntry = DrawViewModelCollectionPopup(Target.ViewModelCollectionEntry);
+                    EditorGUILayout.HelpBox("View Template must be a IViewModelProvider.", MessageType.Error);
                 }
 
-                using (new EditorGUILayout.VerticalScope(EditorStyles.helpBox))
-                {
-                    DrawBindingLabel("View");
+                EditorGUILayout.PropertyField(serializedObject.FindProperty("viewContainer"));
+            }
 
-                    EditorGUILayout.PropertyField(serializedObject.FindProperty("viewTemplate"));
-
-                    if (Target.ViewTemplate != null &&
-                        Target.ViewTemplate.GetComponent<IViewModelProvider>() == null)
-                    {
-                        EditorGUILayout.HelpBox("View Template must be a IViewModelProvider.", MessageType.Error);
-                    }
-
-                    EditorGUILayout.PropertyField(serializedObject.FindProperty("viewContainer"));
-                }
-
-                if (check.changed)
-                {
-                    serializedObject.ApplyModifiedProperties();
-                    EditorUtility.SetDirty(target);
-                }
+            if (check.changed)
+            {
+                serializedObject.ApplyModifiedProperties();
+                EditorUtility.SetDirty(target);
             }
         }
     }

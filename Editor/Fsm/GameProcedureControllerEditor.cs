@@ -1,4 +1,3 @@
-using Hermit.Fsm.Procedure;
 using UnityEditor;
 
 namespace Hermit.Fsm
@@ -9,12 +8,10 @@ namespace Hermit.Fsm
         public override void OnInspectorGUI()
         {
             base.OnInspectorGUI();
-            
-            using (var check = new EditorGUI.ChangeCheckScope())
-            {
-                EditorGUILayout.PropertyField(serializedObject.FindProperty("initState"));
-                if (check.changed) { serializedObject.ApplyModifiedProperties(); }
-            }
+
+            using var check = new EditorGUI.ChangeCheckScope();
+            EditorGUILayout.PropertyField(serializedObject.FindProperty("initState"));
+            if (check.changed) { serializedObject.ApplyModifiedProperties(); }
         }
     }
 }

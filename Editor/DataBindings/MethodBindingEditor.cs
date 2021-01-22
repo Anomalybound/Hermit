@@ -1,4 +1,4 @@
-using Hermit.Common.DataBinding;
+using Hermit.DataBinding;
 using UnityEditor;
 
 namespace Hermit.DataBindings
@@ -27,40 +27,38 @@ namespace Hermit.DataBindings
         {
             base.OnInspectorGUI();
 
-            using (var check = new EditorGUI.ChangeCheckScope())
+            using var check = new EditorGUI.ChangeCheckScope();
+            EditorGUILayout.PropertyField(serializedObject.FindProperty(nameof(Target.showDeclaredMethodsOnly)));
+
+            using (new EditorGUILayout.VerticalScope(EditorStyles.helpBox))
             {
-                EditorGUILayout.PropertyField(serializedObject.FindProperty(nameof(Target.showDeclaredMethodsOnly)));
+                DrawBindingLabel("View Model", ViewModelSource);
 
-                using (new EditorGUILayout.VerticalScope(EditorStyles.helpBox))
-                {
-                    DrawBindingLabel("View Model", ViewModelSource);
+                // Draw View Model Popup
+                Target.ViewModelEntry = DrawViewModelPopup(Target.ViewModelEntry);
+            }
 
-                    // Draw View Model Popup
-                    Target.ViewModelEntry = DrawViewModelPopup(Target.ViewModelEntry);
-                }
+            DrawBindingTypeInfo(true);
 
-                DrawBindingTypeInfo(true);
+            using (new EditorGUILayout.VerticalScope(EditorStyles.helpBox))
+            {
+                DrawBindingLabel("View", ViewSource);
 
-                using (new EditorGUILayout.VerticalScope(EditorStyles.helpBox))
-                {
-                    DrawBindingLabel("View", ViewSource);
+                EditorGUI.BeginDisabledGroup(Target.ViewModelEntry == null);
 
-                    EditorGUI.BeginDisabledGroup(Target.ViewModelEntry == null);
+                // Draw View Popup
+                Target.ViewEntry = DrawViewMethodPopup(Target.ViewEntry, Target.showDeclaredMethodsOnly);
 
-                    // Draw View Popup
-                    Target.ViewEntry = DrawViewMethodPopup(Target.ViewEntry, Target.showDeclaredMethodsOnly);
+                // Draw View adapter popup
+                Target.ViewAdapterType = DrawViewAdapterPopup(Target.ViewAdapterType, ViewAdapterOptions);
 
-                    // Draw View adapter popup
-                    Target.ViewAdapterType = DrawViewAdapterPopup(Target.ViewAdapterType, ViewAdapterOptions);
+                EditorGUI.EndDisabledGroup();
+            }
 
-                    EditorGUI.EndDisabledGroup();
-                }
-
-                if (check.changed)
-                {
-                    serializedObject.ApplyModifiedProperties();
-                    EditorUtility.SetDirty(target);
-                }
+            if (check.changed)
+            {
+                serializedObject.ApplyModifiedProperties();
+                EditorUtility.SetDirty(target);
             }
         }
     }

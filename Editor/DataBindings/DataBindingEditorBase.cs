@@ -3,11 +3,9 @@ using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
 using System.Reflection;
-using Hermit.Common;
-using Hermit.Common.DataBinding;
-using Hermit.Common.DataBinding.Core;
+using Hermit.DataBinding;
 using Hermit.Helpers;
-using Hermit.Service.Views;
+using Hermit.Views;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.Events;
@@ -121,7 +119,8 @@ namespace Hermit.DataBindings
                 }
 
                 AdapterAttributeLookup.Add(adapter, adapterAttribute);
-                AdapterLookup.AddToList(adapterAttribute.FromType, adapter);
+                if (AdapterLookup.TryGetValue(adapterAttribute.FromType, out var results)) { results.Add(adapter); }
+                else { AdapterLookup[adapterAttribute.FromType] = new List<Type> {adapter}; }
             }
         }
 
@@ -157,7 +156,7 @@ namespace Hermit.DataBindings
             {
                 foreach (var assembly in assemblies)
                 {
-                    var viewModelType = assembly.GetType(dataProvider.GetViewModelTypeName);
+                    var viewModelType = assembly.GetType(dataProvider.ViewModelTypeName);
                     if (viewModelType == null) { continue; }
 
                     viewModelTypes.Add(viewModelType);
@@ -195,20 +194,18 @@ namespace Hermit.DataBindings
             var selection = lookup.IndexOf(viewModelEntry);
 
             // Select View Model
-            using (var check = new EditorGUI.ChangeCheckScope())
+            using var check = new EditorGUI.ChangeCheckScope();
+            selection = EditorGUILayout.Popup("Property", selection, options.ToArray());
+
+            if (ViewModelSource == null && selection >= 0) { ViewModelSource = propertyTypeLookup[selection]; }
+
+            if (check.changed)
             {
-                selection = EditorGUILayout.Popup("Property", selection, options.ToArray());
+                viewModelEntry = lookup[selection];
+                BindingBase.dataProviderComponent = providerLookup[viewModelTypeLookup[selection]] as Component;
 
-                if (ViewModelSource == null && selection >= 0) { ViewModelSource = propertyTypeLookup[selection]; }
-
-                if (check.changed)
-                {
-                    viewModelEntry = lookup[selection];
-                    BindingBase.dataProviderComponent = providerLookup[viewModelTypeLookup[selection]] as Component;
-
-                    ViewModelSource = propertyTypeLookup[selection];
-                    ViewModelDest = null;
-                }
+                ViewModelSource = propertyTypeLookup[selection];
+                ViewModelDest = null;
             }
 
             return viewModelEntry;
@@ -230,11 +227,16 @@ namespace Hermit.DataBindings
             {
                 if (component == BindingBase || component == null) { continue; }
 
+                var bindingFlags = BindingFlags.Instance | BindingFlags.Public;
+
                 // TODO: configs for static properties
                 // Get properties with public setter and getter
                 var properties = component.GetType()
-                    .GetProperties(BindingFlags.Instance | BindingFlags.Public)
+                    .GetProperties(bindingFlags)
                     .Where(p => p.GetGetMethod(false) != null && p.GetSetMethod(false) != null);
+
+                var fields = component.GetType()
+                    .GetFields(bindingFlags);
 
                 foreach (var propertyInfo in properties)
                 {
@@ -243,20 +245,26 @@ namespace Hermit.DataBindings
                     options.Add(
                         $"{component.GetType().PrettyName()}/{propertyInfo.Name} - [{propertyInfo.PropertyType.PrettyName()}]");
                 }
+
+                foreach (var fieldInfo in fields)
+                {
+                    data.Add(fieldInfo.FieldType);
+                    lookup.Add($"{component.GetType()}.{fieldInfo.Name}");
+                    options.Add(
+                        $"{component.GetType().PrettyName()}/{fieldInfo.Name} - [{fieldInfo.FieldType.PrettyName()}]");
+                }
             }
 
             var selection = lookup.IndexOf(viewEntry);
-            using (var check = new EditorGUI.ChangeCheckScope())
-            {
-                selection = EditorGUILayout.Popup("Properties", selection, options.ToArray());
+            using var check = new EditorGUI.ChangeCheckScope();
+            selection = EditorGUILayout.Popup("Members", selection, options.ToArray());
 
-                if (ViewSource == null && selection >= 0) { ViewSource = data[selection]; }
+            if (ViewSource == null && selection >= 0) { ViewSource = data[selection]; }
 
-                if (!check.changed) { return viewEntry; }
+            if (!check.changed) { return viewEntry; }
 
-                ViewSource = data[selection];
-                return lookup[selection];
-            }
+            ViewSource = data[selection];
+            return lookup[selection];
         }
 
         protected virtual string DrawViewMethodPopup(string viewEntry, bool declaredMethodsOnly)
@@ -303,22 +311,20 @@ namespace Hermit.DataBindings
             }
 
             var selection = lookup.IndexOf(viewEntry);
-            using (var check = new EditorGUI.ChangeCheckScope())
-            {
-                selection = EditorGUILayout.Popup("Methods", selection, options.ToArray());
+            using var check = new EditorGUI.ChangeCheckScope();
+            selection = EditorGUILayout.Popup("Methods", selection, options.ToArray());
 
-                if (ViewSource == null && selection >= 0) { ViewSource = data[selection]; }
+            if (ViewSource == null && selection >= 0) { ViewSource = data[selection]; }
 
-                if (!check.changed) { return viewEntry; }
+            if (!check.changed) { return viewEntry; }
 
-                ViewSource = data[selection];
-                return lookup[selection];
-            }
+            ViewSource = data[selection];
+            return lookup[selection];
         }
 
         #endregion
 
-        #region View Action        
+        #region View Action
 
         protected virtual (string eventEntry, MemberInfo memberInfo) DrawViewMethodsPopup(string viewMethodEntry,
             bool declaredMethodsOnly)
@@ -361,17 +367,15 @@ namespace Hermit.DataBindings
 
             var selection = lookup.IndexOf(viewMethodEntry);
 
-            using (var check = new EditorGUI.ChangeCheckScope())
-            {
-                selection = EditorGUILayout.Popup("Methods", selection, options.ToArray());
+            using var check = new EditorGUI.ChangeCheckScope();
+            selection = EditorGUILayout.Popup("Methods", selection, options.ToArray());
 
-                if (BindingEvent == null && selection >= 0) { BindingEvent = data[selection]; }
+            if (BindingEvent == null && selection >= 0) { BindingEvent = data[selection]; }
 
-                if (!check.changed) { return (viewMethodEntry, BindingEvent); }
+            if (!check.changed) { return (viewMethodEntry, BindingEvent); }
 
-                BindingEvent = data[selection];
-                return (lookup[selection], BindingEvent);
-            }
+            BindingEvent = data[selection];
+            return (lookup[selection], BindingEvent);
         }
 
         #endregion
@@ -420,17 +424,15 @@ namespace Hermit.DataBindings
 
             var selection = lookup.IndexOf(viewEventEntry);
 
-            using (var check = new EditorGUI.ChangeCheckScope())
-            {
-                selection = EditorGUILayout.Popup("Events", selection, options.ToArray());
+            using var check = new EditorGUI.ChangeCheckScope();
+            selection = EditorGUILayout.Popup("Events", selection, options.ToArray());
 
-                if (BindingEvent == null && selection >= 0) { BindingEvent = data[selection]; }
+            if (BindingEvent == null && selection >= 0) { BindingEvent = data[selection]; }
 
-                if (!check.changed) { return (viewEventEntry, BindingEvent); }
+            if (!check.changed) { return (viewEventEntry, BindingEvent); }
 
-                BindingEvent = data[selection];
-                return (lookup[selection], BindingEvent);
-            }
+            BindingEvent = data[selection];
+            return (lookup[selection], BindingEvent);
         }
 
         #endregion
@@ -465,7 +467,7 @@ namespace Hermit.DataBindings
             {
                 foreach (var assembly in assemblies)
                 {
-                    var viewModelType = assembly.GetType(dataProvider.GetViewModelTypeName);
+                    var viewModelType = assembly.GetType(dataProvider.ViewModelTypeName);
                     if (viewModelType == null) { continue; }
 
                     if (!viewModelTypes.Contains(viewModelType)) { viewModelTypes.Add(viewModelType); }
@@ -492,27 +494,25 @@ namespace Hermit.DataBindings
                     }
 
                     data.Add(viewModelProvider as Component);
-                    options.Add($"{viewModelProvider.GetViewModelTypeName}/{valueName}");
-                    lookup.Add($"{viewModelProvider.GetViewModelTypeName}.{valueName}");
+                    options.Add($"{viewModelProvider.ViewModelTypeName}/{valueName}");
+                    lookup.Add($"{viewModelProvider.ViewModelTypeName}.{valueName}");
                 }
             }
 
             var selection = lookup.IndexOf(viewModelActionEntry);
 
-            using (var check = new EditorGUI.ChangeCheckScope())
-            {
-                selection = EditorGUILayout.Popup("Events", selection, options.ToArray());
+            using var check = new EditorGUI.ChangeCheckScope();
+            selection = EditorGUILayout.Popup("Events", selection, options.ToArray());
 
-                if (selection < 0) { return viewModelActionEntry; }
+            if (selection < 0) { return viewModelActionEntry; }
 
-                if (BindingBase.dataProviderComponent == null) { BindingBase.dataProviderComponent = data[selection]; }
+            if (BindingBase.dataProviderComponent == null) { BindingBase.dataProviderComponent = data[selection]; }
 
-                if (!check.changed) { return viewModelActionEntry; }
+            if (!check.changed) { return viewModelActionEntry; }
 
-                BindingBase.dataProviderComponent = data[selection];
-                serializedObject.ApplyModifiedProperties();
-                return lookup[selection];
-            }
+            BindingBase.dataProviderComponent = data[selection];
+            serializedObject.ApplyModifiedProperties();
+            return lookup[selection];
         }
 
         #endregion
@@ -560,8 +560,8 @@ namespace Hermit.DataBindings
             {
                 case MemberTypes.Event:
                     var eventInfo = eventMemberInfo as EventInfo;
-                    var handlerType = eventInfo.EventHandlerType;
-                    var invokeMethod = handlerType.GetMethod("Invoke");
+                    var handlerType = eventInfo?.EventHandlerType;
+                    var invokeMethod = handlerType?.GetMethod("Invoke");
                     arguments.AddRange(invokeMethod.GetParameters().Select(p => p.ParameterType));
                     break;
                 case MemberTypes.Field:
@@ -600,7 +600,7 @@ namespace Hermit.DataBindings
             {
                 foreach (var assembly in assemblies)
                 {
-                    var viewModelType = assembly.GetType(dataProvider.GetViewModelTypeName);
+                    var viewModelType = assembly.GetType(dataProvider.ViewModelTypeName);
                     if (viewModelType == null) { continue; }
 
                     if (!viewModelTypes.Contains(viewModelType)) { viewModelTypes.Add(viewModelType); }
@@ -636,27 +636,25 @@ namespace Hermit.DataBindings
                 var right = arguments;
                 if (!left.SequenceEqual(right)) { continue; }
 
-                options.Add($"{methodInfoTypeLookup[actionMethod].GetViewModelTypeName}/{actionMethod.Name}");
-                lookup.Add($"{methodInfoTypeLookup[actionMethod].GetViewModelTypeName}.{actionMethod.Name}");
+                options.Add($"{methodInfoTypeLookup[actionMethod].ViewModelTypeName}/{actionMethod.Name}");
+                lookup.Add($"{methodInfoTypeLookup[actionMethod].ViewModelTypeName}.{actionMethod.Name}");
             }
 
             var selection = lookup.IndexOf(viewModelEventEntry);
 
-            using (var check = new EditorGUI.ChangeCheckScope())
+            using var check = new EditorGUI.ChangeCheckScope();
+            selection = EditorGUILayout.Popup("Events", selection, options.ToArray());
+
+            if (BindingBase.dataProviderComponent == null && selection >= 0)
             {
-                selection = EditorGUILayout.Popup("Events", selection, options.ToArray());
-
-                if (BindingBase.dataProviderComponent == null && selection >= 0)
-                {
-                    BindingBase.dataProviderComponent = providerLookup[arguments.Count][selection];
-                }
-
-                if (!check.changed) { return viewModelEventEntry; }
-
                 BindingBase.dataProviderComponent = providerLookup[arguments.Count][selection];
-                serializedObject.ApplyModifiedProperties();
-                return lookup[selection];
             }
+
+            if (!check.changed) { return viewModelEventEntry; }
+
+            BindingBase.dataProviderComponent = providerLookup[arguments.Count][selection];
+            serializedObject.ApplyModifiedProperties();
+            return lookup[selection];
         }
 
         #endregion
@@ -691,7 +689,7 @@ namespace Hermit.DataBindings
             {
                 foreach (var assembly in assemblies)
                 {
-                    var viewModelType = assembly.GetType(dataProvider.GetViewModelTypeName);
+                    var viewModelType = assembly.GetType(dataProvider.ViewModelTypeName);
                     if (viewModelType == null) { continue; }
 
                     if (!viewModelTypes.Contains(viewModelType)) { viewModelTypes.Add(viewModelType); }
@@ -734,27 +732,26 @@ namespace Hermit.DataBindings
                     }
 
                     data.Add(viewModelProvider as Component);
-                    options.Add($"{viewModelProvider.GetViewModelTypeName}/{valueName}");
-                    lookup.Add($"{viewModelProvider.GetViewModelTypeName}.{valueName}");
+                    options.Add($"{viewModelProvider.ViewModelTypeName}/{valueName}");
+                    lookup.Add($"{viewModelProvider.ViewModelTypeName}.{valueName}");
                 }
             }
 
             var selection = lookup.IndexOf(viewModelCollectionEntry);
 
-            using (var check = new EditorGUI.ChangeCheckScope())
-            {
-                selection = EditorGUILayout.Popup("Collections", selection, options.ToArray());
+            using var check = new EditorGUI.ChangeCheckScope();
 
-                if (selection < 0) { return viewModelCollectionEntry; }
+            selection = EditorGUILayout.Popup("Collections", selection, options.ToArray());
 
-                if (BindingBase.dataProviderComponent == null) { BindingBase.dataProviderComponent = data[selection]; }
+            if (selection < 0) { return viewModelCollectionEntry; }
 
-                if (!check.changed) { return viewModelCollectionEntry; }
+            if (BindingBase.dataProviderComponent == null) { BindingBase.dataProviderComponent = data[selection]; }
 
-                BindingBase.dataProviderComponent = data[selection];
-                serializedObject.ApplyModifiedProperties();
-                return lookup[selection];
-            }
+            if (!check.changed) { return viewModelCollectionEntry; }
+
+            BindingBase.dataProviderComponent = data[selection];
+            serializedObject.ApplyModifiedProperties();
+            return lookup[selection];
         }
 
         #endregion
@@ -776,11 +773,13 @@ namespace Hermit.DataBindings
         }
 
         private (string, Type) DrawAdapterPopup(string adapterTypeName, SerializedProperty adapterOptionSp,
-            Type sourceType)
+            Type targetType)
         {
-            var destinationType = sourceType;
-            var data = sourceType != null && AdapterLookup.ContainsKey(sourceType)
-                ? AdapterLookup[sourceType]
+            if (targetType == null) { return (adapterTypeName, null); }
+
+            var convertedType = targetType;
+            var data = targetType != null && AdapterLookup.ContainsKey(targetType)
+                ? AdapterLookup[targetType]
                 : new List<Type>();
 
             var options = data
@@ -789,33 +788,31 @@ namespace Hermit.DataBindings
             options.Insert(0, "None");
             var lookup = data.Select(a => a.FullName).ToList();
 
-            var selection = lookup.IndexOf(adapterTypeName);
-            using (var check = new EditorGUI.ChangeCheckScope())
+            var selection = lookup.IndexOf(adapterTypeName) + 1;
+            using var check = new EditorGUI.ChangeCheckScope();
+
+            selection = EditorGUILayout.Popup("Adapters", selection, options.ToArray());
+            selection--;
+
+            if (lookup.Count <= selection || selection < 0)
             {
-                selection++;
-                selection = EditorGUILayout.Popup("Adapters", selection, options.ToArray());
-                selection--;
+                if (selection < 0) { return (null, null); }
 
-                if (lookup.Count <= selection || selection < 0)
-                {
-                    if (selection < 0) { return (null, null); }
-
-                    return (adapterTypeName, null);
-                }
-
-                var adapter = data[selection];
-
-                if (AdapterAttributeLookup.TryGetValue(adapter, out var adapterAttribute))
-                {
-                    EditorGUILayout.PropertyField(adapterOptionSp);
-
-                    destinationType = adapterAttribute.ToType;
-                }
-
-                if (check.changed) { serializedObject.ApplyModifiedProperties(); }
-
-                return (lookup[selection], destinationType);
+                return (adapterTypeName, null);
             }
+
+            var adapter = data[selection];
+
+            if (AdapterAttributeLookup.TryGetValue(adapter, out var adapterAttribute))
+            {
+                EditorGUILayout.PropertyField(adapterOptionSp);
+
+                convertedType = adapterAttribute.ToType;
+            }
+
+            if (check.changed) { serializedObject.ApplyModifiedProperties(); }
+
+            return (lookup[selection], convertedType);
         }
 
         #endregion
@@ -829,14 +826,13 @@ namespace Hermit.DataBindings
             if (string.IsNullOrEmpty(handlerTypeName) && options.Count > 0) { handlerTypeName = options[0]; }
 
             var selection = options.IndexOf(handlerTypeName);
-            using (var check = new EditorGUI.ChangeCheckScope())
-            {
-                selection = EditorGUILayout.Popup("Handlers", selection, options.ToArray());
+            using var check = new EditorGUI.ChangeCheckScope();
 
-                if (check.changed) { serializedObject.ApplyModifiedProperties(); }
+            selection = EditorGUILayout.Popup("Handlers", selection, options.ToArray());
 
-                return options[selection];
-            }
+            if (check.changed) { serializedObject.ApplyModifiedProperties(); }
+
+            return options[selection];
         }
 
         #endregion
@@ -849,7 +845,6 @@ namespace Hermit.DataBindings
             {
                 EditorGUILayout.LabelField(label, GUILayout.Width(120));
 
-
                 GUILayout.FlexibleSpace();
                 if (type != null) { EditorGUILayout.LabelField($"Type: {type.PrettyName()}", AlignToRightStyle); }
             }
@@ -861,19 +856,20 @@ namespace Hermit.DataBindings
             {
                 EditorGUILayout.LabelField("View Model", GUILayout.Width(70));
                 GUILayout.FlexibleSpace();
+
                 var viewModelText = ViewModelSource != null
                     ? ViewModelDest != null
-                        ? $"{ViewModelSource.PrettyName()}->{ViewModelDest.PrettyName()}"
+                        ? $"{ViewModelSource.PrettyName()} -> {ViewModelDest.PrettyName()}"
                         : ViewModelSource.PrettyName()
                     : EditorUtil.Undefined;
 
                 var viewText = ViewSource != null
                     ? ViewDest != null
-                        ? $"{ViewSource.PrettyName()}->{ViewDest.PrettyName()}"
+                        ? $"{ViewSource.PrettyName()} -> {ViewDest.PrettyName()}"
                         : ViewSource.PrettyName()
                     : EditorUtil.Undefined;
 
-                var connectionSign = oneWay ? "=>" : "<=>";
+                var connectionSign = oneWay ? "==>" : "<==>";
 
                 string content;
 

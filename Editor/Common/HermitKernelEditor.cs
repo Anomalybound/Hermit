@@ -1,13 +1,13 @@
 ﻿using System.Reflection;
 using Hermit.Injection;
-using Hermit.Service.Views.UI;
+using Hermit.ServiceProvider;
 using UnityEditor;
 using UnityEngine;
 
 namespace Hermit.Common
 {
     [CustomEditor(typeof(HermitKernel))]
-    public class HermitKernelEditor : UnityEditor.Editor
+    public class HermitKernelEditor : Editor
     {
         [MenuItem("Hermit/Quick Scene Setup %#k")]
         public static void Setup()
@@ -20,16 +20,14 @@ namespace Hermit.Common
             }
 
             var kernelObj = new GameObject("Hermit Kernel",
-                typeof(HermitKernel), typeof(HermitKernelServiceProvider), typeof(HermitUIServiceProvider)
+                typeof(HermitKernel), typeof(HermitKernelServiceRegistry)
             );
             kernel = kernelObj.GetComponent<HermitKernel>();
-            var kernelServiceProvider = kernelObj.GetComponent<HermitKernelServiceProvider>();
-            var uiServiceProvider = kernelObj.GetComponent<HermitUIServiceProvider>();
-            uiServiceProvider.uiRootPrefab = Resources.Load<UIRoot>("UI Root");
+            var kernelServiceProvider = kernelObj.GetComponent<HermitKernelServiceRegistry>();
 
-            var array = new MonoServiceProvider[]
+            var array = new MonoServiceRegistry[]
             {
-                kernelServiceProvider, uiServiceProvider
+                kernelServiceProvider
             };
             var fieldInfo = typeof(HermitKernel).GetField("serviceProviders",
                 BindingFlags.NonPublic | BindingFlags.Instance);
@@ -50,12 +48,10 @@ namespace Hermit.Common
             }
 
             EditorGUILayout.LabelField($"Hermit Version: {Her.Version}", _versionDisplay);
-            using (var check = new EditorGUI.ChangeCheckScope())
-            {
-                EditorGUILayout.PropertyField(serializedObject.FindProperty("injectSceneObjects"), true);
-                EditorGUILayout.PropertyField(serializedObject.FindProperty("serviceProviders"), true);
-                if (check.changed) { serializedObject.ApplyModifiedProperties(); }
-            }
+            using var check = new EditorGUI.ChangeCheckScope();
+            EditorGUILayout.PropertyField(serializedObject.FindProperty("injectSceneObjects"), true);
+            EditorGUILayout.PropertyField(serializedObject.FindProperty("serviceProviders"), true);
+            if (check.changed) { serializedObject.ApplyModifiedProperties(); }
         }
     }
 }

@@ -1,6 +1,4 @@
-﻿using Hermit.Fsm.Common;
-using Hermit.Fsm.Core;
-using UnityEditor;
+﻿using UnityEditor;
 using UnityEngine;
 
 namespace Hermit.Fsm

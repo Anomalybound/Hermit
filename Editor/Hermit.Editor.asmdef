@@ -1,8 +1,8 @@
 {
     "name": "Hermit.Editor",
+    "rootNamespace": "",
     "references": [
-        "GUID:05db3c3727f094711869959e2ca97546",
-        "GUID:59813c7b596ae4648b210edfc164ffb6"
+        "GUID:f6da6572fef4a4034a1bcd28da6d7cdf"
     ],
     "includePlatforms": [],
     "excludePlatforms": [

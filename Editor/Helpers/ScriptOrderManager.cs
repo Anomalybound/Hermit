@@ -1,5 +1,4 @@
 ﻿using System;
-using Hermit.Common;
 using UnityEditor;
 
 namespace Hermit.Helpers

@@ -5,12 +5,12 @@ using UnityEditor;
 
 namespace Hermit.Common
 {
-    [CustomEditor(typeof(MonoServiceProvider), true)]
+    [CustomEditor(typeof(MonoServiceRegistry), true)]
     public class MonoServiceProviderEditor : Editor
     {
         private void OnEnable()
         {
-            var serviceProvider = target as MonoServiceProvider;
+            var serviceProvider = target as MonoServiceRegistry;
             if (serviceProvider == null) { return; }
 
             var sceneContext = serviceProvider.GetComponentInParent<SceneContext>();
@@ -20,7 +20,7 @@ namespace Hermit.Common
             var field = type.GetField("ServiceProviders", BindingFlags.NonPublic | BindingFlags.Instance);
             if (field == null) { return; }
 
-            var providers = field.GetValue(sceneContext) as MonoServiceProvider[];
+            var providers = field.GetValue(sceneContext) as MonoServiceRegistry[];
             for (var i = 0; i < providers?.Length; i++)
             {
                 var provider = providers[i];

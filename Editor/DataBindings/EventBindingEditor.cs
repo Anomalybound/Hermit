@@ -1,5 +1,5 @@
 using System.Reflection;
-using Hermit.Common.DataBinding;
+using Hermit.DataBinding;
 using UnityEditor;
 
 namespace Hermit.DataBindings
@@ -24,33 +24,31 @@ namespace Hermit.DataBindings
 
             serializedObject.Update();
 
-            using (var check = new EditorGUI.ChangeCheckScope())
+            using var check = new EditorGUI.ChangeCheckScope();
+            using (new EditorGUILayout.VerticalScope(EditorStyles.helpBox))
             {
-                using (new EditorGUILayout.VerticalScope(EditorStyles.helpBox))
-                {
-                    DrawBindingLabel("View");
+                DrawBindingLabel("View");
 
-                    // Draw View Event Popup
-                    (Target.ViewEventEntry, EventMemberInfo) = DrawViewEventPopup(Target.ViewEventEntry);
-                }
+                // Draw View Event Popup
+                (Target.ViewEventEntry, EventMemberInfo) = DrawViewEventPopup(Target.ViewEventEntry);
+            }
 
-                using (new EditorGUILayout.VerticalScope(EditorStyles.helpBox))
-                {
-                    DrawBindingLabel("View Model");
+            using (new EditorGUILayout.VerticalScope(EditorStyles.helpBox))
+            {
+                DrawBindingLabel("View Model");
 
-                    EditorGUI.BeginDisabledGroup(Target.ViewEventEntry == null);
+                EditorGUI.BeginDisabledGroup(Target.ViewEventEntry == null);
 
-                    Target.ViewModelActionEntry =
-                        DrawViewModelActionPopup(Target.ViewModelActionEntry, EventMemberInfo);
+                Target.ViewModelActionEntry =
+                    DrawViewModelActionPopup(Target.ViewModelActionEntry, EventMemberInfo);
 
-                    EditorGUI.EndDisabledGroup();
-                }
+                EditorGUI.EndDisabledGroup();
+            }
 
-                if (check.changed)
-                {
-                    serializedObject.ApplyModifiedProperties();
-                    EditorUtility.SetDirty(target);
-                }
+            if (check.changed)
+            {
+                serializedObject.ApplyModifiedProperties();
+                EditorUtility.SetDirty(target);
             }
         }
     }
