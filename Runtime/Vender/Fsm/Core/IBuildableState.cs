@@ -4,7 +4,7 @@ namespace Hermit.Fsm
 {
     public interface IBuildableState : IState
     {
-        void AddChild(string name, IState state);
+        TState AddChild<TState>(string name, TState state) where TState : IState;
 
         void SetEnterAction(Action onEnterAction);
 

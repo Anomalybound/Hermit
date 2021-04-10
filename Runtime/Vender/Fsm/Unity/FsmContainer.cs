@@ -9,9 +9,7 @@ namespace Hermit.Fsm
 
         public bool UseFixedUpdate => useFixedUpdate;
 
-        public IState Root { get; protected set; }
-        
-        public IState ActiveState { get; protected set; }
+        public IState RootNode { get; protected set; }
 
         protected bool Running { get; private set; }
 
@@ -32,7 +30,8 @@ namespace Hermit.Fsm
         private void Awake()
         {
             OnInit();
-            Root = BuildState();
+            RootNode = BuildState();
+            RootNode.Enter();
         }
 
         private void OnEnable()
@@ -49,14 +48,20 @@ namespace Hermit.Fsm
 
         private void Update()
         {
-            if (Running && !UseFixedUpdate) { Root?.Update(Time.deltaTime); }
+            if (Running && !UseFixedUpdate)
+            {
+                RootNode?.Update(Time.deltaTime);
+            }
 
             OnUpdate(Time.deltaTime);
         }
 
         private void FixedUpdate()
         {
-            if (Running && UseFixedUpdate) { Root?.Update(Time.fixedDeltaTime); }
+            if (Running && UseFixedUpdate)
+            {
+                RootNode?.Update(Time.fixedDeltaTime);
+            }
 
             OnFixedUpdate(Time.fixedDeltaTime);
         }

@@ -8,8 +8,6 @@ namespace Hermit.Fsm
     {
         private FsmContainer _fsm;
 
-        private IState _activeState;
-
         private void OnEnable()
         {
             _fsm = target as FsmContainer;
@@ -30,22 +28,20 @@ namespace Hermit.Fsm
                 if (check.changed) { serializedObject.ApplyModifiedProperties(); }
             }
 
-            if (_fsm.Root == null)
+            if (_fsm.RootNode == null)
             {
                 EditorGUILayout.LabelField("Root state not initialized.");
                 return;
             }
 
-            _activeState = null;
-
-            DrawState("Root", _fsm.Root);
+            DrawState("Root", _fsm.RootNode);
         }
 
         private void DrawState(string stateName, IState state)
         {
             using (new GUILayout.VerticalScope(EditorStyles.helpBox))
             {
-                DrawState(stateName, state, _activeState == state);
+                DrawState(stateName, state, state.Active);
 
                 if (state.Children.Count > 0) { DrawChildren(state); }
             }
@@ -62,23 +58,15 @@ namespace Hermit.Fsm
                 var rect = GUILayoutUtility.GetLastRect();
                 rect.width = 20;
 
-                if (_fsm.Root != state) { GUI.Toggle(rect, active, ""); }
+                if (_fsm.RootNode != state) { GUI.Toggle(rect, active, ""); }
             }
         }
 
         private void DrawChildren(IState state)
         {
             EditorGUI.indentLevel++;
-
-            if (state.ActiveChildrenStates.Count > 0)
-            {
-                var activeState = state.ActiveChildrenStates.Peek();
-                if (_activeState != activeState)
-                {
-                    Repaint();
-                    _activeState = activeState;
-                }
-            }
+            
+            Repaint();
 
             if (state.Children.Count > 0)
             {

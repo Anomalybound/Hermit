@@ -22,7 +22,7 @@ namespace Hermit.Fsm
 
         public TProcedureIndex InitState => initState;
 
-        public TProcedureIndex Current => _indexLookup[Root.ActiveChildrenStates.Peek()];
+        public TProcedureIndex Current => _indexLookup[RootNode.ActiveChildrenStates.Peek()];
 
         public event Action<IState, IState> OnStateChanged;
 
@@ -66,10 +66,11 @@ namespace Hermit.Fsm
                 root.AddChild(id.ToString(CultureInfo.InvariantCulture), procedure);
             }
 
-            ActiveState = Root = root;
+            RootNode = root;
+
             if (procedures.Count <= 0)
             {
-                return Root;
+                return RootNode;
             }
 
             if (procedures.Any(p => p.Index.Equals(InitState)))
@@ -84,52 +85,55 @@ namespace Hermit.Fsm
             }
 
             HermitEvent.Send(HermitEvent.ProcedureBuildStateFinished);
-            return Root;
+            return RootNode;
         }
 
         #region Facade
 
+        public void ClearState()
+        {
+            TrackStateEvent(() => RootNode.ClearStates());
+        }
+
         public void ChangeState(TProcedureIndex index)
         {
-            TrackStateEvent(() => Root.ChangeState(index.ToString(CultureInfo.InvariantCulture)));
+            TrackStateEvent(() => RootNode.ChangeState(index.ToString(CultureInfo.InvariantCulture)));
         }
 
         public void PushState(TProcedureIndex index)
         {
-            TrackStateEvent(() => Root.PushState(index.ToString(CultureInfo.InvariantCulture)));
+            TrackStateEvent(() => RootNode.PushState(index.ToString(CultureInfo.InvariantCulture)));
         }
 
         public void ChangeState(string stateName)
         {
-            TrackStateEvent(() => Root.ChangeState(stateName));
+            TrackStateEvent(() => RootNode.ChangeState(stateName));
         }
 
-        public void PushState(string stateName)
+        public void PushState(string stateName, bool allowDuplicated = false)
         {
-            TrackStateEvent(() => Root.PushState(stateName));
+            TrackStateEvent(() => RootNode.PushState(stateName, allowDuplicated));
         }
 
-        public void PopState()
+        public void PopState(bool includingRoot)
         {
-            TrackStateEvent(() => Root.PopState());
+            TrackStateEvent(() => RootNode.PopState(includingRoot));
         }
 
         public void TriggerEvent(string eventId, EventArgs args)
         {
-            TrackStateEvent(() => Root.TriggerEvent(eventId, args));
+            TrackStateEvent(() => RootNode.TriggerEvent(eventId, args));
         }
 
         private void TrackStateEvent(Action action)
         {
             var previousActive =
-                Root.ActiveChildrenStates.Count > 0 ? Root.ActiveChildrenStates.Peek() : null;
+                RootNode.ActiveChildrenStates.Count > 0 ? RootNode.ActiveChildrenStates.Peek() : null;
 
             action?.Invoke();
 
             var currentActive =
-                Root.ActiveChildrenStates.Count > 0 ? Root.ActiveChildrenStates.Peek() : null;
-
-            ActiveState = currentActive ?? Root;
+                RootNode.ActiveChildrenStates.Count > 0 ? RootNode.ActiveChildrenStates.Peek() : null;
 
             if (previousActive != currentActive)
             {

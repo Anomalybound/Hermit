@@ -7,19 +7,24 @@ namespace Hermit.Fsm
     {
         #region IState Implementation
 
+        public bool Active { get; private set; }
+
         public IState Parent { get; set; }
 
         public float ElapsedTime { get; private set; }
-
         public Dictionary<string, IState> Children { get; } = new Dictionary<string, IState>();
 
         public Stack<IState> ActiveChildrenStates { get; } = new Stack<IState>();
+
+        #region Lifecycle
 
         public virtual void Enter()
         {
             OnEnterAction?.Invoke();
 
             ElapsedTime = 0f;
+
+            Active = true;
         }
 
         public virtual void Update(float deltaTime)
@@ -28,14 +33,13 @@ namespace Hermit.Fsm
             if (ActiveChildrenStates.Count > 0)
             {
                 ActiveChildrenStates.Peek().Update(deltaTime);
-                return;
             }
 
             OnUpdateAction?.Invoke(deltaTime);
 
             ElapsedTime += deltaTime;
 
-            // Check if condition meets
+            // Check if any condition meets
             foreach (var conditionPair in _conditions)
             {
                 if (conditionPair.Key.Invoke())
@@ -47,7 +51,19 @@ namespace Hermit.Fsm
 
         public virtual void Exit()
         {
+            InternalPopAll(false);
+
             OnExitAction?.Invoke();
+
+            Active = false;
+        }
+
+        #endregion
+
+        public void ClearStates()
+        {
+            InternalPopAll(true);
+            Enter();
         }
 
         public virtual void ChangeState(string name)
@@ -59,7 +75,7 @@ namespace Hermit.Fsm
 
             while (ActiveChildrenStates.Count > 0)
             {
-                PopState();
+                PopState(true);
             }
 
             InternalPushState(result, false);
@@ -75,9 +91,13 @@ namespace Hermit.Fsm
             InternalPushState(result, allowDuplicated);
         }
 
-        public void PopState()
+        public void PopState(bool backToRoot)
         {
             InternalPopState();
+
+            var active = ActiveChildrenStates.Count > 0 ? ActiveChildrenStates.Peek() :
+                backToRoot ? this : null;
+            active?.Enter();
         }
 
         public void TriggerEvent(string id)
@@ -122,7 +142,15 @@ namespace Hermit.Fsm
 
         #endregion
 
-        #region Private Operations
+        #region Internal Operations
+
+        private void InternalPopAll(bool enterRoot)
+        {
+            while (ActiveChildrenStates.Count > 0)
+            {
+                PopState(enterRoot);
+            }
+        }
 
         private void InternalPopState()
         {
@@ -146,6 +174,9 @@ namespace Hermit.Fsm
                 }
             }
 
+            var active = ActiveChildrenStates.Count > 0 ? ActiveChildrenStates.Peek() : null;
+            active?.Exit();
+
             ActiveChildrenStates.Push(state);
             state.Enter();
         }
@@ -154,7 +185,7 @@ namespace Hermit.Fsm
 
         #region Helper
 
-        public void AddChild(string name, IState state)
+        public TState AddChild<TState>(string name, TState state) where TState : IState
         {
             if (!Children.ContainsKey(name))
             {
@@ -165,6 +196,8 @@ namespace Hermit.Fsm
             {
                 throw new ApplicationException($"Child state already exists: {name}");
             }
+
+            return state;
         }
 
         public void SetEnterAction(Action onEnterAction)

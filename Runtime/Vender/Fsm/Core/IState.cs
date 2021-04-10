@@ -7,6 +7,8 @@ namespace Hermit.Fsm
     {
         #region Properties
 
+        bool Active { get; }
+
         IState Parent { get; set; }
 
         Dictionary<string, IState> Children { get; }
@@ -17,11 +19,13 @@ namespace Hermit.Fsm
 
         #region Operations
 
+        void ClearStates();
+
         void ChangeState(string stateName);
 
         void PushState(string stateName, bool allowDuplicated = false);
 
-        void PopState();
+        void PopState(bool backToRoot);
 
         void TriggerEvent(string id, EventArgs eventArgs);
 

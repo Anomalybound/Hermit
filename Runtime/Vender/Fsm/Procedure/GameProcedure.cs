@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Globalization;
 
 namespace Hermit.Fsm
 {
@@ -41,39 +40,5 @@ namespace Hermit.Fsm
         protected virtual void OnExit() { }
 
         protected virtual void OnUpdate(float deltaTime) { }
-
-        #region Facade
-
-        public void ChangeState(TProcedureIndex index)
-        {
-            Controller.ChangeState(index.ToString(CultureInfo.InvariantCulture));
-        }
-
-        public void PushState(TProcedureIndex index)
-        {
-            Controller.PushState(index.ToString(CultureInfo.InvariantCulture));
-        }
-
-        public new void ChangeState(string stateName)
-        {
-            Controller.ChangeState(stateName);
-        }
-
-        public new void PushState(string stateName)
-        {
-            Controller.PushState(stateName);
-        }
-
-        public new void PopState()
-        {
-            Controller.PopState();
-        }
-
-        public new void TriggerEvent(string eventId, EventArgs args)
-        {
-            Controller.TriggerEvent(eventId, args);
-        }
-
-        #endregion
     }
 }
