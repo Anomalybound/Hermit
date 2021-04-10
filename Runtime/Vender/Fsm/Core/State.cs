@@ -13,7 +13,7 @@ namespace Hermit.Fsm
 
         public Dictionary<string, IState> Children { get; } = new Dictionary<string, IState>();
 
-        public Stack<IState> ActiveStates { get; } = new Stack<IState>();
+        public Stack<IState> ActiveChildrenStates { get; } = new Stack<IState>();
 
         public virtual void Enter()
         {
@@ -25,9 +25,9 @@ namespace Hermit.Fsm
         public virtual void Update(float deltaTime)
         {
             // Only update the latest state
-            if (ActiveStates.Count > 0)
+            if (ActiveChildrenStates.Count > 0)
             {
-                ActiveStates.Peek().Update(deltaTime);
+                ActiveChildrenStates.Peek().Update(deltaTime);
                 return;
             }
 
@@ -54,7 +54,7 @@ namespace Hermit.Fsm
                 throw new ApplicationException($"Child state [{name}] not found.");
             }
 
-            while (ActiveStates.Count > 0) { PopState(); }
+            while (ActiveChildrenStates.Count > 0) { PopState(); }
 
             InternalPushState(result);
         }
@@ -71,7 +71,7 @@ namespace Hermit.Fsm
 
         public void PopState()
         {
-            PrivatePopState();
+            InternalPopState();
         }
 
         public void TriggerEvent(string id)
@@ -81,9 +81,9 @@ namespace Hermit.Fsm
 
         public void TriggerEvent(string id, EventArgs eventArgs)
         {
-            if (ActiveStates.Count > 0)
+            if (ActiveChildrenStates.Count > 0)
             {
-                ActiveStates.Peek().TriggerEvent(id, eventArgs);
+                ActiveChildrenStates.Peek().TriggerEvent(id, eventArgs);
                 return;
             }
 
@@ -109,7 +109,8 @@ namespace Hermit.Fsm
 
         #region Runtime
 
-        private readonly Dictionary<string, Action<EventArgs>> _events = new Dictionary<string, Action<EventArgs>>();
+        private readonly Dictionary<string, Action<EventArgs>> _events =
+            new Dictionary<string, Action<EventArgs>>();
 
         private readonly Dictionary<Func<bool>, Action> _conditions = new Dictionary<Func<bool>, Action>();
 
@@ -117,15 +118,20 @@ namespace Hermit.Fsm
 
         #region Private Operations
 
-        private void PrivatePopState()
+        private void InternalPopState()
         {
-            var result = ActiveStates.Pop();
+            if (ActiveChildrenStates.Count <= 0)
+            {
+                throw new IndexOutOfRangeException($"ActiveStates stack is empty.");
+            }
+
+            var result = ActiveChildrenStates.Pop();
             result.Exit();
         }
 
         private void InternalPushState(IState state)
         {
-            ActiveStates.Push(state);
+            ActiveChildrenStates.Push(state);
             state.Enter();
         }
 

@@ -11,7 +11,7 @@ namespace Hermit.Fsm
 
         Dictionary<string, IState> Children { get; }
 
-        Stack<IState> ActiveStates { get; }
+        Stack<IState> ActiveChildrenStates { get; }
 
         #endregion
 

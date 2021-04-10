@@ -10,6 +10,8 @@ namespace Hermit.Fsm
         public bool UseFixedUpdate => useFixedUpdate;
 
         public IState Root { get; protected set; }
+        
+        public IState ActiveState { get; protected set; }
 
         protected bool Running { get; private set; }
 
