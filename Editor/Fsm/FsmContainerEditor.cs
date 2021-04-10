@@ -56,7 +56,7 @@ namespace Hermit.Fsm
             using (new GUILayout.HorizontalScope())
             {
                 EditorGUILayout.LabelField(
-                    $"{stateName}[{state.GetType().FullName}] - Children: [{state.Children.Count}] - Active: [{state.ActiveStates.Count}]",
+                    $"{stateName}[{state.GetType().FullName}] - Children: [{state.Children.Count}] - Active: [{state.ActiveChildrenStates.Count}]",
                     GUILayout.ExpandWidth(true));
 
                 var rect = GUILayoutUtility.GetLastRect();
@@ -70,9 +70,9 @@ namespace Hermit.Fsm
         {
             EditorGUI.indentLevel++;
 
-            if (state.ActiveStates.Count > 0)
+            if (state.ActiveChildrenStates.Count > 0)
             {
-                var activeState = state.ActiveStates.Peek();
+                var activeState = state.ActiveChildrenStates.Peek();
                 if (_activeState != activeState)
                 {
                     Repaint();
