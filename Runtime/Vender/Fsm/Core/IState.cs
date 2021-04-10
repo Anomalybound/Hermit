@@ -19,7 +19,7 @@ namespace Hermit.Fsm
 
         void ChangeState(string stateName);
 
-        void PushState(string stateName);
+        void PushState(string stateName, bool allowDuplicated = false);
 
         void PopState();
 

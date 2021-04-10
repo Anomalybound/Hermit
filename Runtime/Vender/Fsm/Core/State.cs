@@ -38,7 +38,10 @@ namespace Hermit.Fsm
             // Check if condition meets
             foreach (var conditionPair in _conditions)
             {
-                if (conditionPair.Key.Invoke()) { conditionPair.Value?.Invoke(); }
+                if (conditionPair.Key.Invoke())
+                {
+                    conditionPair.Value?.Invoke();
+                }
             }
         }
 
@@ -54,19 +57,22 @@ namespace Hermit.Fsm
                 throw new ApplicationException($"Child state [{name}] not found.");
             }
 
-            while (ActiveChildrenStates.Count > 0) { PopState(); }
+            while (ActiveChildrenStates.Count > 0)
+            {
+                PopState();
+            }
 
-            InternalPushState(result);
+            InternalPushState(result, false);
         }
 
-        public void PushState(string name)
+        public void PushState(string name, bool allowDuplicated = false)
         {
             if (!Children.TryGetValue(name, out var result))
             {
                 throw new ApplicationException($"Child state [{name}] not found.");
             }
 
-            InternalPushState(result);
+            InternalPushState(result, allowDuplicated);
         }
 
         public void PopState()
@@ -129,8 +135,17 @@ namespace Hermit.Fsm
             result.Exit();
         }
 
-        private void InternalPushState(IState state)
+        private void InternalPushState(IState state, bool allowDuplicated)
         {
+            if (ActiveChildrenStates.Count > 0 && !allowDuplicated)
+            {
+                var activeChild = ActiveChildrenStates.Peek();
+                if (activeChild == state)
+                {
+                    return;
+                }
+            }
+
             ActiveChildrenStates.Push(state);
             state.Enter();
         }
@@ -146,7 +161,10 @@ namespace Hermit.Fsm
                 Children.Add(name, state);
                 state.Parent = this;
             }
-            else { throw new ApplicationException($"Child state already exists: {name}"); }
+            else
+            {
+                throw new ApplicationException($"Child state already exists: {name}");
+            }
         }
 
         public void SetEnterAction(Action onEnterAction)
@@ -166,14 +184,26 @@ namespace Hermit.Fsm
 
         public void AddEvent(string id, Action<EventArgs> action)
         {
-            if (!_events.ContainsKey(id)) { _events.Add(id, action); }
-            else { throw new ApplicationException($"Event already exists: {id}"); }
+            if (!_events.ContainsKey(id))
+            {
+                _events.Add(id, action);
+            }
+            else
+            {
+                throw new ApplicationException($"Event already exists: {id}");
+            }
         }
 
         public void AddEvent<TArgs>(string id, Action<TArgs> action) where TArgs : EventArgs
         {
-            if (!_events.ContainsKey(id)) { _events.Add(id, arg => { action.Invoke((TArgs) arg); }); }
-            else { throw new ApplicationException($"Event already exists: {id}"); }
+            if (!_events.ContainsKey(id))
+            {
+                _events.Add(id, arg => { action.Invoke((TArgs) arg); });
+            }
+            else
+            {
+                throw new ApplicationException($"Event already exists: {id}");
+            }
         }
 
         public void AddCondition(Func<bool> predicate, Action action)
