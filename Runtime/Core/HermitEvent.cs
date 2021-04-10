@@ -20,7 +20,7 @@ namespace Hermit
         {
             var eventData = EventPool<SystemEvent>.Rent();
             eventData.Message = msg;
-            Her.Trigger(endpoint, eventData);
+            App.Trigger(endpoint, eventData);
         }
     }
 }

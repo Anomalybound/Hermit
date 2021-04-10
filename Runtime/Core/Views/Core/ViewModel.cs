@@ -6,16 +6,9 @@ using JetBrains.Annotations;
 
 namespace Hermit.Views
 {
-    public sealed class EmptyViewModel : ViewModel
-    {
-        public override void Dispose() { }
-    }
-
     public abstract class ViewModel : INotifyPropertyChanged, INotifyPropertyChanging, IDisposable
     {
         public virtual bool Reusable { get; } = false;
-
-        public static readonly ViewModel Empty = new EmptyViewModel();
 
         private readonly ConcurrentDictionary<string, object> _properties = new ConcurrentDictionary<string, object>();
 

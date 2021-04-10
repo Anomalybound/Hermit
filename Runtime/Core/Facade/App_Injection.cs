@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace Hermit
 {
-    public partial class Her
+    public partial class App
     {
         public static bool AutoRegister => I.GeneralSettings.AutoRegisterEvents;
 
@@ -11,7 +11,7 @@ namespace Hermit
 
         public static object Create(Type type, string id = null)
         {
-            var instance = I.Context.Container.Create(type, id);
+            var instance = I.RootContainer.Create(type, id);
             if (instance != null && AutoRegister) { I.EventBroker.Register(instance); }
 
             return instance;
@@ -19,7 +19,7 @@ namespace Hermit
 
         public static object Instance(Type type, string id = null)
         {
-            var instance = I.Context.Container.Instance(type, id);
+            var instance = I.RootContainer.Instance(type, id);
             if (instance != null && AutoRegister) { I.EventBroker.Register(instance); }
 
             return instance;
@@ -27,7 +27,7 @@ namespace Hermit
 
         public static object Singleton(Type type, string id = null)
         {
-            var instance = I.Context.Container.Singleton(type, id);
+            var instance = I.RootContainer.Singleton(type, id);
             if (instance != null && AutoRegister) { I.EventBroker.Register(instance); }
 
             return instance;
@@ -35,7 +35,7 @@ namespace Hermit
 
         public static object Resolve(Type type, string id = null)
         {
-            var instance = I.Context.Container.Resolve(type, id);
+            var instance = I.RootContainer.Resolve(type, id);
             if (instance != null && AutoRegister) { I.EventBroker.Register(instance); }
 
             return instance;
@@ -43,7 +43,7 @@ namespace Hermit
 
         public static T Create<T>(string id = null) where T : class
         {
-            var instance = I.Context.Container.Create<T>(id);
+            var instance = I.RootContainer.Create<T>(id);
             if (instance != null && AutoRegister) { I.EventBroker.Register(instance); }
 
             return instance;
@@ -51,7 +51,7 @@ namespace Hermit
 
         public static T Singleton<T>(string id = null) where T : class
         {
-            var instance = I.Context.Container.Singleton<T>(id);
+            var instance = I.RootContainer.Singleton<T>(id);
             if (instance != null && AutoRegister) { I.EventBroker.Register(instance); }
 
             return instance;
@@ -59,7 +59,7 @@ namespace Hermit
 
         public static T Instance<T>(string id = null) where T : class
         {
-            var instance = I.Context.Container.Instance<T>(id);
+            var instance = I.RootContainer.Instance<T>(id);
             if (instance != null && AutoRegister) { I.EventBroker.Register(instance); }
 
             return instance;
@@ -67,7 +67,7 @@ namespace Hermit
 
         public static T Resolve<T>(string id = null) where T : class
         {
-            var instance = I.Context.Container.Resolve<T>(id);
+            var instance = I.RootContainer.Resolve<T>(id);
 
             if (instance != null && AutoRegister) { I.EventBroker.Register(instance); }
 
@@ -76,7 +76,7 @@ namespace Hermit
 
         public static T Inject<T>(T target)
         {
-            var instance = I.Context.Container.Inject(target);
+            var instance = I.RootContainer.Inject(target);
             if (instance != null && AutoRegister) { I.EventBroker.Register(instance); }
 
             return instance;
@@ -84,7 +84,7 @@ namespace Hermit
 
         public static void InjectGameObject(GameObject target)
         {
-            var context = I.Context.Container;
+            var context = I.RootContainer;
             var behaviours = target.GetComponents<MonoBehaviour>();
             foreach (var monoBehaviour in behaviours)
             {

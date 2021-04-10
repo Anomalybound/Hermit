@@ -34,7 +34,7 @@ namespace Hermit.Views
                 return viewAttribute;
             }
 
-            Her.Error($"View attribute not found on [{type.FullName}].");
+            App.Error($"View attribute not found on [{type.FullName}].");
 
             return null;
         }

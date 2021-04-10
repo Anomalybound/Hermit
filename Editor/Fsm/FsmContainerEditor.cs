@@ -18,8 +18,11 @@ namespace Hermit.Fsm
         public override void OnInspectorGUI()
         {
             base.OnInspectorGUI();
-            
+
             serializedObject.Update();
+                
+            EditorGUILayout.Space();
+            EditorGUILayout.LabelField("Controller Options", EditorStyles.boldLabel); 
 
             using (var check = new EditorGUI.ChangeCheckScope())
             {

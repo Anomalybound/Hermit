@@ -2,6 +2,7 @@ using System;
 using System.Reflection;
 using Hermit.Views;
 using UnityEngine;
+using UnityEngine.UI;
 using Component = UnityEngine.Component;
 
 namespace Hermit.DataBinding
@@ -30,7 +31,7 @@ namespace Hermit.DataBinding
             if (dataProviderComponent != null && dataProviderComponent is IViewModelProvider provider)
             {
                 DataProvider = provider;
-                
+
                 if (DataProvider.GetViewModel() != null)
                 {
                     IsDataReady = true;
@@ -56,7 +57,7 @@ namespace Hermit.DataBinding
         protected virtual void OnDestroy()
         {
             if (DataProvider != null) { DataProvider.OnDataReady -= OnDataReady; }
-            
+
             DataProvider?.DataBindings.Remove(this);
         }
 
@@ -91,20 +92,11 @@ namespace Hermit.DataBinding
             Connect();
         }
 
-        public virtual void SetupBinding()
-        {
-            ViewModel = DataProvider.GetViewModel();
-        }
+        public virtual void SetupBinding() { ViewModel = DataProvider.GetViewModel(); }
 
-        public virtual void Connect()
-        {
-            IsBindingConnected = true;
-        }
+        public virtual void Connect() { IsBindingConnected = true; }
 
-        public virtual void Disconnect()
-        {
-            IsBindingConnected = false;
-        }
+        public virtual void Disconnect() { IsBindingConnected = false; }
 
         public abstract void UpdateBinding();
 
@@ -122,7 +114,7 @@ namespace Hermit.DataBinding
 
             if (typeName.Length == 0 || memberName.Length == 0)
             {
-                Her.Error($"Bad formatting! Expected [<type-name>.<member-name>]: {entry} ");
+                App.Error($"Bad formatting! Expected [<type-name>.<member-name>]: {entry} ");
                 return (null, null);
             }
 
@@ -136,7 +128,7 @@ namespace Hermit.DataBinding
             var viewMemberInfos = viewModel.GetType().GetMember(memberName);
             if (viewMemberInfos.Length <= 0)
             {
-                Her.Error($"Can't find member of name: {memberName} on {viewModel}.");
+                App.Error($"Can't find member of name: {memberName} on {viewModel}.");
                 return null;
             }
 
@@ -149,23 +141,30 @@ namespace Hermit.DataBinding
         {
             var (typeName, memberName) = ParseEntry2TypeMember(entry);
 
-            var component = viewProvider.GetComponent(typeName);
-            if (component == null)
+            var type = AssemblyHelper.GetTypeInAppDomain(typeName);
+            var components = viewProvider.GetComponents(type);
+            if (components == null)
             {
-                Her.Error($"Can't find component of type: {typeName} on {viewProvider}.");
+                App.Error($"Can't find component of type: {typeName} on {viewProvider}.");
                 return (null, null);
             }
 
-            var viewMemberInfos = component.GetType().GetMember(memberName);
-            if (viewMemberInfos.Length <= 0)
+            for (var i = 0; i < components.Length; i++)
             {
-                Her.Error($"Can't find member of name: {memberName} on {component}.");
-                return (null, null);
+                var component = components[i];
+
+                var viewMemberInfos = component.GetType().GetMember(memberName);
+                if (viewMemberInfos.Length <= 0)
+                {
+                    App.Error($"Can't find member of name: {memberName} on {component}.");
+                    continue;
+                }
+
+                var memberInfo = viewMemberInfos[0];
+                return (component, memberInfo);
             }
 
-            var memberInfo = viewMemberInfos[0];
-
-            return (component, memberInfo);
+            return (null, null);
         }
 
         #endregion

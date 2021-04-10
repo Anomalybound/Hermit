@@ -2,7 +2,7 @@ using Hermit.Views;
 
 namespace Hermit
 {
-    public partial class Her
+    public partial class App
     {
         public static IView GetView(ulong id)
         {

@@ -94,7 +94,7 @@ namespace Hermit.DataBinding
         {
             if (string.IsNullOrEmpty(CollectionHandlerTypeName)) { return; }
 
-            ChangedHandler = Her.Resolve<IViewCollectionChangedHandler>(CollectionHandlerTypeName);
+            ChangedHandler = App.Resolve<IViewCollectionChangedHandler>(CollectionHandlerTypeName);
             ChangedHandler.SetUp(ViewTemplate, viewContainer);
         }
 

@@ -19,7 +19,7 @@ namespace Hermit.DataBinding
 
         public DefaultCollectionChangedHandler()
         {
-            ViewManager = Her.Resolve<IViewManager>();
+            ViewManager = App.Resolve<IViewManager>();
         }
 
         public void SetUp(GameObject viewTemplate, Transform viewContainer)

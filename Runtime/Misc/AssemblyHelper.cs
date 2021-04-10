@@ -47,7 +47,18 @@ namespace Hermit
                 return ret;
             }
 
-            return null;
+            var uiType = GetTypeInUGUIAppDomain(typeName);
+            return uiType != null ? uiType : null;
+        }
+
+        private static Type GetTypeInUGUIAppDomain(string typeName)
+        {
+            var uguiAssembly = typeof(UnityEngine.UI.Text).Assembly;
+            var uiType = uguiAssembly.GetType($"UnityEngine.UI.{typeName}");
+            if (uiType == null) { return null; }
+
+            TypeNameLookup[typeName] = uiType;
+            return uiType;
         }
     }
 }

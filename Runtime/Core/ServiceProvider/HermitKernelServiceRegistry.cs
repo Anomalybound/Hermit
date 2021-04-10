@@ -22,9 +22,9 @@ namespace Hermit.ServiceProvider
         public override void RegisterBindings(IDependencyContainer container)
         {
             // Built-in Services
-            container.Bind<IMessageHub>().To<MessageHub>().FromInstance(Her.I.MessageHub);
-            container.Bind<IEventBroker>().To<EventBroker>().FromInstance(Her.I.EventBroker);
-            container.Bind<ILog>().To<UnityLog>().FromInstance(Her.I.Logger);
+            container.Bind<IMessageHub>().To<MessageHub>().FromInstance(App.I.MessageHub);
+            container.Bind<IEventBroker>().To<EventBroker>().FromInstance(App.I.EventBroker);
+            container.Bind<ILog>().To<UnityLog>().FromInstance(App.I.Logger);
             container.Bind<IStore>().To<DictionaryStore>().FromInstance(DictionaryStore.Instance);
 
             // View
@@ -33,7 +33,7 @@ namespace Hermit.ServiceProvider
             container.Bind<IViewFactory>().To<DefaultViewFactory>();
 
             // Essentials
-            container.BindAll<Her>().FromInstance(Her.I);
+            container.BindAll<App>().FromInstance(App.I);
             container.Bind<HermitGeneralSettings>().FromInstance(settings);
             container.BindInstance(container);
         }

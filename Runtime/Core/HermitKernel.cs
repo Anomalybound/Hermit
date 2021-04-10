@@ -13,11 +13,11 @@ namespace Hermit
             {
                 instance = this;
                 base.Awake();
-                Inject(Her.I);
+                Inject(App.I);
             }
             else
             {
-                Her.Warn("HermitKernel can only have one instance.");
+                App.Warn("HermitKernel can only have one instance.");
                 Destroy(gameObject);
             }
         }

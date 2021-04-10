@@ -11,7 +11,7 @@ namespace Hermit.Views
 
         protected DefaultViewFactory()
         {
-            _viewLoader = Her.Resolve<IViewLoader>();
+            _viewLoader = App.Resolve<IViewLoader>();
         }
 
         public async UniTask<IView> CreateInstance<TView>() where TView : IView

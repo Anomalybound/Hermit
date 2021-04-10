@@ -27,7 +27,9 @@ namespace Hermit.DataBinding
 
         private void Awake()
         {
-            var container = Contexts.GlobalContext.Container;
+            if (App.I == null) { return; }
+
+            var container = App.I.RootContainer;
 
             if (target == null) { return; }
 
@@ -41,8 +43,7 @@ namespace Hermit.DataBinding
                 case BindingRegisterType.BindAll:
                     bindingInfo = container.BindAll(target.GetType()).FromInstance(target);
                     break;
-                default:
-                    throw new ArgumentOutOfRangeException();
+                default: throw new ArgumentOutOfRangeException();
             }
 
             switch (asScope)
@@ -53,8 +54,7 @@ namespace Hermit.DataBinding
                 case AsType.Transient:
                     bindingInfo.AsTransient();
                     break;
-                default:
-                    throw new ArgumentOutOfRangeException();
+                default: throw new ArgumentOutOfRangeException();
             }
 
             bindingInfo.WithId(bindingId.Trim());

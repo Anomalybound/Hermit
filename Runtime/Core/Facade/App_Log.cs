@@ -3,7 +3,7 @@ namespace Hermit
     /// <summary>
     ///  Her.Log would be available anytime.
     /// </summary>
-    public partial class Her
+    public partial class App
     {
         public static void Log(object message)
         {

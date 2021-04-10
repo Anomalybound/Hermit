@@ -100,7 +100,7 @@ namespace Hermit.DataBinding
         {
             if (string.IsNullOrEmpty(viewModelAdapterTypeString)) { return; }
 
-            ViewModelAdapterInstance = Her.Resolve<IAdapter>(viewModelAdapterTypeString);
+            ViewModelAdapterInstance = App.Resolve<IAdapter>(viewModelAdapterTypeString);
         }
 
         protected void BindViewModel2ViewEvent()

@@ -18,7 +18,7 @@ namespace Hermit.DataBinding
         {
             if (storeValue == null || string.IsNullOrEmpty(storeId) || string.IsNullOrEmpty(storeKey)) { return; }
 
-            var store = Her.GetStore(storeId);
+            var store = App.GetStore(storeId);
             store.Set(storeKey, storeValue);
         }
     }

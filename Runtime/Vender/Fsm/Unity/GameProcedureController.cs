@@ -38,7 +38,7 @@ namespace Hermit.Fsm
 
             foreach (var type in types)
             {
-                if (!(Her.Create(type) is GameProcedure<TProcedureController, TProcedureIndex> instance))
+                if (!(App.Create(type) is GameProcedure<TProcedureController, TProcedureIndex> instance))
                 {
                     continue;
                 }
@@ -71,7 +71,7 @@ namespace Hermit.Fsm
             else
             {
                 var first = procedures[0].Index;
-                Her.Warn($"Procedure of [{InitState}] is no available, change to {first} instead.");
+                App.Warn($"Procedure of [{InitState}] is no available, change to {first} instead.");
                 ChangeState(first);
             }
 

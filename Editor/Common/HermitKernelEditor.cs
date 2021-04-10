@@ -47,7 +47,7 @@ namespace Hermit.Common
                 _versionDisplay = new GUIStyle(EditorStyles.helpBox) {alignment = TextAnchor.MiddleCenter};
             }
 
-            EditorGUILayout.LabelField($"Hermit Version: {Her.Version}", _versionDisplay);
+            EditorGUILayout.LabelField($"Hermit Version: {App.Version}", _versionDisplay);
             using var check = new EditorGUI.ChangeCheckScope();
             EditorGUILayout.PropertyField(serializedObject.FindProperty("injectSceneObjects"), true);
             EditorGUILayout.PropertyField(serializedObject.FindProperty("serviceProviders"), true);

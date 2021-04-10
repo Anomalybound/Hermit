@@ -14,12 +14,11 @@ namespace Hermit.Injection
 
         public IDependencyContainer Container { get; private set; }
 
-        protected readonly List<ServiceRegistryBase> ServiceProviderBases = new List<ServiceRegistryBase>();
+        protected readonly List<ServiceRegistryBase> serviceProviderBases = new List<ServiceRegistryBase>();
 
         protected virtual void Awake()
         {
             Container = new DiContainer();
-            Contexts.SetActiveContext(this);
             
             RegisterServices();
             InitServices();
@@ -82,7 +81,7 @@ namespace Hermit.Injection
                 provider.Initialization(Container);
             }
 
-            foreach (var serviceProviderBase in ServiceProviderBases)
+            foreach (var serviceProviderBase in serviceProviderBases)
             {
                 if (serviceProviderBase == null) { return; }
 
@@ -93,13 +92,13 @@ namespace Hermit.Injection
         private void RegisterInternalServiceProviders()
         {
             // internal
-            ServiceProviderBases.Add(new HermitDataBindingServiceRegistry());
+            serviceProviderBases.Add(new HermitDataBindingServiceRegistry());
 
             // custom service providers
             RegisterServiceProviderBases();
 
             // register
-            foreach (var serviceProvider in ServiceProviderBases) { serviceProvider.RegisterBindings(Container); }
+            foreach (var serviceProvider in serviceProviderBases) { serviceProvider.RegisterBindings(Container); }
         }
 
         #region Imeplementation of IContext

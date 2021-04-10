@@ -41,10 +41,10 @@ namespace Hermit.Views
                 case ViewModelProvideType.Manual:
                     break;
                 case ViewModelProvideType.AutoCreate:
-                    videModelInstance = Her.Create(AssemblyHelper.GetTypeInAppDomain(viewModelTypeString));
+                    videModelInstance = App.Create(AssemblyHelper.GetTypeInAppDomain(viewModelTypeString));
                     break;
                 case ViewModelProvideType.AutoResolve:
-                    videModelInstance = Her.Resolve(AssemblyHelper.GetTypeInAppDomain(viewModelTypeString));
+                    videModelInstance = App.Resolve(AssemblyHelper.GetTypeInAppDomain(viewModelTypeString));
                     break;
                 default:
                     throw new ArgumentOutOfRangeException();
@@ -65,7 +65,7 @@ namespace Hermit.Views
         /// </summary>
         public void SetUpViewInfo()
         {
-            ViewManager = Her.Resolve<IViewManager>();
+            ViewManager = App.Resolve<IViewManager>();
             ViewId = ViewManager.Register(this);
         }
 
@@ -87,7 +87,7 @@ namespace Hermit.Views
         public void SetViewModel(object context)
         {
             if (context is ViewModel viewModel) { DataContext = viewModel; }
-            else { Her.Warn($"{context} is not a ViewModel."); }
+            else { App.Warn($"{context} is not a ViewModel."); }
 
             OnDataReady?.Invoke();
             ReBindAll();

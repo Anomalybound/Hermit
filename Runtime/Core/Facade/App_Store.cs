@@ -4,7 +4,7 @@ using Hermit.Service.Stores;
 
 namespace Hermit
 {
-    public partial class Her
+    public partial class App
     {
         private readonly Dictionary<string, IStore> _stores = new Dictionary<string, IStore>();
 

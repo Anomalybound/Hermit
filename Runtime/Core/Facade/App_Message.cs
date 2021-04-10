@@ -3,7 +3,7 @@ using Hermit.Service.Messages;
 
 namespace Hermit
 {
-    public partial class Her
+    public partial class App
     {
         public static void Publish<T>(T payloads)
         {

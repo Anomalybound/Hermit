@@ -22,7 +22,7 @@ namespace Hermit.Views
         /// </summary>
         public virtual void SetUpViewInfo()
         {
-            ViewManager = Her.Resolve<IViewManager>();
+            ViewManager = App.Resolve<IViewManager>();
             ViewId = ViewManager.Register(this);
         }
 
@@ -50,7 +50,7 @@ namespace Hermit.Views
         public void SetViewModel(object context)
         {
             if (context is TViewModel viewModel) { DataContext = viewModel; }
-            else { Her.Warn($"{context} is not matching {typeof(TViewModel)}"); }
+            else { App.Warn($"{context} is not matching {typeof(TViewModel)}"); }
 
             OnDataReady?.Invoke();
             ReBindAll();

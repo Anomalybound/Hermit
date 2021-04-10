@@ -2,16 +2,16 @@ using Cysharp.Threading.Tasks;
 
 namespace Hermit
 {
-    public partial class Her
+    public partial class App
     {
         #region Registeration
 
-        public static void Listen(object obj)
+        public static void RegisterListener(object obj)
         {
             I.EventBroker.Register(obj);
         }
 
-        public static void UnListen(object obj)
+        public static void UnRegisterListener(object obj)
         {
             I.EventBroker.Unregister(obj);
         }
